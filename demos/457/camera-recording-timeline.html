@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Camera recording runs around the clock with a day timeline</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+  .hours { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; }
+  .hours .chip[data-gap="true"] { border-style: dashed; color: var(--onv); }
+  .hours .chip[aria-pressed="true"] { outline: 2px solid var(--p); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="camera-recording-timeline">
+  <h1>Camera recording runs around the clock with a day timeline</h1>
+  <p class="muted">Choose an hour on the timeline, filter the events, and change the playback speed.</p>
+
+  <section class="card stack" aria-labelledby="timeline-heading">
+    <h2 id="timeline-heading">Day timeline (pretend camera: Front door)</h2>
+    <p class="small muted">Solid hours have recorded footage. Dashed hours are gaps with no footage.</p>
+    <div id="hours" class="hours" role="group" aria-label="Hours of the day"></div>
+  </section>
+
+  <section class="card stack" aria-labelledby="player-heading">
+    <h2 id="player-heading">Playback</h2>
+    <p id="player" class="note" aria-live="polite">No moment chosen yet.</p>
+    <div class="row">
+      <label class="field" for="speed">Speed</label>
+      <select id="speed">
+        <option value="0.5">0.5x</option>
+        <option value="1" selected>1x</option>
+        <option value="2">2x</option>
+      </select>
+    </div>
+  </section>
+
+  <section class="card stack" aria-labelledby="events-heading">
+    <h2 id="events-heading">Events of this camera</h2>
+    <label class="field" for="kind">Show events</label>
+    <select id="kind">
+      <option value="all">All kinds</option>
+      <option value="Zoom">Zoom</option>
+      <option value="Filter">Filter</option>
+      <option value="Keyboard control">Keyboard control</option>
+    </select>
+    <p id="event-count" class="small muted" aria-live="polite"></p>
+    <ul id="events" class="list"></ul>
+  </section>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var gapHours = { 6: true, 12: true, 18: true };
+  var events = [
+    { hour: 8, at: '08:30', kind: 'Zoom' },
+    { hour: 10, at: '10:15', kind: 'Filter' },
+    { hour: 14, at: '14:40', kind: 'Keyboard control' },
+    { hour: 20, at: '20:05', kind: 'Zoom' }
+  ];
+  var hoursBox = document.getElementById('hours');
+  var player = document.getElementById('player');
+  var speed = document.getElementById('speed');
+  var kind = document.getElementById('kind');
+  var eventsList = document.getElementById('events');
+  var eventCount = document.getElementById('event-count');
+  var chosen = null;
+
+  function pad(h) { return (h < 10 ? '0' : '') + h + ':00'; }
+
+  function describe() {
+    if (chosen === null) {
+      player.textContent = 'No moment chosen yet.';
+      return;
+    }
+    var label = pad(chosen);
+    if (gapHours[chosen]) {
+      player.textContent = label + ' is a gap: no footage was recorded in this hour (pretend).';
+    } else {
+      player.textContent = 'Playing from ' + label + ' at ' + speed.value + 'x (pretend playback).';
+    }
+  }
+
+  function buildHours() {
+    hoursBox.textContent = '';
+    for (var h = 0; h < 24; h++) {
+      (function (hour) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'chip';
+        b.dataset.gap = gapHours[hour] ? 'true' : 'false';
+        b.setAttribute('aria-pressed', chosen === hour ? 'true' : 'false');
+        b.textContent = pad(hour) + (gapHours[hour] ? ' gap' : ' recorded');
+        b.addEventListener('click', function () {
+          chosen = hour;
+          buildHours();
+          describe();
+        });
+        hoursBox.appendChild(b);
+      })(h);
+    }
+  }
+
+  function renderEvents() {
+    var filter = kind.value;
+    var shown = events.filter(function (e) { return filter === 'all' || e.kind === filter; });
+    eventsList.textContent = '';
+    eventCount.textContent = shown.length + ' event(s) shown.';
+    shown.forEach(function (e) {
+      var li = document.createElement('li');
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'chip';
+      b.textContent = e.at + ' ' + e.kind + ': go to this hour';
+      b.addEventListener('click', function () {
+        chosen = e.hour;
+        buildHours();
+        describe();
+      });
+      li.appendChild(b);
+      eventsList.appendChild(li);
+    });
+  }
+
+  speed.addEventListener('change', describe);
+  kind.addEventListener('change', renderEvents);
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    chosen = null;
+    speed.value = '1';
+    kind.value = 'all';
+    buildHours();
+    describe();
+    renderEvents();
+  });
+
+  buildHours();
+  describe();
+  renderEvents();
+})();
+</script>
+</body>
+</html>

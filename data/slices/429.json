@@ -1,0 +1,56 @@
+{
+ "build": 429,
+ "core": "2026.11.1.429",
+ "supervisor": "2026.11.0.429",
+ "os": "18.5.429",
+ "tag": "v2026.11.1.429",
+ "source": "716b72745",
+ "date": "2026-11-13T14:02:50-05:00",
+ "previous_build": 425,
+ "changes": [
+  {
+   "sha": "716b72745",
+   "date": "2026-11-13T14:02:50-05:00",
+   "title": "Publish complete guides and fix nested demo asset URLs",
+   "areas": [
+    "build",
+    "docs",
+    "interface"
+   ],
+   "detail": "Render the feature documentation and wiki as linked articles. Resolve sample media beside the demo bundle and include a verified screenshot of the published speech editor."
+  },
+  {
+   "sha": "bb55f1bb6",
+   "date": "2026-11-13T13:46:43-05:00",
+   "title": "Add visual action dictionaries and improve phone workflows",
+   "areas": [
+    "build",
+    "docs",
+    "core",
+    "interface"
+   ],
+   "detail": "Keep declared action controls and expose dictionaries, with speech engine options and a browser demo. Keep the phone navigation visible while scrolling, fit accessibility controls at narrow widths, and add file upload for dashboard resources and touch-friendly media saving."
+  },
+  {
+   "sha": "c3be822e9",
+   "date": "2026-11-13T11:02:10-05:00",
+   "title": "Records: closeout of 13 November, build 425 live",
+   "areas": [
+    "docs"
+   ],
+   "detail": "Documents only; no build is started by this push.\n\n- The live instance runs build 2026.11.1.425 since 11:00 Toronto time, after a browser pass on that exact image with no page errors. - What was seen in that build and what was not is listed; the features of batches 59 and 60 have not yet been used for real in a browser. - Batch 61 is unfinished and says so: what is in it, what is missing, and that its build needs a browser pass before going live. - The next steps are listed in order. Release 422 was read back; the release for build 425 was still building and has not been read back.",
+   "detail_yue": "收工記錄：425 版 11:00 上線，瀏覽器檢查零錯誤。邊樣喺新版見過、邊樣未見， 照實寫低。第 61 批未完成，寫明有乜冇乜。下一步逐項列好。 淨係文件，唔會觸發構建。"
+  },
+  {
+   "sha": "86235d86f",
+   "date": "2026-11-13T10:50:13-05:00",
+   "title": "UNFINISHED: known options for dictionary fields, parts only",
+   "areas": [
+    "core",
+    "interface"
+   ],
+   "detail": "Batch 61, saved unfinished so the work is not lost. Nothing in the interface uses it yet, so behaviour for people is unchanged.\n\nIn this commit - Server: an admin-only websocket command, tts/engine/options, that returns a text-to-speech engine's supported, common and default options. It compiles and has a written test. It has NOT been run against a real server. - Frontend: a model for \"known options\" of a dictionary field (merge by source, value kinds, keys used elsewhere in the home), a loader for the server command, and a catalogue holding only the five tts.speak option keys confirmed in the server source. No unit tests yet.\n\nNot done - The visual dictionary editor does not show known options: no chips, no specific controls, no strings. The action, field and language are not passed to the editor. - Notification data keys were left out on purpose: they are read by the companion app and could not be confirmed in this repository.\n\nChecks: type check at baseline (the two known gallery errors); the Python files compile. The full test suite was not run for this commit.",
+   "detail_yue": "第 61 批，未完成，先保存。字典欄位「已知選項」只做咗底層：伺服器多咗個 讀取語音引擎選項嘅指令（未真係跑過），前端有模型同目錄（未有測試）。 介面完全未接駁，所以用落去同之前一樣。額度就嚟用完，先存檔免得唔見。"
+  }
+ ]
+}

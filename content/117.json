@@ -1,0 +1,41 @@
+{
+  "build": 117,
+  "headline": "Phone tables stop spilling over, and Deploy Assistant pages are tidied",
+  "summary": "Build 117 is a polish pass. The defects were found by opening a running copy of build 115 at 1440 and 390 pixels wide. On a phone, table rows now grow with their stacked columns instead of spilling into the next row, and the page tab strip no longer cuts a tab name in half. Deploy Assistant pages get clearer headers, correct wording for one backup, and a Minecraft server dialog that names only its current step.",
+  "summary_yue": "第 117 版係一次執靚功夫。問題係喺第 115 版嘅運行副本，用 1440 同 390 像素闊度睇出嚟嘅。手機上嘅表格行而家會跟住疊埋嘅欄位一齊長大，唔會溢落下一行；頁面分頁列嘅邊位會淡出，唔會斬開個頁名。Deploy 助手嘅標頭、「1 個備份」嘅寫法，同埋 Minecraft 伺服器對話框，都整好咗。",
+  "highlights": [
+    {
+      "id": "phone-table-rows",
+      "title": "Phone table rows grow with their stacked columns",
+      "areas": ["interface"],
+      "what": "On a phone, the rows of a data table grow with their stacked columns. Before, a second line of text could spill into the row below, as seen on the users and blueprints pages. The page tab strip also fades out at an edge where tabs are scrolled out of view, instead of cutting a tab name in half.",
+      "what_yue": "手機上面，資料表嘅行會跟住疊埋嘅欄位一齊長大。以前第二行字會溢落下一行，用戶同藍圖頁見得最明顯。頁面分頁列嘅邊位而家會淡出，唔會將分頁名斬開一半。",
+      "why": "A second line of text spilling into the next row made a phone table hard to read, and a tab name cut in half looked like a broken page.",
+      "try": [
+        "Press Before to see the defect: the second line of a pretend user runs into the next row.",
+        "Press After to see the row grow to hold its own stacked columns.",
+        "Type in the search box to narrow the pretend users.",
+        "Press Start again to return to the Before view."
+      ],
+      "sha": ["7ecc7c4a7"],
+      "demo": "demos/117/phone-table-rows.html"
+    },
+    {
+      "id": "deploy-assistant-polish",
+      "title": "Deploy Assistant headers, backup counts and the Minecraft dialog steps",
+      "areas": ["deploy"],
+      "what": "An instance card says 1 backup, not 1 backups, and the count follows the number of backups. In the new Minecraft server dialog the current step is named and the other steps show only their number, so the names are no longer cut off. The Instances, Downloads and Extensions pages put their main buttons in the header, and the number steppers now use real buttons.",
+      "what_yue": "實例卡嘅字而家係「1 個備份」，會跟住實際數目變。新嘅 Minecraft 伺服器對話框會話你知而家第幾步叫咩名，其他步就只顯示號碼，所以唔會再被斬走。實例、下載同擴充功能嘅主要掣，而家擺喺標頭入面；數字加減嘅掣亦都係真正嘅掣。",
+      "why": "Wrong plurals and cut-off step names make a setup dialog look careless, and the buttons were hard to find when they sat under the header.",
+      "try": [
+        "Press + and - on the pretend backup count and read the wording change.",
+        "Press Next to move through the pretend setup steps.",
+        "Check that only the current step has a name, and the others show their numbers.",
+        "Press Back and Start again to return to the first step."
+      ],
+      "sha": ["e4425a069"],
+      "demo": "demos/117/deploy-assistant-polish.html"
+    }
+  ],
+  "other": []
+}

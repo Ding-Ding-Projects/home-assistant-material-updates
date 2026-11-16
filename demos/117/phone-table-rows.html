@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phone table rows demo</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+  .phone { max-width: 340px; width: 100%; margin: 0 auto; border: 2px solid var(--outv); border-radius: 24px; padding: 12px; background: var(--sl1); }
+  .users { list-style: none; margin: 0; padding: 0; }
+  .users > li { padding: 10px 0; border-top: 1px solid var(--outv); }
+  .users > li:first-child { border-top: none; }
+  .user-cols { display: flex; flex-direction: column; gap: 4px; }
+  .user-cols span { overflow-wrap: anywhere; }
+  /* Before: the row is fixed at one line high, so its stacked lines spill into the next row. */
+  .users.before > li { height: 44px; overflow: visible; padding-top: 6px; }
+  .users.before .user-cols { height: 44px; overflow: visible; }
+  .strip-demo { display: flex; gap: 12px; overflow: hidden; white-space: nowrap; padding: 8px 0; }
+  .strip-demo .tab { flex: none; padding: 8px 12px; border-radius: 12px; background: var(--sl2); }
+  .fade { -webkit-mask-image: linear-gradient(to right, #000 80%, transparent); mask-image: linear-gradient(to right, #000 80%, transparent); }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="phone-table-rows">
+  <h1>Phone table rows</h1>
+  <p class="muted">Look at the pretend users table at phone width. Switch between the defect and the fixed layout.</p>
+
+  <div class="row">
+    <button type="button" id="before" aria-pressed="true" class="tonal">Before</button>
+    <button type="button" id="after" aria-pressed="false" class="tonal">After</button>
+  </div>
+
+  <section class="phone" aria-labelledby="h-users">
+    <h2 id="h-users" style="font-size:18px">Pretend users</h2>
+    <label class="field" for="search">Search pretend users
+      <input type="search" id="search" autocomplete="off">
+    </label>
+    <ul class="users" id="users" aria-live="polite"></ul>
+    <p class="small muted" id="count"></p>
+  </section>
+
+  <section class="card stack" aria-labelledby="h-tabs">
+    <h2 id="h-tabs" style="font-size:18px">Tab strip</h2>
+    <div class="strip-demo fade" id="tabs">
+      <span class="tab">Pretend page one</span>
+      <span class="tab">Pretend page two</span>
+      <span class="tab">Pretend page three</span>
+      <span class="tab">Pretend page four</span>
+    </div>
+    <p class="small muted">The strip fades at its right edge when tabs are scrolled out of view.</p>
+  </section>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var USERS = [
+    { name: 'Pretend user Ada', role: 'Administrator in the pretend system', seen: 'Seen a long time ago in the pretend log' },
+    { name: 'Pretend user Ben', role: 'Member', seen: 'Seen today' },
+    { name: 'Pretend user Chi', role: 'Member with a very long pretend role name', seen: 'Seen yesterday' },
+    { name: 'Pretend user Dee', role: 'Guest', seen: 'Never seen' }
+  ];
+  var list = document.getElementById('users');
+  var search = document.getElementById('search');
+  var count = document.getElementById('count');
+  var before = document.getElementById('before');
+  var after = document.getElementById('after');
+
+  function setMode(mode) {
+    list.className = 'users ' + mode;
+    before.setAttribute('aria-pressed', mode === 'before' ? 'true' : 'false');
+    after.setAttribute('aria-pressed', mode === 'after' ? 'true' : 'false');
+    before.className = mode === 'before' ? 'filled' : 'tonal';
+    after.className = mode === 'after' ? 'filled' : 'tonal';
+  }
+
+  function render() {
+    var q = search.value.trim().toLowerCase();
+    var shown = USERS.filter(function (u) {
+      return q === '' || (u.name + ' ' + u.role + ' ' + u.seen).toLowerCase().indexOf(q) !== -1;
+    });
+    list.innerHTML = '';
+    shown.forEach(function (u) {
+      var li = document.createElement('li');
+      var cols = document.createElement('div');
+      cols.className = 'user-cols';
+      [u.name, u.role, u.seen].forEach(function (text) {
+        var s = document.createElement('span');
+        s.textContent = text;
+        cols.appendChild(s);
+      });
+      li.appendChild(cols);
+      list.appendChild(li);
+    });
+    count.textContent = 'Showing ' + shown.length + ' of ' + USERS.length + ' pretend users.';
+  }
+
+  before.addEventListener('click', function () { setMode('before'); });
+  after.addEventListener('click', function () { setMode('after'); });
+  search.addEventListener('input', render);
+
+  function reset() {
+    search.value = '';
+    setMode('before');
+    render();
+  }
+  document.querySelectorAll('[data-demo-reset]').forEach(function (b) { b.addEventListener('click', reset); });
+  reset();
+})();
+</script>
+</body>
+</html>

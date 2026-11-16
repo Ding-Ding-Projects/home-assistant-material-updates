@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Link confirmation page</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="link-confirmation-page">
+  <h1>Link confirmation page</h1>
+  <p class="muted">Type a full address, press Continue to reach the confirmation step, then go back or go on. The error log below refuses any link that is not from this site.</p>
+
+  <section class="card stack" id="form-step" aria-labelledby="form-h">
+    <h2 id="form-h" style="font-size:18px;margin:0">Address</h2>
+    <label class="field" for="addr">Address to open
+      <input type="text" id="addr" autocomplete="off" placeholder="https://example.com">
+    </label>
+    <p id="addr-error" class="note error" hidden></p>
+    <div class="row"><button type="button" class="filled" id="continue">Continue</button></div>
+  </section>
+
+  <section class="card stack" id="confirm-step" aria-labelledby="confirm-h" hidden>
+    <h2 id="confirm-h" style="font-size:18px;margin:0">Leave this page?</h2>
+    <p id="confirm-text"></p>
+    <div class="row">
+      <button type="button" class="tonal" id="go-back">Go back</button>
+      <button type="button" class="filled" id="open-it">Open the address</button>
+    </div>
+  </section>
+
+  <section class="card stack" aria-labelledby="log-h">
+    <h2 id="log-h" style="font-size:18px;margin:0">Error log</h2>
+    <div class="row">
+      <button type="button" class="tonal" id="err-outside">Add an error with an outside link</button>
+      <button type="button" class="tonal" id="err-inside">Add an error from this site</button>
+    </div>
+    <ul class="list" id="log" aria-label="Error log entries"></ul>
+  </section>
+
+  <p id="result" class="note" aria-live="polite"></p>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var addr = document.getElementById('addr');
+  var err = document.getElementById('addr-error');
+  var formStep = document.getElementById('form-step');
+  var confirmStep = document.getElementById('confirm-step');
+  var confirmText = document.getElementById('confirm-text');
+  var result = document.getElementById('result');
+  var log = document.getElementById('log');
+  var pending = '';
+  var entries = [];
+
+  function renderLog() {
+    log.innerHTML = '';
+    if (!entries.length) {
+      var empty = document.createElement('li');
+      empty.textContent = 'No entries yet.';
+      log.appendChild(empty);
+      return;
+    }
+    entries.forEach(function (text) {
+      var li = document.createElement('li');
+      li.textContent = text;
+      log.appendChild(li);
+    });
+  }
+
+  function showForm() {
+    confirmStep.hidden = true;
+    formStep.hidden = false;
+    addr.focus();
+  }
+
+  document.getElementById('continue').addEventListener('click', function () {
+    var v = addr.value.trim();
+    if (!/^https?:\/\/\S+$/i.test(v)) {
+      err.hidden = false;
+      err.textContent = 'Type a full address that starts with https:// or http://.';
+      addr.setAttribute('aria-invalid', 'true');
+      result.textContent = 'The address was not accepted. Fix it and press Continue again.';
+      addr.focus();
+      return;
+    }
+    err.hidden = true;
+    addr.removeAttribute('aria-invalid');
+    pending = v;
+    formStep.hidden = true;
+    confirmStep.hidden = false;
+    confirmText.textContent = 'You are about to leave this page for ' + v + '.';
+    document.getElementById('go-back').focus();
+    result.textContent = 'Confirmation step shown. Focus is on Go back.';
+  });
+
+  document.getElementById('go-back').addEventListener('click', function () {
+    showForm();
+    result.textContent = 'Back on the form. The address is still there.';
+  });
+
+  document.getElementById('open-it').addEventListener('click', function () {
+    result.textContent = 'Pretend: ' + pending + ' would open in a new tab. Nothing is opened.';
+  });
+
+  document.getElementById('err-outside').addEventListener('click', function () {
+    result.textContent = 'Refused: that link points outside this site, so no log entry was added. Pretend link: https://outside.example/source.';
+  });
+
+  document.getElementById('err-inside').addEventListener('click', function () {
+    entries.push('Error from this site, linked to this site only.');
+    renderLog();
+    result.textContent = 'Accepted: the error from this site is in the log.';
+  });
+
+  function reset() {
+    entries = [];
+    pending = '';
+    addr.value = '';
+    addr.removeAttribute('aria-invalid');
+    err.hidden = true;
+    formStep.hidden = false;
+    confirmStep.hidden = true;
+    result.textContent = '';
+    renderLog();
+  }
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', reset);
+  reset();
+})();
+</script>
+</body>
+</html>

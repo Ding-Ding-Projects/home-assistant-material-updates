@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tab strip: collapse and float</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.stage { position: relative; height: 320px; border: 1px solid var(--outv); border-radius: 16px; background: var(--sl1); overflow: hidden; }
+.page { position: absolute; inset: 0; padding: 16px; font-size: 14px; color: var(--onv); }
+.strip { position: absolute; display: flex; gap: 4px; padding: 6px; box-sizing: border-box; background: var(--sl0); border: 1px solid var(--outv); border-radius: 16px; }
+.strip[data-pos="top"], .strip[data-pos="bottom"] { border-radius: 0; }
+.strip[data-pos="left"], .strip[data-pos="right"] { border-radius: 0; }
+.strip[data-pos="float"] { z-index: 2; box-shadow: 0 4px 16px rgba(0,0,0,.2); }
+.tab { display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 10px; border: 0; border-radius: 12px; background: transparent; color: var(--on); font-size: 14px; white-space: nowrap; overflow: hidden; }
+.tab[aria-current="true"] { background: var(--sc); color: var(--on-sc); }
+.tab .icon { font-size: 18px; width: 24px; text-align: center; flex: none; }
+.strip.collapsed .name { display: none; }
+.strip.collapsed .tab { justify-content: center; padding: 0; }
+.handle { min-height: 48px; border: 0; background: transparent; color: var(--onv); font-size: 14px; }
+.strip[data-pos="top"], .strip[data-pos="bottom"] { flex-direction: row; }
+.strip[data-pos="left"], .strip[data-pos="right"], .strip[data-pos="float"] { flex-direction: column; }
+.strip[data-pos="top"] .tab, .strip[data-pos="bottom"] .tab { flex: 0 0 auto; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="tab-strip-collapse-and-float">
+  <h1>Tab strip: collapse to icons and float anywhere</h1>
+  <p class="muted">Choose where the strip sits, collapse it to icons, then drag the floating strip by its handle or move it with the arrow keys.</p>
+
+  <section class="card stack" aria-labelledby="pos-h">
+    <h2 id="pos-h" style="font-size:18px;margin:0">Position</h2>
+    <div class="row" role="group" aria-label="Tab strip position">
+      <button type="button" class="chip" data-pos="top" aria-pressed="false">Top</button>
+      <button type="button" class="chip" data-pos="bottom" aria-pressed="false">Bottom</button>
+      <button type="button" class="chip" data-pos="left" aria-pressed="false">Left</button>
+      <button type="button" class="chip" data-pos="right" aria-pressed="false">Right</button>
+      <button type="button" class="chip" data-pos="float" aria-pressed="false">Float</button>
+    </div>
+    <label class="row" for="collapse">
+      <input type="checkbox" class="switch" id="collapse">
+      <span>Collapse to icons</span>
+    </label>
+  </section>
+
+  <section class="card" aria-label="Preview">
+    <div class="stage" id="stage">
+      <div class="page" id="page"></div>
+      <div class="strip" id="strip" data-pos="top">
+        <button type="button" class="handle" id="handle" aria-label="Drag handle for the floating strip. Use the arrow keys to move it; hold Shift for bigger steps.">Drag handle</button>
+      </div>
+    </div>
+  </section>
+
+  <p id="result" class="note good" aria-live="polite"></p>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var TABS = [
+    { name: 'Overview', icon: '⌂' },
+    { name: 'Energy', icon: '⚡' },
+    { name: 'Automations', icon: '⚙' },
+    { name: 'Settings', icon: '☰' },
+    { name: 'Tools', icon: '⚒' }
+  ];
+  var INITIAL = { pos: 'top', collapsed: false, x: 0.6, y: 0.1, current: 0 };
+  var BAR = 56, PAD = 16;
+  var LABELS = { top: 'top', bottom: 'bottom', left: 'left', right: 'right', float: 'floating over the page' };
+  var state = {};
+  var stage = document.getElementById('stage');
+  var strip = document.getElementById('strip');
+  var page = document.getElementById('page');
+  var handle = document.getElementById('handle');
+  var collapse = document.getElementById('collapse');
+  var result = document.getElementById('result');
+  var chips = document.querySelectorAll('[data-pos]');
+  var dragging = false;
+
+  function clamp01(v) { return Math.max(0, Math.min(1, v)); }
+
+  function buildTabs() {
+    strip.querySelectorAll('.tab').forEach(function (n) { n.remove(); });
+    TABS.forEach(function (t, i) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'tab';
+      b.setAttribute('aria-label', t.name);
+      b.setAttribute('title', t.name);
+      b.dataset.index = String(i);
+      var ic = document.createElement('span');
+      ic.className = 'icon';
+      ic.setAttribute('aria-hidden', 'true');
+      ic.textContent = t.icon;
+      var nm = document.createElement('span');
+      nm.className = 'name';
+      nm.textContent = t.name;
+      b.appendChild(ic);
+      b.appendChild(nm);
+      b.addEventListener('click', function () {
+        state.current = i;
+        render();
+      });
+      strip.appendChild(b);
+    });
+  }
+
+  function render() {
+    var W = stage.clientWidth;
+    var H = stage.clientHeight;
+    var side = Math.min(state.collapsed ? 64 : 200, Math.floor(W * 0.4));
+    var pad = { top: PAD, right: PAD, bottom: PAD, left: PAD };
+    var st = { left: '', right: '', top: '', bottom: '', width: '', height: '' };
+
+    strip.dataset.pos = state.pos;
+    strip.classList.toggle('collapsed', state.collapsed);
+    handle.hidden = state.pos !== 'float';
+
+    if (state.pos === 'top') {
+      st.left = '0'; st.right = '0'; st.top = '0'; st.width = '100%'; st.height = BAR + 'px';
+      pad.top = BAR + PAD;
+    } else if (state.pos === 'bottom') {
+      st.left = '0'; st.right = '0'; st.bottom = '0'; st.width = '100%'; st.height = BAR + 'px';
+      pad.bottom = BAR + PAD;
+    } else if (state.pos === 'left') {
+      st.left = '0'; st.top = '0'; st.bottom = '0'; st.width = side + 'px'; st.height = 'auto';
+      pad.left = side + PAD;
+    } else if (state.pos === 'right') {
+      st.right = '0'; st.top = '0'; st.bottom = '0'; st.width = side + 'px'; st.height = 'auto';
+      pad.right = side + PAD;
+    } else {
+      st.width = side + 'px'; st.height = 'auto';
+    }
+
+    applyStyle(st);
+
+    if (state.pos === 'float') {
+      var sh = strip.offsetHeight;
+      var left = Math.round(state.x * Math.max(0, W - side));
+      var top = Math.round(state.y * Math.max(0, H - sh));
+      left = Math.max(0, Math.min(left, W - side));
+      top = Math.max(0, Math.min(top, H - sh));
+      applyStyle({ left: left + 'px', top: top + 'px' });
+    }
+
+    page.style.paddingTop = pad.top + 'px';
+    page.style.paddingRight = pad.right + 'px';
+    page.style.paddingBottom = pad.bottom + 'px';
+    page.style.paddingLeft = pad.left + 'px';
+    page.textContent = 'Showing: ' + TABS[state.current].name + '. This is pretend page content.';
+
+    strip.querySelectorAll('.tab').forEach(function (b, i) {
+      b.setAttribute('aria-current', i === state.current ? 'true' : 'false');
+    });
+
+    chips.forEach(function (c) {
+      if (c.dataset.pos) c.setAttribute('aria-pressed', c.dataset.pos === state.pos ? 'true' : 'false');
+    });
+    collapse.checked = state.collapsed;
+
+    var text = 'Strip at the ' + LABELS[state.pos] + '. ' + (state.collapsed ? 'Icons only.' : 'Names shown.');
+    if (state.pos === 'float') {
+      text += ' Position: ' + Math.round(state.x * 100) + '% across, ' + Math.round(state.y * 100) + '% down.';
+    }
+    result.textContent = text;
+  }
+
+  function applyStyle(obj) {
+    Object.keys(obj).forEach(function (k) { strip.style[k] = obj[k]; });
+  }
+
+  function reset() {
+    state = { pos: INITIAL.pos, collapsed: INITIAL.collapsed, x: INITIAL.x, y: INITIAL.y, current: INITIAL.current };
+    render();
+  }
+
+  chips.forEach(function (c) {
+    if (!c.dataset.pos) return;
+    c.addEventListener('click', function () {
+      state.pos = c.dataset.pos;
+      render();
+    });
+  });
+
+  collapse.addEventListener('change', function () {
+    state.collapsed = collapse.checked;
+    render();
+  });
+
+  handle.addEventListener('pointerdown', function (e) {
+    if (state.pos !== 'float') return;
+    dragging = true;
+    handle.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+  handle.addEventListener('pointermove', function (e) {
+    if (!dragging) return;
+    var r = stage.getBoundingClientRect();
+    var side = Math.min(state.collapsed ? 64 : 200, Math.floor(r.width * 0.4));
+    state.x = clamp01((e.clientX - r.left - side / 2) / Math.max(1, r.width - side));
+    state.y = clamp01((e.clientY - r.top - 24) / Math.max(1, r.height - 80));
+    render();
+  });
+  handle.addEventListener('pointerup', function () { dragging = false; });
+  handle.addEventListener('pointercancel', function () { dragging = false; });
+
+  handle.addEventListener('keydown', function (e) {
+    if (state.pos !== 'float') return;
+    var step = e.shiftKey ? 0.15 : 0.05;
+    if (e.key === 'ArrowLeft') state.x -= step;
+    else if (e.key === 'ArrowRight') state.x += step;
+    else if (e.key === 'ArrowUp') state.y -= step;
+    else if (e.key === 'ArrowDown') state.y += step;
+    else return;
+    e.preventDefault();
+    state.x = clamp01(state.x);
+    state.y = clamp01(state.y);
+    render();
+  });
+
+  window.addEventListener('resize', render);
+  document.querySelector('[data-demo-reset]').addEventListener('click', reset);
+
+  buildTabs();
+  reset();
+})();
+</script>
+</body>
+</html>

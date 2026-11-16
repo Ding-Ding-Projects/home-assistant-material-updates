@@ -1,0 +1,24 @@
+{
+ "build": 123,
+ "core": "2026.11.1.123",
+ "supervisor": "2026.11.0.123",
+ "os": "18.5.123",
+ "tag": "v2026.11.1.123",
+ "source": "003ecf227",
+ "date": "2026-11-11T21:22:46-05:00",
+ "previous_build": 122,
+ "changes": [
+  {
+   "sha": "003ecf227",
+   "date": "2026-11-11T21:22:46-05:00",
+   "title": "Fix the toast regression of build 122; operating system update end state; host controls; pass fixes",
+   "areas": [
+    "docs",
+    "core",
+    "interface"
+   ],
+   "detail": "- Toasts: a stacked toast kept the fixed toast's offsets and was pushed sideways and upward, with its buttons off a phone screen. It is placed by the stack only now. Measured in a local build at 390, 320 and 1440 px. Build 122 should be skipped. - Updates: an operating system update is staged and takes effect after a restart, but was reported as finished at once. It now ends with \"Installed. Restart to finish\", Restart now and Later, checks the running version after the restart and says so if the old one came back. - Host: reboot, shutdown and moving the data disk are offered only where the Supervisor lists them; the app store's Repositories page shows the built-in repositories. - From the browser pass on build 122: toolbar chips, row checkbox reach, the \"Shown\" count following the search, sub-tab labels, page catalog titles, the automation editor's bottom bar, the Blueprints note, dark bar contrast, dialog button heights, and the reason a blueprint could not be fetched (server side, with tests). - Full mode documentation: the copy command sets the core's port to 80, and the notes reflect the run with the published images of release 122.\n\nChecked: type check clean; 6,301 frontend t",
+   "detail_yue": "122 版出咗個烏龍：啲提示訊息成舊飛咗去右上角，手機度粒掣出晒界。而家由 疊羅漢嗰個容器擺位，返返正中。作業系統更新之前啱啱開始就話「搞掂」，其實 未重新開機，而家老老實實話「裝好咗，重開先至生效」。仲有瀏覽器逐樣度返 嘅一輪執漏，同埋完整模式搬家指令補返改埠嗰步。"
+  }
+ ]
+}

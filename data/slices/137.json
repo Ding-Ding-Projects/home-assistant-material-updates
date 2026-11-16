@@ -1,0 +1,66 @@
+{
+ "build": 137,
+ "core": "2026.11.1.137",
+ "supervisor": "2026.11.0.137",
+ "os": "18.5.137",
+ "tag": "v2026.11.1.137",
+ "source": "55d9604cf",
+ "date": "2026-11-12T12:34:16-05:00",
+ "previous_build": 132,
+ "changes": [
+  {
+   "sha": "55d9604cf",
+   "date": "2026-11-12T12:34:16-05:00",
+   "title": "Fixes from the viewing pass on build 131, and what that pass saw",
+   "areas": [
+    "docs",
+    "interface"
+   ],
+   "detail": "Batch 40. Published build 131 was driven on three throwaway instances (headless, pictures inspected). Most of what was waiting to be seen works; the roadmap is ticked for exactly that and nothing more. The pass also found defects, fixed here in source and unit tested, not yet seen.\n\n- The link confirmation page threw an error because it focused a button that had not rendered yet, and the error log then fetched a source file from an outside host to explain the stack trace. A page whose whole job is asking before anything leaves should not phone anyone first. Fixed, and the error log now refuses any address that is not this instance's own origin, with a test. - Locks: list rows stack in the narrow panel instead of printing a path one letter per line; the remove prompt stays inside the window; wizard step 2 scrolls above its buttons. The School mode switch waits for the PIN before it shows on. - Appearance: a fill on a data table was hidden under the table's own white surface. Automation editor: one set of Run now and Check instead of three; trace page title and run picker; room under the sticky search. Colour tool: its two names are labelled. - Phone and language: bar labels stack at",
+   "detail_yue": "第 40 批。喺三個用完即棄嘅 131 版本上面逐樣睇過，大部分等緊「未睇過」 嘅功能都真係得，路線圖只係剔返真係見到嗰啲。順手捉到一堆蟲：連結確認頁 未問人就自己去外面攞原始檔嚟解釋錯誤（專責把關嗰頁自己先走漏風聲）；鎖 清單條路徑一個字一行；移除鎖個提示跌咗出畫面；表格上色畀自己層白底冚住； 自動化編輯器有三套「即刻行」。全部喺源碼修好兼有單元測試，未喺瀏覽器 再睇。"
+  },
+  {
+   "sha": "22c552fa7",
+   "date": "2026-11-12T12:08:54-05:00",
+   "title": "Repairs: no \"Unsupported installation method\" when the Supervisor says supported",
+   "areas": [
+    "core"
+   ],
+   "detail": "Batch 39. In full hosting mode the Repairs page showed two cards arguing with each other: \"Unsupported installation method\" on top, and \"Unsupported: Nothing. This installation is supported\" below it.\n\nThe first came from the Supervisor integration's start-up check, which raises that repair for every installation that is not the appliance operating system, without asking anyone. The second comes from the Supervisor itself, which is the one that actually checks the host. The start-up check now raises the repair only when the Supervisor does not report its host as supported. An installation the Supervisor calls unsupported, or one that reports nothing, still gets the repair.\n\nTest: a supported Supervisor on a 64-bit host raises nothing (two architectures). Run in a throwaway container: the 16 installation-check tests passed; the harness's own translation check errors on every test in that file, changed or not.\n\nNot seen in a running build. The stored entry on a running instance clears at the next start after the update.",
+   "detail_yue": "第 39 批。完整託管模式入面，「修復」頁兩張卡喺度拗交：上面話「不支援嘅 安裝方式」，下面話「冇嘢不支援，呢個安裝係受支援」。上面嗰張係開機檢查 見到唔係官方系統就照出，問都唔問；下面嗰張係 Supervisor 自己驗過主機先 講。而家開機檢查會先聽 Supervisor 講：佢話支援就唔出聲，佢話唔支援或者 乜都冇講先照舊提醒。未喺運行中嘅版本睇過。"
+  },
+  {
+   "sha": "95a83e69d",
+   "date": "2026-11-12T12:03:54-05:00",
+   "title": "Deploy Assistant build: stop early when the desktop runtime was not unpacked",
+   "areas": [
+    "docs",
+    "deploy"
+   ],
+   "detail": "Batch 38. `deploy-assistant\\build.bat` was run on Windows for the first time. Install, 21 tests and the window build passed, then the installer step made nothing and the script blamed a missing Setup.exe, which was true and no help at all. The real cause sat four steps earlier: on Node.js 26 the unzip step used by the package install ends early without an error, so the desktop runtime is never unpacked. The release build uses Node.js 22, which is why published installers are fine.\n\n- build.bat now checks for the unpacked runtime straight after the install and names the Node.js version to use. - Records: what was seen of the built window (driven headless, nothing deployed), the defects left for the design lane, and what a read-only look at the logs says about the container found Exited (128): about 95 out-of-memory kills in the Docker virtual machine, an unclean engine restart, and a known engine defect that makes `unless-stopped` skip a container afterwards. The number 128 itself stays unexplained.\n\nThe installer and the packaged window are still unverified on this machine.",
+   "detail_yue": "第 38 批。部署助手個 build.bat 第一次喺 Windows 跑：裝嘢、21 個測試、起 視窗都過，去到整安裝檔就交白卷，仲話搵唔到 Setup.exe，講得啱但係冇用。 真兇喺四步之前：Node.js 26 解壓縮靜雞雞收工，連個桌面執行檔都冇解出嚟。 而家裝完即刻驗，仲話埋你知要用邊個版本。另外記低咗個容器點解瞓低唔起身： 記憶體爆煲、引擎唔乾淨咁重啟，加一個已知嘅引擎問題；128 呢個數就真係 查唔到。"
+  },
+  {
+   "sha": "42de55f75",
+   "date": "2026-11-12T11:07:48-05:00",
+   "title": "Supervisor tests: bring the suite back in line with this project's changes",
+   "areas": [
+    "docs",
+    "supervisor"
+   ],
+   "detail": "Batch 37. The Supervisor unit tests had never been run against this project's changes. First run on Python 3.14 in a throwaway container: 4,030 passed, 34 failed, 75 errors. Every failure was a test still describing the upstream product, not a defect in the changed code.\n\n- The shared fixtures patched a telemetry module attribute that no longer exists, because the reporting hooks are no-ops here. They now replace the hooks themselves, so the existing assertions still run. - The data filter tests need diagnostics on, which this project forces off; a local fixture lets those tests set the flag. - Expected image names and the version channel address now name this project's registry and channel file.\n\nAfter the fixes: 4,139 passed, 0 failed, 0 errors, 1 skipped (the suite's own skip). Only files under supervisor/tests changed. Linters were not run on the edited tests.\n\nAlso recorded: release 2026.11.1.131 was opened in a browser on a throwaway instance and the New tab catalog's sections fill the panel.",
+   "detail_yue": "第 37 批。Supervisor 嘅單元測試由頭到尾未為呢個項目跑過，一跑：34 個 失敗、75 個出錯。睇真啲，全部係測試仲以為自己喺上游，仲去 patch 一個 已經搬走咗嘅遙測屬性、仲期待舊嘅映像名同版本網址。改返啲測試跟返而家 嘅行為，冇郁過正式程式碼。而家 4,139 個過晒，1 個係佢自己跳過。"
+  },
+  {
+   "sha": "b48bd9677",
+   "date": "2026-11-12T10:54:40-05:00",
+   "title": "Media upload: let every file be chosen, refuse the unrelated ones in the app",
+   "areas": [
+    "docs",
+    "interface"
+   ],
+   "detail": "Batch 36. On an iPhone the upload button opened a picker full of Ogg files, all greyed out. The file field was limited to audio, video and picture types, and a phone greys out whatever it cannot play itself, which is a strict door policy for a file that only wanted to be uploaded.\n\n- The field names no type now, so every file can be chosen. - A chosen file with no type gets one from its name. The phone hands an Ogg file over with an empty type and the server refuses an upload that has no media type. - Files that are not pictures, video or audio are refused in the interface before anything is sent, in one message that names them. The related files in the same choice still upload. - Chosen pictures get the conversion dropped pictures already had. Audio and video are not converted; they go up as they are.\n\nChecks: file-drop and component tests 1,092 passed in 101 files; type check clean apart from the two known gallery errors. Not seen in a browser and not tried on a phone.",
+   "detail_yue": "第 36 批。iPhone 撳上載，成版 Ogg 檔灰晒揀唔到：個輸入格淨係收「影音圖」， 部電話自己播唔到嘅就當你唔存在。而家乜檔都揀得，冇類型嘅就睇檔名補返； 唔關事嘅檔喺介面度直接請走，仲會點名，同一批入面啱嘅照樣上載。圖片識 自動轉格式，聲同片就原封不動，冇扮識轉。只做咗單元測試，未喺瀏覽器同 真電話試過。"
+  }
+ ]
+}

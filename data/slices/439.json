@@ -1,0 +1,42 @@
+{
+ "build": 439,
+ "core": "2026.11.1.439",
+ "supervisor": "2026.11.0.439",
+ "os": "18.5.439",
+ "tag": "v2026.11.1.439",
+ "source": "47a063cfd",
+ "date": "2026-11-14T00:56:38-05:00",
+ "previous_build": 437,
+ "changes": [
+  {
+   "sha": "47a063cfd",
+   "date": "2026-11-14T00:56:38-05:00",
+   "title": "Fix six faults seen by using build 437",
+   "areas": [
+    "interface"
+   ],
+   "detail": "Each was seen in the published image on a throwaway instance. None of the fixes has been seen in a browser yet.\n\n- Automation tools on a phone: a fixed stage height meant for wide windows also applied to small ones, so the content stopped about 168 px above the bottom and cards and buttons were cut. The fixed height now applies to wide, tall windows only. The flow view lays the graph out top to bottom when left to right would need too small a scale, so no node is cut on open. - Session clock on a phone: its offset ignored the bottom bar's real height and the device inset, so it sat on the bar on dashboards and over a card on Settings. It now sits in its own row right above the bar on every page, and inside the page area on wide windows. The setting is also sent to the server when the page is hidden, not only when it is unloaded. - Storage: \"NaN rows\" for an entity and in the growth line. Formatted strings were being passed where the plural rules need numbers, and missing counts leaked into sums. Unknown counts now read as words. - Lights: the page name was shown three times; the toolbar keeps it. - \"Continue on error for all actions\": clicking the label now toggles the switch. - Au",
+   "detail_yue": "執返 437 版真係用過見到嘅六個問題：手機工具面板內容唔夠高、流程圖切咗 節點；時鐘小圖示喺手機有時壓住底欄有時遮住卡；儲存頁出「NaN 行」； 燈光頁標題出三次；「所有動作出錯都繼續」個標籤撳唔到；儲存列文字斷三行。 另外補返粵語覆蓋清單，等個測試唔再紅。全部未喺瀏覽器睇。"
+  },
+  {
+   "sha": "5f885179a",
+   "date": "2026-11-14T00:43:20-05:00",
+   "title": "README pictures from build 437, and what was seen by using it",
+   "areas": [
+    "docs"
+   ],
+   "detail": "Documents only; no build is started by this push.\n\n- Home, settings home, the System page, home on a phone and the automation editor are replaced with captures of build 2026.11.1.437 at double sharpness. The Updates page with its automatic updates card is new. - The notes record what was used for real in build 437 and seen working (automatic updates installing by themselves, continue on error for all actions in the saved YAML, the visual dictionary editor), what was seen wrong and is not fixed (the tools sheet on a phone, the session clock on a phone, \"NaN rows\" on the storage page, the Lights title), and that the live instance moved to 437 at 23:51 Toronto time.",
+   "detail_yue": "README 換咗 437 版嘅相，仲加咗「更新」頁嗰張。記錄寫低 437 版真係用過 見到得嘅嘢（自動更新自己裝、所有動作出錯都繼續、字典圖形編輯器）， 同埋見到有問題未執嘅嘢。淨係文件，唔會觸發構建。"
+  },
+  {
+   "sha": "85660ebd5",
+   "date": "2026-11-13T20:15:10-05:00",
+   "title": "Link the verified gallery and current recovery handoff",
+   "areas": [
+    "docs"
+   ],
+   "detail": "Link the reviewed synthetic screenshot gallery from the project README. Record the source-bound Raspberry Pi recovery and unfinished backup progress work without merging the recovery code.",
+   "detail_yue": "喺 README 加入已核實嘅示範圖片集，記低 Raspberry Pi 復原分支 同備份進度頁嘅後續工作，未完成嘅程式改動繼續留喺復原分支。"
+  }
+ ]
+}

@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stacked messages demo</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+  .toast { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 16px; border-radius: 16px; background: var(--sl2); }
+  .toast.warning { background: var(--amberc); color: var(--amber); }
+  .toast.error { background: var(--errc); color: var(--on-errc); }
+  .toast .text { flex: 1 1 180px; }
+  .toast .left { font-size: 13px; color: var(--onv); }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="stacked-toasts">
+  <h1>Stacked messages</h1>
+  <p class="muted">Send messages to see the stack, the waiting chip, and the timers. Point at a message to pause its timer.</p>
+
+  <section class="card stack" aria-labelledby="h-send">
+    <h2 id="h-send" style="font-size:18px">Send</h2>
+    <label class="field" for="sev">Severity
+      <select id="sev">
+        <option value="info">Info</option>
+        <option value="warning">Warning</option>
+        <option value="error">Error</option>
+      </select>
+    </label>
+    <div class="row">
+      <button type="button" class="filled" id="send">Send a message</button>
+      <button type="button" class="chip" id="waiting" hidden>More waiting</button>
+    </div>
+    <p class="small muted" id="counts" aria-live="polite"></p>
+  </section>
+
+  <section class="stack" aria-label="Pretend messages" id="stack"></section>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var MAX_VISIBLE = 3;
+  var SECONDS = 8;
+  var sevSel = document.getElementById('sev');
+  var stack = document.getElementById('stack');
+  var waiting = document.getElementById('waiting');
+  var counts = document.getElementById('counts');
+  var visible = [];
+  var queue = [];
+  var seq = 0;
+
+  function makeToast(t) {
+    var li = document.createElement('div');
+    li.className = 'toast ' + t.sev;
+    li.setAttribute('role', 'group');
+    li.tabIndex = 0;
+    var text = document.createElement('span');
+    text.className = 'text';
+    text.textContent = 'Pretend ' + t.sev + ' message ' + t.n;
+    var left = document.createElement('span');
+    left.className = 'left';
+    var dismiss = document.createElement('button');
+    dismiss.type = 'button';
+    dismiss.textContent = 'Dismiss';
+    dismiss.setAttribute('aria-label', 'Dismiss pretend message ' + t.n);
+    dismiss.addEventListener('click', function () { remove(t.id); });
+    li.appendChild(text);
+    li.appendChild(left);
+    li.appendChild(dismiss);
+    li.addEventListener('mouseenter', function () { t.paused = true; });
+    li.addEventListener('mouseleave', function () { t.paused = false; });
+    li.addEventListener('focusin', function () { t.paused = true; });
+    li.addEventListener('focusout', function () { t.paused = false; });
+    t.el = li;
+    t.left = left;
+    return li;
+  }
+
+  function draw() {
+    stack.innerHTML = '';
+    visible.forEach(function (t) {
+      var node = t.el || makeToast(t);
+      t.left.textContent = 'Closes in ' + Math.ceil(t.remaining) + ' s' + (t.paused ? ' (paused)' : '');
+      stack.appendChild(node);
+    });
+    waiting.hidden = queue.length === 0;
+    waiting.textContent = 'More waiting: ' + queue.length;
+    counts.textContent = visible.length + ' visible, ' + queue.length + ' waiting.';
+  }
+
+  function promote() {
+    while (visible.length < MAX_VISIBLE && queue.length) {
+      var t = queue.shift();
+      t.el = null;
+      visible.push(t);
+    }
+  }
+
+  function remove(id) {
+    visible = visible.filter(function (t) { return t.id !== id; });
+    promote();
+    draw();
+  }
+
+  document.getElementById('send').addEventListener('click', function () {
+    seq += 1;
+    var t = { id: seq, n: seq, sev: sevSel.value, remaining: SECONDS, paused: false, el: null, left: null };
+    if (visible.length < MAX_VISIBLE) { visible.push(t); } else { queue.push(t); }
+    draw();
+  });
+
+  waiting.addEventListener('click', function () {
+    counts.textContent = 'The waiting messages appear when a visible one closes or is dismissed.';
+  });
+
+  setInterval(function () {
+    var changed = false;
+    visible.forEach(function (t) {
+      if (!t.paused) { t.remaining -= 1; changed = true; }
+    });
+    var expired = visible.filter(function (t) { return t.remaining <= 0; });
+    expired.forEach(function (t) { visible = visible.filter(function (v) { return v !== t; }); });
+    if (expired.length) { promote(); draw(); return; }
+    if (changed) { draw(); }
+  }, 1000);
+
+  function reset() {
+    visible = [];
+    queue = [];
+    seq = 0;
+    sevSel.value = 'info';
+    stack.innerHTML = '';
+    draw();
+    counts.textContent = 'No messages. 0 visible, 0 waiting.';
+  }
+  document.querySelectorAll('[data-demo-reset]').forEach(function (b) { b.addEventListener('click', reset); });
+  reset();
+})();
+</script>
+</body>
+</html>

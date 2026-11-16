@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Add from a ZIP file</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.demo label.row { display: flex; align-items: center; gap: 12px; min-height: 48px; cursor: pointer; }
+.demo input[type="checkbox"] { width: 24px; height: 24px; flex: none; accent-color: var(--p); }
+.demo ul { margin: 0; padding: 0; list-style: none; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="marketplace-zip-import">
+  <h1>Add from a ZIP file</h1>
+  <p class="muted">Choose an archive, look inside it, then add what the product found.</p>
+
+  <section class="card stack" aria-labelledby="step1">
+    <h2 id="step1">1. Choose an archive</h2>
+    <label class="field" for="archive">Archive (pretend)</label>
+    <select id="archive">
+      <option value="garden-lights.zip">garden-lights.zip</option>
+      <option value="wall-theme.zip">wall-theme.zip</option>
+      <option value="escape.zip">escape.zip</option>
+      <option value="sealed.zip">sealed.zip</option>
+    </select>
+    <div class="row">
+      <button type="button" id="look" class="filled">Look inside</button>
+    </div>
+    <h3>What the product found</h3>
+    <ul id="found" class="list"></ul>
+    <div id="confirm-wrap" class="note" hidden>
+      <label class="row" for="confirm">
+        <input type="checkbox" id="confirm">
+        <span>I understand this item runs code</span>
+      </label>
+    </div>
+    <div class="row">
+      <button type="button" id="add" class="filled" disabled>Add</button>
+    </div>
+  </section>
+
+  <section class="card stack" aria-labelledby="installed-h">
+    <h2 id="installed-h">Installed from files</h2>
+    <ul id="installed" class="list"></ul>
+  </section>
+
+  <p id="result" class="note" aria-live="polite">Nothing added yet.</p>
+
+  <div class="row">
+    <button type="button" data-demo-reset class="tonal">Start again</button>
+  </div>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var archives = {
+    'garden-lights.zip': { ok: true, items: [{ name: 'Garden lights', kind: 'Integration', how: 'Found its integration manifest', runs: true }] },
+    'wall-theme.zip': { ok: true, items: [{ name: 'Wall theme', kind: 'Theme', how: 'Found theme files', runs: false }] },
+    'escape.zip': { ok: false, reason: 'an entry path contains "..", so the whole archive is refused.' },
+    'sealed.zip': { ok: false, reason: 'the archive is encrypted, so it is refused.' }
+  };
+  var archive = document.getElementById('archive');
+  var lookBtn = document.getElementById('look');
+  var found = document.getElementById('found');
+  var wrap = document.getElementById('confirm-wrap');
+  var confirm = document.getElementById('confirm');
+  var add = document.getElementById('add');
+  var installed = document.getElementById('installed');
+  var result = document.getElementById('result');
+  var current = null;
+  var have = {};
+
+  function say(text) { result.textContent = text; }
+
+  function needsConfirm() {
+    return !!current && current.items.some(function (it) { return it.runs; });
+  }
+
+  function look() {
+    var a = archives[archive.value];
+    current = null;
+    found.textContent = '';
+    confirm.checked = false;
+    wrap.hidden = true;
+    add.disabled = true;
+    if (!a.ok) {
+      say('Refused: ' + a.reason);
+      return;
+    }
+    current = a;
+    a.items.forEach(function (it) {
+      var li = document.createElement('li');
+      li.className = 'note';
+      li.textContent = it.name + ' (' + it.kind + '). ' + it.how + '. ' +
+        (it.runs ? 'It runs code, so it needs the confirmation.' : 'No code, so no confirmation is needed.');
+      found.appendChild(li);
+    });
+    wrap.hidden = !needsConfirm();
+    add.disabled = needsConfirm();
+    say('Found ' + a.items.length + ' item. Check what Add will do, then add it.');
+  }
+
+  function addItems() {
+    if (!current) { say('Look inside an archive first.'); return; }
+    if (needsConfirm() && !confirm.checked) {
+      say('Tick the confirmation first. This item runs code.');
+      return;
+    }
+    var added = [];
+    var skipped = [];
+    current.items.forEach(function (it) {
+      if (have[it.name]) { skipped.push(it.name); return; }
+      have[it.name] = true;
+      added.push(it.name);
+      var li = document.createElement('li');
+      li.className = 'note';
+      li.textContent = it.name + ' (' + it.kind + ')';
+      installed.appendChild(li);
+    });
+    add.disabled = true;
+    if (added.length) {
+      say('Added: ' + added.join(', ') + '.' + (skipped.length ? ' Already there, not overwritten: ' + skipped.join(', ') + '.' : ''));
+    } else {
+      say('Already added. Nothing was overwritten.');
+    }
+  }
+
+  archive.addEventListener('change', function () { say('Press Look inside to check this archive.'); });
+  lookBtn.addEventListener('click', look);
+  confirm.addEventListener('change', function () { add.disabled = needsConfirm() && !confirm.checked; });
+  add.addEventListener('click', addItems);
+
+  function reset() {
+    current = null;
+    have = {};
+    archive.value = 'garden-lights.zip';
+    found.textContent = '';
+    installed.textContent = '';
+    confirm.checked = false;
+    wrap.hidden = true;
+    add.disabled = true;
+    say('Nothing added yet.');
+  }
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', reset);
+  reset();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phone and empty-page layout fixes</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+  .preview { width: 100%; max-width: 100%; margin: 0 auto; }
+  .preview.phone { max-width: 320px; }
+  .dev-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 8px 0; border-top: 1px solid var(--outv); }
+  .dev-row:first-child { border-top: none; }
+  .dev-name { flex: 1 1 140px; min-width: 0; }
+  .dev-battery { flex: 0 0 auto; min-width: 48px; }
+  .before .dev-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fixed.phone .dev-empty { display: none; }
+  .fixed .dev-name, .fixed .dev-battery { overflow-wrap: anywhere; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="layout-fixes">
+  <h1>Phone and empty-page layout fixes</h1>
+  <p class="muted">Choose phone or wide, then switch the fixed layout on and off to compare the two. Use the empty Lights page to see its empty state.</p>
+
+  <section class="card stack" aria-labelledby="view-title">
+    <h2 id="view-title" class="small">Preview</h2>
+    <div class="row" role="group" aria-label="Preview width">
+      <button type="button" class="chip" id="wide" aria-pressed="true">Wide</button>
+      <button type="button" class="chip" id="phone" aria-pressed="false">Phone (320 px)</button>
+    </div>
+    <label class="row">
+      <input type="checkbox" class="switch" id="fixed" checked>
+      <span>Show the fixed layout</span>
+    </label>
+  </section>
+
+  <div id="frame" class="preview before">
+    <section class="card stack" aria-labelledby="dev-title">
+      <h2 id="dev-title" class="small">Devices</h2>
+      <div id="devices"></div>
+    </section>
+
+    <section class="card stack" aria-labelledby="light-title" style="margin-top:16px">
+      <h2 id="light-title" class="small">Lights</h2>
+      <div id="lights"></div>
+      <div class="row">
+        <label class="row">
+          <input type="checkbox" class="switch" id="admin">
+          <span>Administrator</span>
+        </label>
+      </div>
+      <div class="row" id="adminRow" hidden>
+        <button type="button" class="tonal" id="goDevices">Go to devices and services</button>
+      </div>
+      <button type="button" class="filled" id="addLight">Add a light</button>
+    </section>
+  </div>
+
+  <p id="status" aria-live="polite" class="note">Preview is wide, the fixed layout is on.</p>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var DEVICES = [
+    { name: 'Pretend hallway sensor with a long name that used to be cut', battery: '84%' },
+    { name: 'Pretend kitchen plug', battery: '' },
+    { name: 'Pretend door lock', battery: '61%' }
+  ];
+
+  var frame = document.getElementById('frame');
+  var devicesEl = document.getElementById('devices');
+  var lightsEl = document.getElementById('lights');
+  var wide = document.getElementById('wide');
+  var phone = document.getElementById('phone');
+  var fixed = document.getElementById('fixed');
+  var admin = document.getElementById('admin');
+  var adminRow = document.getElementById('adminRow');
+  var goDevices = document.getElementById('goDevices');
+  var addLight = document.getElementById('addLight');
+  var status = document.getElementById('status');
+  var lights = [];
+  var isPhone = false;
+
+  function say(msg) { status.textContent = msg; }
+
+  function renderDevices() {
+    devicesEl.innerHTML = '';
+    DEVICES.forEach(function (d) {
+      var row = document.createElement('div');
+      row.className = 'dev-row';
+      var n = document.createElement('span');
+      n.className = 'dev-name';
+      n.textContent = d.name;
+      var b = document.createElement('span');
+      b.className = 'dev-battery' + (d.battery === '' ? ' dev-empty' : '');
+      b.textContent = d.battery === '' ? '-' : 'Battery ' + d.battery;
+      row.appendChild(n);
+      row.appendChild(b);
+      devicesEl.appendChild(row);
+    });
+  }
+
+  function renderLights() {
+    lightsEl.innerHTML = '';
+    if (lights.length === 0) {
+      var empty = document.createElement('div');
+      empty.className = 'note';
+      empty.textContent = 'No lights yet. Lights belong here. Press Add a light to add one.';
+      lightsEl.appendChild(empty);
+      return;
+    }
+    lights.forEach(function (name) {
+      var p = document.createElement('p');
+      p.className = 'dev-row';
+      p.textContent = name;
+      lightsEl.appendChild(p);
+    });
+  }
+
+  function applyView() {
+    frame.classList.toggle('phone', isPhone);
+    frame.classList.toggle('fixed', fixed.checked);
+    wide.setAttribute('aria-pressed', isPhone ? 'false' : 'true');
+    phone.setAttribute('aria-pressed', isPhone ? 'true' : 'false');
+    frame.classList.toggle('before', !fixed.checked);
+    adminRow.hidden = !admin.checked;
+    renderDevices();
+  }
+
+  wide.addEventListener('click', function () {
+    isPhone = false;
+    applyView();
+    say('Preview is wide. ' + (fixed.checked ? 'The fixed layout is on.' : 'The earlier layout is shown.'));
+  });
+  phone.addEventListener('click', function () {
+    isPhone = true;
+    applyView();
+    say('Preview is phone width. ' + (fixed.checked ? 'Empty battery cells are left out.' : 'The earlier layout shows a dash and cuts the text.'));
+  });
+  fixed.addEventListener('change', function () {
+    applyView();
+    say(fixed.checked ? 'Fixed layout is on.' : 'Earlier layout is shown: an empty cell takes room and text is cut.');
+  });
+  admin.addEventListener('change', function () {
+    adminRow.hidden = !admin.checked;
+    say(admin.checked ? 'Administrator view: a button to devices and services is shown.' : 'Administrator button is hidden.');
+  });
+  goDevices.addEventListener('click', function () {
+    say('Pretend: this would open devices and services.');
+  });
+  addLight.addEventListener('click', function () {
+    lights.push('Pretend light ' + (lights.length + 1));
+    renderLights();
+    say('Added ' + lights[lights.length - 1] + '.');
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    isPhone = false;
+    fixed.checked = true;
+    admin.checked = false;
+    lights = [];
+    renderLights();
+    applyView();
+    say('Preview is wide, the fixed layout is on.');
+  });
+
+  renderLights();
+  applyView();
+})();
+</script>
+</body>
+</html>

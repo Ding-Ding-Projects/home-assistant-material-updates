@@ -1,0 +1,20 @@
+{
+  "build": 437,
+  "headline": "Guarded dashboard saves, and recoverable card drafts",
+  "summary": "Build 437 makes dashboard saves guarded and keeps work in progress. The dashboard editor keeps saved revisions and card drafts, so an unfinished card edit can be recovered. The build also improves the frontend editors, live entity states, media navigation and simulation tools, and carries forward the reviewed recovery work from the main branch.",
+  "summary_yue": "437 版令儀表板儲存有保護，編輯器會保存已儲存嘅版本同卡片草稿，未完成嘅卡片編輯可以再拎返出嚟。今次亦改善前端編輯器、實體即時狀態、媒體導覽同模擬工具，並保留主分支上已覆核嘅復原工作。",
+  "highlights": [
+    {
+      "id": "dashboard-draft-recovery",
+      "title": "Dashboard saves are guarded and card drafts can be recovered",
+      "areas": ["interface"],
+      "what": "Saving a dashboard is now guarded, so an editor that was opened from an older copy does not save over a newer one without warning. The editor keeps saved revisions and card drafts, so an unfinished card edit can be picked up again instead of being lost.",
+      "what_yue": "儀表板而家儲存有保護。由舊版本開嘅編輯器，唔會未經提示就覆蓋較新嘅版本。編輯器會保留已儲存嘅版本同卡片草稿，未完成嘅卡片編輯可以再拎返出嚟，唔會不見。",
+      "why": "An unfinished card edit could be lost when the editor closed, and a save from a stale copy could overwrite someone else's work.",
+      "try": ["Open the demo dashboard and change a card title.", "Press Save draft, then Discard, and recover the draft.", "Change the dashboard from another editor, then try to save and read the message."],
+      "sha": ["6c4cc70d1"],
+      "demo": "demos/437/dashboard-draft-recovery.html"
+    }
+  ],
+  "other": []
+}

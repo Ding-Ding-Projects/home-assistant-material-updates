@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Add a step between two steps</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.demo ol { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.demo .gap { display: flex; justify-content: center; }
+.demo .gap button { min-height: 48px; }
+.demo .step { min-height: 56px; display: flex; align-items: center; gap: 12px; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="add-step-between">
+  <h1>Add a step between two steps</h1>
+  <p class="muted">Use &quot;Add a step here&quot; between any two steps. Or press T, C or A to add a trigger, condition or action at the end.</p>
+
+  <section class="card stack" aria-labelledby="auto-h">
+    <h2 id="auto-h">Automation: front door light</h2>
+    <ol id="steps" aria-label="Steps of the pretend automation"></ol>
+  </section>
+
+  <section id="adder" class="card tonal stack" aria-labelledby="add-h" hidden>
+    <h2 id="add-h">Add a step here</h2>
+    <label class="field" for="kind">Kind of step</label>
+    <select id="kind">
+      <option value="trigger">Trigger</option>
+      <option value="condition">Condition</option>
+      <option value="action">Action</option>
+    </select>
+    <div class="row">
+      <button type="button" id="place" class="filled">Place it here</button>
+      <button type="button" id="cancel" class="text">Cancel</button>
+    </div>
+  </section>
+
+  <p id="result" class="note" aria-live="polite">Nothing added yet.</p>
+
+  <div class="row">
+    <button type="button" data-demo-reset class="tonal">Start again</button>
+  </div>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var labels = { trigger: 'Trigger', condition: 'Condition', action: 'Action' };
+  var start = [
+    { type: 'trigger', text: 'When the front door opens' },
+    { type: 'action', text: 'Turn on the hall light' },
+    { type: 'action', text: 'Notify the phone' }
+  ];
+  var steps = [];
+  var pending = -1;
+  var ol = document.getElementById('steps');
+  var adder = document.getElementById('adder');
+  var kind = document.getElementById('kind');
+  var result = document.getElementById('result');
+
+  function say(t) { result.textContent = t; }
+
+  function gap(index) {
+    var li = document.createElement('li');
+    li.className = 'gap';
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'text';
+    b.textContent = 'Add a step here';
+    b.setAttribute('aria-label', 'Add a step here, at position ' + (index + 1));
+    b.addEventListener('click', function () { openAdder(index); });
+    li.appendChild(b);
+    return li;
+  }
+
+  function render() {
+    ol.textContent = '';
+    steps.forEach(function (s, i) {
+      ol.appendChild(gap(i));
+      var li = document.createElement('li');
+      li.className = 'note step';
+      li.textContent = (i + 1) + '. ' + labels[s.type] + ': ' + s.text;
+      ol.appendChild(li);
+    });
+    ol.appendChild(gap(steps.length));
+  }
+
+  function openAdder(index) {
+    pending = index;
+    adder.hidden = false;
+    kind.focus();
+    say('Choose the kind of step for position ' + (index + 1) + '.');
+  }
+
+  function closeAdder() {
+    pending = -1;
+    adder.hidden = true;
+  }
+
+  document.getElementById('place').addEventListener('click', function () {
+    if (pending < 0) return;
+    var type = kind.value;
+    steps.splice(pending, 0, { type: type, text: 'New ' + type });
+    say('Added a ' + type.toLowerCase() + ' at position ' + (pending + 1) + '.');
+    closeAdder();
+    render();
+  });
+
+  document.getElementById('cancel').addEventListener('click', function () {
+    closeAdder();
+    say('Cancelled. Nothing was added.');
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var t = e.target;
+    if (t && /^(INPUT|SELECT|TEXTAREA)$/.test(t.tagName)) return;
+    var map = { t: 'trigger', c: 'condition', a: 'action' };
+    var key = (e.key || '').toLowerCase();
+    if (!map[key]) return;
+    steps.push({ type: map[key], text: 'New ' + map[key] });
+    closeAdder();
+    render();
+    say('Added a ' + map[key] + ' at the end, from the keyboard.');
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    steps = start.map(function (s) { return Object.assign({}, s); });
+    closeAdder();
+    render();
+    say('Nothing added yet.');
+  });
+
+  steps = start.map(function (s) { return Object.assign({}, s); });
+  render();
+})();
+</script>
+</body>
+</html>

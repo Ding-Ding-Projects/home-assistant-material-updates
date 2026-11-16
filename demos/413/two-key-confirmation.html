@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Two-key confirmation</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.demo input[type="range"] { width: 100%; min-height: 48px; accent-color: var(--p); }
+.demo button[aria-pressed] { width: 100%; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="two-key-confirmation">
+  <h1>Two-key confirmation</h1>
+  <p class="muted">Delete a pretend dashboard: turn both keys, then slide all the way to the end.</p>
+
+  <section class="card stack" aria-labelledby="dlg-h">
+    <h2 id="dlg-h">Delete this dashboard?</h2>
+    <p>The dashboard &quot;Garden&quot; and its cards will be removed.</p>
+
+    <div class="grid">
+      <button type="button" id="key1" data-label="Key one" aria-pressed="false">Key one: not turned yet</button>
+      <button type="button" id="key2" data-label="Key two" aria-pressed="false">Key two: not turned yet</button>
+    </div>
+
+    <label class="field" for="slide">Slide to confirm</label>
+    <input type="range" id="slide" min="0" max="100" step="1" value="0">
+
+    <div class="row">
+      <button type="button" id="confirm" class="filled" disabled>Delete dashboard</button>
+    </div>
+  </section>
+
+  <p id="result" class="note" aria-live="polite">Turn both keys, then slide to the end.</p>
+
+  <div class="row">
+    <button type="button" data-demo-reset class="tonal">Start again</button>
+  </div>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var k1 = document.getElementById('key1');
+  var k2 = document.getElementById('key2');
+  var slide = document.getElementById('slide');
+  var go = document.getElementById('confirm');
+  var msg = document.getElementById('result');
+  var done = false;
+
+  function keysTurned() {
+    return k1.getAttribute('aria-pressed') === 'true' && k2.getAttribute('aria-pressed') === 'true';
+  }
+
+  function refresh() {
+    go.disabled = done || !(keysTurned() && Number(slide.value) === 100);
+  }
+
+  function toggle(btn) {
+    var on = btn.getAttribute('aria-pressed') !== 'true';
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    btn.textContent = btn.getAttribute('data-label') + (on ? ': turned' : ': not turned yet');
+    if (!keysTurned()) {
+      slide.value = 0;
+      msg.textContent = 'Turn both keys first. Then slide to the end.';
+    } else {
+      msg.textContent = 'Both keys are turned. Now slide all the way to the end.';
+    }
+    refresh();
+  }
+
+  k1.addEventListener('click', function () { toggle(k1); });
+  k2.addEventListener('click', function () { toggle(k2); });
+
+  slide.addEventListener('input', function () {
+    if (!keysTurned()) {
+      slide.value = 0;
+      msg.textContent = 'Turn both keys before sliding.';
+    } else if (Number(slide.value) === 100) {
+      msg.textContent = 'Ready. Press Delete dashboard to finish.';
+    }
+    refresh();
+  });
+
+  slide.addEventListener('change', function () {
+    if (Number(slide.value) < 100) {
+      slide.value = 0;
+      msg.textContent = 'Slide all the way to the end to confirm.';
+    }
+    refresh();
+  });
+
+  go.addEventListener('click', function () {
+    if (go.disabled) return;
+    done = true;
+    go.disabled = true;
+    slide.disabled = true;
+    msg.textContent = 'Dashboard deleted (pretend). Nothing was really removed.';
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    done = false;
+    k1.setAttribute('aria-pressed', 'false');
+    k2.setAttribute('aria-pressed', 'false');
+    k1.textContent = 'Key one: not turned yet';
+    k2.textContent = 'Key two: not turned yet';
+    slide.disabled = false;
+    slide.value = 0;
+    msg.textContent = 'Turn both keys, then slide to the end.';
+    refresh();
+  });
+
+  refresh();
+})();
+</script>
+</body>
+</html>

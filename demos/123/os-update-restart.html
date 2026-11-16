@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Operating system update restart demo</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="os-update-restart">
+  <h1>Operating system update restart</h1>
+  <p class="muted">Stage the pretend update, then restart, then check which version is running.</p>
+
+  <section class="card stack" aria-labelledby="h-row">
+    <h2 id="h-row" style="font-size:18px">Operating system</h2>
+    <p id="version-line">Pretend version 1.0 is running.</p>
+    <div class="row" id="actions"></div>
+    <div class="note" id="update-note" aria-live="polite"></div>
+  </section>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var state; // idle, staged, later, restarting, checked
+  var running; // old or new
+  var versionLine = document.getElementById('version-line');
+  var actions = document.getElementById('actions');
+  var note = document.getElementById('update-note');
+
+  function button(label, handler, cls) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = label;
+    if (cls) { b.className = cls; }
+    b.addEventListener('click', handler);
+    return b;
+  }
+
+  function render() {
+    actions.innerHTML = '';
+    if (state === 'idle') {
+      versionLine.textContent = 'Pretend version 1.0 is running.';
+      actions.appendChild(button('Stage update', stage, 'filled'));
+      note.className = 'note';
+      note.textContent = 'No update is staged.';
+    } else if (state === 'staged') {
+      versionLine.textContent = 'Pretend version 1.0 is running. Pretend version 2.0 is staged.';
+      actions.appendChild(button('Restart now', restartNow, 'filled'));
+      actions.appendChild(button('Later', later, 'tonal'));
+      note.className = 'note warn';
+      note.textContent = 'Installed. Restart to finish.';
+    } else if (state === 'later') {
+      versionLine.textContent = 'Pretend version 1.0 is running. Pretend version 2.0 is staged.';
+      actions.appendChild(button('Restart now', restartNow, 'filled'));
+      note.className = 'note';
+      note.textContent = 'Installed. It takes effect after the next restart. Restart now is still here.';
+    } else if (state === 'restarting') {
+      versionLine.textContent = 'Restarting the pretend system.';
+      note.className = 'note';
+      note.textContent = 'Restarting. Choose the version that came back below.';
+      actions.appendChild(button('New version came back', function () { check('new'); }, 'tonal'));
+      actions.appendChild(button('Old version came back', function () { check('old'); }, 'tonal'));
+    } else if (state === 'checked') {
+      versionLine.textContent = 'Running: pretend version ' + (running === 'new' ? '2.0' : '1.0') + '.';
+      if (running === 'new') {
+        note.className = 'note good';
+        note.textContent = 'Version check: the new version is running.';
+      } else {
+        note.className = 'note error';
+        note.textContent = 'Version check: the old version came back. The update did not take effect. Restart again or check the update.';
+      }
+      actions.appendChild(button('Check version again', function () { state = 'restarting'; render(); }, 'tonal'));
+    }
+  }
+
+  function stage() { state = 'staged'; render(); }
+  function later() { state = 'later'; render(); }
+  function restartNow() { state = 'restarting'; render(); }
+  function check(which) { running = which; state = 'checked'; render(); }
+
+  function reset() {
+    state = 'idle';
+    running = 'new';
+    render();
+  }
+  document.querySelectorAll('[data-demo-reset]').forEach(function (b) { b.addEventListener('click', reset); });
+  reset();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Schedule entity rule demo</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="schedule-entity-rules">
+  <h1>Schedule rule on an entity</h1>
+  <p class="muted">Choose an entity, a comparison and a value, then change the pretend state to see whether the rule would run.</p>
+
+  <section class="card stack" aria-labelledby="h-rule">
+    <h2 id="h-rule" style="font-size:18px">Rule</h2>
+    <label class="field" for="entity">Entity
+      <select id="entity">
+        <option value="temp">Pretend temperature sensor (a number)</option>
+        <option value="door">Pretend door (open or closed)</option>
+      </select>
+    </label>
+    <label class="field" for="op">Comparison
+      <select id="op">
+        <option value="is">is</option>
+        <option value="isnot">is not</option>
+        <option value="above">above</option>
+        <option value="below">below</option>
+      </select>
+    </label>
+    <label class="field" for="value">Value
+      <input type="text" id="value" inputmode="decimal" value="20">
+    </label>
+    <p class="note error" id="error" role="alert" hidden></p>
+  </section>
+
+  <section class="card stack" aria-labelledby="h-state">
+    <h2 id="h-state" style="font-size:18px">Pretend current state</h2>
+    <label class="field" for="reading" id="reading-label">Pretend sensor reading (a number)
+      <input type="text" id="reading" inputmode="decimal" value="22">
+    </label>
+    <label class="field" for="door" id="door-label" hidden>Pretend door state
+      <select id="door">
+        <option value="open">open</option>
+        <option value="closed">closed</option>
+      </select>
+    </label>
+    <p class="note" id="verdict" aria-live="polite"></p>
+  </section>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var entity = document.getElementById('entity');
+  var op = document.getElementById('op');
+  var value = document.getElementById('value');
+  var reading = document.getElementById('reading');
+  var readingLabel = document.getElementById('reading-label');
+  var door = document.getElementById('door');
+  var doorLabel = document.getElementById('door-label');
+  var error = document.getElementById('error');
+  var verdict = document.getElementById('verdict');
+
+  function render() {
+    var isTemp = entity.value === 'temp';
+    readingLabel.hidden = !isTemp;
+    doorLabel.hidden = isTemp;
+    // Above and below need a number, so they cannot apply to the door.
+    var numericOp = op.value === 'above' || op.value === 'below';
+    var problem = '';
+    if (!isTemp && numericOp) {
+      problem = 'Above and below need a number. The door is open or closed, so use is or is not.';
+    } else if (isTemp && numericOp && value.value.trim() === '') {
+      problem = 'Type a number for the rule to compare with.';
+    } else if (isTemp && numericOp && isNaN(Number(value.value))) {
+      problem = 'That value is not a number. Type a number such as 20.';
+    }
+    error.hidden = problem === '';
+    error.textContent = problem;
+    if (problem) {
+      verdict.className = 'note warn';
+      verdict.textContent = 'The rule is not complete yet. Fix the entry above.';
+      return;
+    }
+    var passes = false;
+    var text;
+    if (isTemp) {
+      var r = Number(reading.value);
+      var v = Number(value.value);
+      if (op.value === 'is') { passes = r === v; }
+      else if (op.value === 'isnot') { passes = r !== v; }
+      else if (op.value === 'above') { passes = r > v; }
+      else { passes = r < v; }
+      text = 'the sensor reads ' + reading.value + ' and the rule compares it with ' + value.value + ' using "' + opWord() + '"';
+    } else {
+      var s = door.value;
+      passes = op.value === 'is' ? s === value.value.trim() : s !== value.value.trim();
+      text = 'the door is ' + s + ' and the rule checks it ' + opWord() + ' "' + value.value.trim() + '"';
+    }
+    verdict.className = passes ? 'note good' : 'note';
+    verdict.textContent = (passes ? 'The rule would run now: ' : 'The rule would not run now: ') + text + '.';
+  }
+
+  function opWord() {
+    var map = { is: 'is', isnot: 'is not', above: 'above', below: 'below' };
+    return map[op.value];
+  }
+
+  entity.addEventListener('change', function () {
+    value.value = entity.value === 'temp' ? '20' : 'open';
+    op.value = entity.value === 'temp' ? 'above' : 'is';
+    render();
+  });
+  op.addEventListener('change', render);
+  value.addEventListener('input', render);
+  reading.addEventListener('input', render);
+  door.addEventListener('change', render);
+
+  function reset() {
+    entity.value = 'temp';
+    op.value = 'above';
+    value.value = '20';
+    reading.value = '22';
+    door.value = 'open';
+    render();
+  }
+  document.querySelectorAll('[data-demo-reset]').forEach(function (b) { b.addEventListener('click', reset); });
+  reset();
+})();
+</script>
+</body>
+</html>

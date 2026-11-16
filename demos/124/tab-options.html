@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tab options demo</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+  .strip { display: flex; gap: 8px; padding: 12px; border-radius: 16px; background: var(--sl2); }
+  .strip[data-edge="left"], .strip[data-edge="right"] { flex-direction: column; }
+  .strip[data-edge="bottom"] { order: 2; }
+  .tab-list { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .tab-list li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-height: 56px; padding: 8px 12px; border-radius: 12px; background: var(--sl0); }
+  .tab-name { flex: 1 1 160px; font-weight: 500; }
+  .tab-list button { min-height: 48px; }
+  .tab-list button[disabled] { opacity: .6; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="tab-options">
+  <h1>Tab options</h1>
+  <p class="muted">Pick an edge, pin a tab, lock another, then search the tabs.</p>
+
+  <section class="card stack" aria-labelledby="h-strip">
+    <h2 id="h-strip" style="font-size:18px">Tab strip</h2>
+    <label class="field" for="dock">Strip edge
+      <select id="dock">
+        <option value="top">Top</option>
+        <option value="right">Right</option>
+        <option value="bottom">Bottom</option>
+        <option value="left">Left</option>
+      </select>
+    </label>
+    <div class="strip" id="strip" data-edge="top" aria-label="Pretend tab strip preview">
+      <span class="badge">Pretend strip</span>
+      <span class="badge primary" id="edge-label">Docked: top</span>
+    </div>
+  </section>
+
+  <section class="card stack" aria-labelledby="h-tabs">
+    <h2 id="h-tabs" style="font-size:18px">Pretend tabs</h2>
+    <label class="field" for="search">Search tabs
+      <input type="search" id="search" autocomplete="off">
+    </label>
+    <ul class="tab-list" id="tab-list"></ul>
+    <p id="status" class="note" aria-live="polite"></p>
+  </section>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var START = [
+    { id: 'a', name: 'Pretend tab A', pinned: false, locked: false, open: true },
+    { id: 'b', name: 'Pretend tab B', pinned: false, locked: false, open: true },
+    { id: 'c', name: 'Pretend tab C', pinned: false, locked: false, open: true },
+    { id: 'd', name: 'Pretend tab D', pinned: false, locked: false, open: true }
+  ];
+  var tabs = [];
+  var list = document.getElementById('tab-list');
+  var search = document.getElementById('search');
+  var dock = document.getElementById('dock');
+  var strip = document.getElementById('strip');
+  var edgeLabel = document.getElementById('edge-label');
+  var status = document.getElementById('status');
+
+  function find(id) {
+    for (var i = 0; i < tabs.length; i++) { if (tabs[i].id === id) return tabs[i]; }
+    return null;
+  }
+
+  function act(id, what) {
+    var t = find(id);
+    if (!t) return;
+    if (what === 'pin') { t.pinned = !t.pinned; }
+    if (what === 'lock') { t.locked = !t.locked; }
+    if (what === 'close' && !t.locked) { t.open = false; }
+    render();
+  }
+
+  function render() {
+    var q = search.value.trim().toLowerCase();
+    var shown = tabs.filter(function (t) {
+      return t.open && (q === '' || t.name.toLowerCase().indexOf(q) !== -1);
+    });
+    shown.sort(function (x, y) { return (y.pinned ? 1 : 0) - (x.pinned ? 1 : 0); });
+    list.innerHTML = '';
+    shown.forEach(function (t) {
+      var li = document.createElement('li');
+      var name = document.createElement('span');
+      name.className = 'tab-name';
+      name.textContent = t.name + (t.pinned ? ' (pinned)' : '') + (t.locked ? ' (locked)' : '');
+      li.appendChild(name);
+      li.appendChild(makeButton(t, 'pin', t.pinned ? 'Unpin' : 'Pin', t.pinned));
+      li.appendChild(makeButton(t, 'lock', t.locked ? 'Unlock' : 'Lock', t.locked));
+      li.appendChild(makeButton(t, 'close', 'Close', false, t.locked));
+      list.appendChild(li);
+    });
+    var openCount = tabs.filter(function (t) { return t.open; }).length;
+    status.textContent = 'Showing ' + shown.length + ' of ' + openCount + ' open tabs. Pinned tabs come first.';
+  }
+
+  function makeButton(t, what, label, pressed, disabled) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = label;
+    b.setAttribute('aria-label', label + ' ' + t.name);
+    if (what !== 'close') { b.setAttribute('aria-pressed', pressed ? 'true' : 'false'); }
+    if (disabled) { b.disabled = true; b.title = 'Locked tabs cannot be closed'; }
+    b.addEventListener('click', function () { act(t.id, what); });
+    return b;
+  }
+
+  dock.addEventListener('change', function () {
+    strip.setAttribute('data-edge', dock.value);
+    edgeLabel.textContent = 'Docked: ' + dock.value;
+    status.textContent = 'The pretend strip now sits on the ' + dock.value + ' edge.';
+  });
+  search.addEventListener('input', render);
+
+  function reset() {
+    tabs = START.map(function (t) { return Object.assign({}, t); });
+    dock.value = 'top';
+    strip.setAttribute('data-edge', 'top');
+    edgeLabel.textContent = 'Docked: top';
+    search.value = '';
+    render();
+    status.textContent = 'Back to the first state.';
+  }
+  document.querySelectorAll('[data-demo-reset]').forEach(function (b) { b.addEventListener('click', reset); });
+  reset();
+})();
+</script>
+</body>
+</html>

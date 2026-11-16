@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tab leftovers: hide dialog and phone order</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="tab-leftovers-hide-and-phone-order">
+  <h1>Hide tabs and the phone Pages order</h1>
+  <p class="muted">Compare the order of the wide strip with the phone Pages sheet, then hide some tabs from the search field.</p>
+
+  <section class="card stack" aria-labelledby="order-h">
+    <h2 id="order-h" style="font-size:18px;margin:0">Order</h2>
+    <div class="row" role="group" aria-label="View">
+      <button type="button" class="chip" id="view-wide" aria-pressed="true">Wide strip</button>
+      <button type="button" class="chip" id="view-phone" aria-pressed="false">Phone sheet</button>
+    </div>
+    <label class="row" for="before">
+      <input type="checkbox" class="switch" id="before">
+      <span>Show the build before this fix</span>
+    </label>
+    <ol class="list" id="order" aria-label="Tab order"></ol>
+  </section>
+
+  <section class="card stack" aria-labelledby="hide-h">
+    <h2 id="hide-h" style="font-size:18px;margin:0">Hide tabs</h2>
+    <label class="field" for="hide-search">
+      <span>Search tabs</span>
+      <input type="search" id="hide-search" placeholder="Search tabs" autocomplete="off">
+    </label>
+    <p class="small muted" id="hide-hint">Pick the tabs to hide. Hidden tabs stay in the More list, so nothing is lost.</p>
+    <fieldset class="stack" style="border:0;margin:0;padding:0">
+      <legend class="sr-only">Tabs that can be hidden</legend>
+      <div id="hide-list" class="stack"></div>
+    </fieldset>
+    <div class="row"><button type="button" class="filled" id="hide-go">Hide selected</button></div>
+  </section>
+
+  <p id="result" class="note good" aria-live="polite"></p>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var TABS = [
+    { id: 'overview', name: 'Overview' },
+    { id: 'energy', name: 'Energy', group: 'Home' },
+    { id: 'climate', name: 'Climate', group: 'Home' },
+    { id: 'lights', name: 'Lights' },
+    { id: 'settings', name: 'Settings' }
+  ];
+
+  var hidden = {};
+  var view = 'wide';
+  var before = document.getElementById('before');
+  var order = document.getElementById('order');
+  var hideList = document.getElementById('hide-list');
+  var search = document.getElementById('hide-search');
+  var result = document.getElementById('result');
+
+  // Same rule for both views: a group sits where its first member sits.
+  function layoutOrder(tabs) {
+    var out = [];
+    var seen = {};
+    tabs.forEach(function (t) {
+      if (t.group) {
+        if (seen[t.group]) return;
+        seen[t.group] = true;
+        out.push({ group: t.group, members: tabs.filter(function (x) { return x.group === t.group; }) });
+      } else {
+        out.push({ members: [t] });
+      }
+    });
+    return out;
+  }
+
+  // The build before the fix put every group first on the phone sheet.
+  function phoneOrder(tabs) {
+    var groups = layoutOrder(tabs).filter(function (b) { return b.group; });
+    var loose = layoutOrder(tabs).filter(function (b) { return !b.group; });
+    return groups.concat(loose);
+  }
+
+  function visibleTabs() {
+    return TABS.filter(function (t) { return !hidden[t.id]; });
+  }
+
+  function render() {
+    var tabs = visibleTabs();
+    var blocks;
+    if (view === 'wide' || !before.checked) {
+      blocks = layoutOrder(tabs);
+    } else {
+      blocks = phoneOrder(tabs);
+    }
+    order.innerHTML = '';
+    blocks.forEach(function (b) {
+      var li = document.createElement('li');
+      li.textContent = b.group ? b.group + ': ' + b.members.map(function (m) { return m.name; }).join(', ') : b.members[0].name;
+      order.appendChild(li);
+    });
+
+    hideList.innerHTML = '';
+    var q = search.value.trim().toLowerCase();
+    TABS.forEach(function (t) {
+      if (hidden[t.id]) return;
+      if (q && t.name.toLowerCase().indexOf(q) < 0) return;
+      var label = document.createElement('label');
+      label.className = 'row';
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.value = t.id;
+      cb.className = 'hide-pick';
+      var span = document.createElement('span');
+      span.textContent = t.name;
+      label.appendChild(cb);
+      label.appendChild(span);
+      hideList.appendChild(label);
+    });
+    if (!hideList.children.length) {
+      var none = document.createElement('p');
+      none.className = 'muted';
+      none.textContent = q ? 'No tab matches that word.' : 'Every tab is hidden.';
+      hideList.appendChild(none);
+    }
+
+    var wideBtn = document.getElementById('view-wide');
+    var phoneBtn = document.getElementById('view-phone');
+    wideBtn.setAttribute('aria-pressed', view === 'wide' ? 'true' : 'false');
+    phoneBtn.setAttribute('aria-pressed', view === 'phone' ? 'true' : 'false');
+    result.textContent = (view === 'wide' ? 'Wide strip order shown.' : 'Phone sheet order shown.') +
+      (before.checked ? ' Old build: groups first.' : ' Same order as the wide strip.');
+  }
+
+  document.getElementById('view-wide').addEventListener('click', function () { view = 'wide'; render(); });
+  document.getElementById('view-phone').addEventListener('click', function () { view = 'phone'; render(); });
+  before.addEventListener('change', render);
+  search.addEventListener('input', render);
+
+  document.getElementById('hide-go').addEventListener('click', function () {
+    var picked = hideList.querySelectorAll('.hide-pick:checked');
+    if (!picked.length) {
+      result.textContent = 'Nothing selected. Tick a tab first.';
+      return;
+    }
+    var names = [];
+    picked.forEach(function (cb) {
+      hidden[cb.value] = true;
+      TABS.forEach(function (t) { if (t.id === cb.value) names.push(t.name); });
+    });
+    result.textContent = 'Hidden: ' + names.join(', ') + '. They are in the More list.';
+    render();
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    hidden = {};
+    view = 'wide';
+    before.checked = false;
+    search.value = '';
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Close other tabs and strip position</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="tab-close-others-and-strip-position">
+  <h1>Close other tabs and the strip position</h1>
+  <p class="muted">Pin some tabs, preview Close other tabs to see which ones stay and why, move a grouped tab, and change where the strip sits.</p>
+
+  <section class="card stack" aria-labelledby="tabs-h">
+    <h2 id="tabs-h" style="font-size:18px;margin:0">Tabs</h2>
+    <ul class="list" id="tabs" aria-label="Tabs"></ul>
+    <div class="row">
+      <button type="button" class="tonal" id="move-start">Move selected to start</button>
+      <button type="button" class="tonal" id="move-end">Move selected to end</button>
+    </div>
+    <div class="row">
+      <button type="button" class="filled" id="close-others">Close other tabs</button>
+    </div>
+  </section>
+
+  <section class="card stack" id="preview" aria-labelledby="pv-h" hidden>
+    <h2 id="pv-h" style="font-size:18px;margin:0">Close other tabs: preview</h2>
+    <p>These tabs will stay open:</p>
+    <ul class="list" id="keep-list"></ul>
+    <div class="row">
+      <button type="button" class="tonal" id="cancel-close">Cancel</button>
+      <button type="button" class="filled" id="confirm-close">Close the others</button>
+    </div>
+  </section>
+
+  <section class="card stack" aria-labelledby="pos-h">
+    <h2 id="pos-h" style="font-size:18px;margin:0">Tab strip position</h2>
+    <label class="field" for="pos">Tab strip position
+      <select id="pos">
+        <option value="top">Top</option>
+        <option value="bottom">Bottom</option>
+        <option value="left">Left</option>
+        <option value="right">Right</option>
+      </select>
+    </label>
+    <p id="strip-view" class="note" aria-hidden="true"></p>
+  </section>
+
+  <p id="result" class="note good" aria-live="polite"></p>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var START = [
+    { name: 'Overview', group: null, pinned: false },
+    { name: 'Energy', group: 'Home', pinned: false },
+    { name: 'Climate', group: 'Home', pinned: true },
+    { name: 'Lights', group: null, pinned: false },
+    { name: 'Settings', group: null, pinned: false }
+  ];
+
+  var tabs = [];
+  var selected = 0;
+  var listEl = document.getElementById('tabs');
+  var keepList = document.getElementById('keep-list');
+  var preview = document.getElementById('preview');
+  var result = document.getElementById('result');
+  var pos = document.getElementById('pos');
+  var stripView = document.getElementById('strip-view');
+  var pendingKeep = [];
+
+  function render() {
+    listEl.innerHTML = '';
+    tabs.forEach(function (t, i) {
+      var li = document.createElement('li');
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = t.name && i === selected ? 'filled' : 'tonal';
+      btn.textContent = (t.group ? t.group + ' / ' : '') + t.name + (t.pinned ? ' (pinned)' : '');
+      btn.setAttribute('aria-pressed', i === selected ? 'true' : 'false');
+      btn.setAttribute('aria-label', t.name + (t.group ? ', in group ' + t.group : '') + (t.pinned ? ', pinned' : ''));
+      btn.addEventListener('click', function () {
+        selected = i;
+        render();
+      });
+      var pin = document.createElement('button');
+      pin.type = 'button';
+      pin.className = 'tonal';
+      pin.textContent = t.pinned ? 'Unpin' : 'Pin';
+      pin.setAttribute('aria-label', (t.pinned ? 'Unpin ' : 'Pin ') + t.name);
+      pin.addEventListener('click', function () {
+        t.pinned = !t.pinned;
+        result.textContent = (t.pinned ? 'Pinned ' : 'Unpinned ') + t.name + '.';
+        render();
+      });
+      li.appendChild(btn);
+      li.appendChild(pin);
+      listEl.appendChild(li);
+    });
+    stripView.textContent = 'The strip sits at the ' + pos.value + '.';
+  }
+
+  function moveSelected(toEnd) {
+    var t = tabs[selected];
+    var from = selected;
+    var arr = tabs.slice();
+    arr.splice(from, 1);
+    var idx;
+    if (t.group) {
+      // A grouped tab stays inside its group.
+      var members = arr.map(function (x, i) { return { x: x, i: i }; }).filter(function (o) { return o.x.group === t.group; });
+      if (toEnd) {
+        idx = members.length ? members[members.length - 1].i + 1 : arr.length;
+      } else {
+        idx = members.length ? members[0].i : arr.length;
+      }
+    } else {
+      idx = toEnd ? arr.length : 0;
+    }
+    arr.splice(idx, 0, t);
+    tabs = arr;
+    selected = idx;
+    result.textContent = 'Moved ' + t.name + (t.group ? ' inside ' + t.group : '') + ' to the ' + (toEnd ? 'end' : 'start') + '.';
+    render();
+  }
+
+  function reasonFor(t, i) {
+    if (i === selected) return 'It is the selected tab.';
+    if (t.pinned) return 'It is pinned.';
+    return null;
+  }
+
+  document.getElementById('move-start').addEventListener('click', function () { moveSelected(false); });
+  document.getElementById('move-end').addEventListener('click', function () { moveSelected(true); });
+
+  document.getElementById('close-others').addEventListener('click', function () {
+    keepList.innerHTML = '';
+    pendingKeep = [];
+    tabs.forEach(function (t, i) {
+      var reason = reasonFor(t, i);
+      if (!reason) return;
+      pendingKeep.push(i);
+      var li = document.createElement('li');
+      li.textContent = t.name + ': ' + reason;
+      keepList.appendChild(li);
+    });
+    preview.hidden = false;
+    document.getElementById('confirm-close').focus();
+    result.textContent = 'Preview open. ' + pendingKeep.length + ' tab(s) will stay.';
+  });
+
+  document.getElementById('cancel-close').addEventListener('click', function () {
+    preview.hidden = true;
+    result.textContent = 'Nothing was closed.';
+  });
+
+  document.getElementById('confirm-close').addEventListener('click', function () {
+    var keep = pendingKeep.map(function (i) { return tabs[i]; });
+    var closed = tabs.length - keep.length;
+    tabs = keep;
+    selected = 0;
+    preview.hidden = true;
+    result.textContent = 'Closed ' + closed + ' tab(s). ' + keep.length + ' stayed open.';
+    render();
+  });
+
+  pos.addEventListener('change', function () {
+    result.textContent = 'Strip moved to the ' + pos.value + '.';
+    render();
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    tabs = START.map(function (t) { return { name: t.name, group: t.group, pinned: t.pinned }; });
+    selected = 0;
+    pos.value = 'top';
+    preview.hidden = true;
+    result.textContent = '';
+    render();
+  });
+
+  tabs = START.map(function (t) { return { name: t.name, group: t.group, pinned: t.pinned }; });
+  render();
+})();
+</script>
+</body>
+</html>

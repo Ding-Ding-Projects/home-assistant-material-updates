@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Select entities by rule</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.demo label.row { display: flex; align-items: center; gap: 12px; min-height: 48px; cursor: pointer; }
+.demo input[type="checkbox"] { width: 24px; height: 24px; flex: none; accent-color: var(--p); }
+.demo ul { margin: 0; padding: 0; list-style: none; }
+.demo .rule { display: grid; grid-template-columns: 1fr; gap: 8px; padding: 8px 0; border-top: 1px solid var(--outv); }
+.demo .rule:first-child { border-top: none; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="select-by-rule">
+  <h1>Select entities by rule</h1>
+  <p class="muted">Write rules, see how many entities match, then apply the result to your selection.</p>
+
+  <section class="card stack" aria-labelledby="rules-h">
+    <h2 id="rules-h">Rules</h2>
+    <div id="rules"></div>
+    <div class="row">
+      <button type="button" id="add-rule" class="tonal">Add rule</button>
+    </div>
+    <label class="field" for="group">Combine the rules</label>
+    <select id="group">
+      <option value="all">All of these rules</option>
+      <option value="any">Any of these rules</option>
+      <option value="not">None of these rules</option>
+    </select>
+    <p id="count" class="note" aria-live="polite"></p>
+    <label class="field" for="action">What to do with the matches</label>
+    <select id="action">
+      <option value="replace">Replace the selection</option>
+      <option value="add">Add to the selection</option>
+      <option value="remove">Remove from the selection</option>
+      <option value="keep">Keep only the matches already selected</option>
+    </select>
+    <div class="row">
+      <button type="button" id="apply" class="filled">Apply to selection</button>
+    </div>
+  </section>
+
+  <section class="card stack" aria-labelledby="ent-h">
+    <h2 id="ent-h">Entities</h2>
+    <ul id="entities" class="list"></ul>
+    <p id="status" class="small muted" aria-live="polite"></p>
+  </section>
+
+  <div class="row">
+    <button type="button" data-demo-reset class="tonal">Start again</button>
+  </div>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var entities = [
+    { id: 'light.hall', name: 'Hall light', area: 'Hall', labels: ['lights'] },
+    { id: 'light.kitchen', name: 'Kitchen light', area: 'Kitchen', labels: ['lights'] },
+    { id: 'light.porch', name: 'Porch light', area: 'Outside', labels: [] },
+    { id: 'sensor.hall_motion', name: 'Hall motion', area: 'Hall', labels: ['security'] },
+    { id: 'sensor.door', name: 'Front door', area: 'Outside', labels: ['security'] },
+    { id: 'switch.fan', name: 'Bedroom fan', area: 'Bedroom', labels: [] },
+    { id: 'climate.lounge', name: 'Lounge thermostat', area: 'Lounge', labels: ['climate'] },
+    { id: 'light.bedroom', name: 'Bedroom lamp', area: 'Bedroom', labels: ['lights'] }
+  ];
+  var fieldNames = { name: 'Name contains', area: 'Area is', label: 'Has label' };
+  var rules = [];
+  var selected = {};
+  var rulesBox = document.getElementById('rules');
+  var group = document.getElementById('group');
+  var action = document.getElementById('action');
+  var count = document.getElementById('count');
+  var list = document.getElementById('entities');
+  var status = document.getElementById('status');
+
+  function test(rule, e) {
+    var v = rule.value.trim().toLowerCase();
+    if (rule.field === 'name') return e.name.toLowerCase().indexOf(v) >= 0;
+    if (rule.field === 'area') return e.area.toLowerCase() === v;
+    return e.labels.indexOf(v) >= 0;
+  }
+
+  function activeRules() {
+    return rules.filter(function (r) { return r.value.trim() !== ''; });
+  }
+
+  function matches() {
+    var active = activeRules();
+    if (!active.length) return [];
+    var mode = group.value;
+    return entities.filter(function (e) {
+      var hits = active.map(function (r) { return test(r, e); });
+      if (mode === 'all') return hits.every(Boolean);
+      if (mode === 'any') return hits.some(Boolean);
+      return !hits.some(Boolean);
+    });
+  }
+
+  function updateCount() {
+    if (!activeRules().length) {
+      count.textContent = 'Type a value in a rule to see matches.';
+      return;
+    }
+    var m = matches();
+    count.textContent = m.length + ' of ' + entities.length + ' entities match. Apply will change the selection using these matches.';
+  }
+
+  function renderRules() {
+    rulesBox.textContent = '';
+    rules.forEach(function (r, i) {
+      var box = document.createElement('div');
+      box.className = 'rule';
+      var f = document.createElement('select');
+      f.setAttribute('aria-label', 'Rule ' + (i + 1) + ' field');
+      Object.keys(fieldNames).forEach(function (k) {
+        var o = document.createElement('option');
+        o.value = k;
+        o.textContent = fieldNames[k];
+        f.appendChild(o);
+      });
+      f.value = r.field;
+      f.addEventListener('change', function () { r.field = f.value; updateCount(); });
+      var v = document.createElement('input');
+      v.type = 'text';
+      v.value = r.value;
+      v.setAttribute('aria-label', 'Rule ' + (i + 1) + ' value');
+      v.placeholder = 'Value';
+      v.addEventListener('input', function () { r.value = v.value; updateCount(); });
+      var del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'text';
+      del.textContent = 'Remove rule ' + (i + 1);
+      del.addEventListener('click', function () {
+        rules.splice(i, 1);
+        renderRules();
+        updateCount();
+      });
+      box.appendChild(f);
+      box.appendChild(v);
+      box.appendChild(del);
+      rulesBox.appendChild(box);
+    });
+  }
+
+  function renderEntities() {
+    list.textContent = '';
+    entities.forEach(function (e) {
+      var li = document.createElement('li');
+      var l = document.createElement('label');
+      l.className = 'row';
+      var c = document.createElement('input');
+      c.type = 'checkbox';
+      c.checked = !!selected[e.id];
+      c.addEventListener('change', function () {
+        selected[e.id] = c.checked;
+        status.textContent = 'Selection now has ' + selectedCount() + ' entities.';
+      });
+      var s = document.createElement('span');
+      s.textContent = e.name + ' (' + e.area + (e.labels.length ? ', ' + e.labels.join(', ') : '') + ')';
+      l.appendChild(c);
+      l.appendChild(s);
+      li.appendChild(l);
+      list.appendChild(li);
+    });
+  }
+
+  function selectedCount() {
+    return Object.keys(selected).filter(function (k) { return selected[k]; }).length;
+  }
+
+  document.getElementById('apply').addEventListener('click', function () {
+    var ids = matches().map(function (e) { return e.id; });
+    var mode = action.value;
+    if (!activeRules().length) {
+      status.textContent = 'Nothing applied: add a rule value first.';
+      return;
+    }
+    if (mode === 'replace') {
+      selected = {};
+      ids.forEach(function (id) { selected[id] = true; });
+    } else if (mode === 'add') {
+      ids.forEach(function (id) { selected[id] = true; });
+    } else if (mode === 'remove') {
+      ids.forEach(function (id) { delete selected[id]; });
+    } else {
+      Object.keys(selected).forEach(function (id) {
+        if (selected[id] && ids.indexOf(id) < 0) delete selected[id];
+      });
+    }
+    renderEntities();
+    status.textContent = 'Applied. Selection now has ' + selectedCount() + ' entities.';
+    updateCount();
+  });
+
+  document.getElementById('add-rule').addEventListener('click', function () {
+    if (rules.length >= 4) {
+      status.textContent = 'Four rules is the most in this demo.';
+      return;
+    }
+    rules.push({ field: 'name', value: '' });
+    renderRules();
+    updateCount();
+  });
+
+  group.addEventListener('change', updateCount);
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    rules = [{ field: 'area', value: 'Hall' }];
+    selected = {};
+    group.value = 'all';
+    action.value = 'replace';
+    renderRules();
+    renderEntities();
+    updateCount();
+    status.textContent = 'Nothing selected yet.';
+  });
+
+  rules = [{ field: 'area', value: 'Hall' }];
+  renderRules();
+  renderEntities();
+  updateCount();
+  status.textContent = 'Nothing selected yet.';
+})();
+</script>
+</body>
+</html>

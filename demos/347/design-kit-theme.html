@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The new modern look is the default theme</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+  [hidden] { display: none !important; }
+  input[type="color"] { min-height: 56px; width: 100%; padding: 4px; border-radius: 12px; border: 1px solid var(--out); background: var(--sl0); cursor: pointer; }
+  label.row { min-height: 48px; cursor: pointer; flex-wrap: nowrap; }
+  .kit-sample { display: grid; gap: 16px; }
+  .kit-colours { display: flex; flex-wrap: wrap; gap: 8px; }
+  .kit-chip-swatch { min-height: 48px; min-width: 96px; border-radius: 12px; padding: 0 12px; display: inline-flex; align-items: center; }
+  .kit-primary { background: var(--p); color: var(--on-p); }
+  .kit-container { background: var(--pc); color: var(--on-pc); }
+  .kit-error { background: var(--errc); color: var(--on-errc); }
+  .kit-good { background: var(--greenc); color: var(--green); }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="design-kit-theme">
+  <h1>The new modern look is the default theme</h1>
+  <p class="muted">Change the theme and the custom primary colour, then see the sample components follow the kit.</p>
+
+  <section class="card stack" aria-labelledby="theme-title">
+    <h2 id="theme-title">Theme</h2>
+    <div class="row" role="group" aria-label="Theme choice">
+      <button type="button" class="chip" id="t-light" aria-pressed="false">Light</button>
+      <button type="button" class="chip" id="t-dark" aria-pressed="false">Dark</button>
+      <button type="button" class="chip" id="t-system" aria-pressed="true">System</button>
+    </div>
+    <label class="field">Custom primary colour
+      <input type="color" id="primary" value="#00639b">
+    </label>
+    <div class="row">
+      <button type="button" class="tonal" id="use-kit">Use the kit colour</button>
+    </div>
+    <p class="note" id="theme-msg" aria-live="polite">Theme follows the system setting.</p>
+  </section>
+
+  <section class="card kit-sample stack" aria-labelledby="sample-title">
+    <h2 id="sample-title">Sample components</h2>
+    <div class="kit-colours" aria-hidden="true">
+      <span class="kit-chip-swatch kit-primary">Primary</span>
+      <span class="kit-chip-swatch kit-container">Primary container</span>
+      <span class="kit-chip-swatch kit-error">Error</span>
+      <span class="kit-chip-swatch kit-good">Success</span>
+    </div>
+    <div class="row">
+      <button type="button" class="filled">Filled button</button>
+      <button type="button" class="tonal">Tonal button</button>
+      <span class="badge primary">Primary badge</span>
+      <span class="badge good">Success badge</span>
+    </div>
+    <label class="row"><input type="checkbox" class="switch" id="sample-switch" checked> <span>Sample switch</span></label>
+    <label class="field">Add an item to the list
+      <input type="text" id="item-text" placeholder="Type a name">
+    </label>
+    <div class="row">
+      <button type="button" class="tonal" id="add">Add to the list</button>
+    </div>
+    <ul class="list" id="items" aria-label="Sample list">
+      <li>Kitchen</li>
+      <li>Hall</li>
+    </ul>
+  </section>
+
+  <div class="row">
+    <button type="button" data-demo-reset>Start again</button>
+  </div>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  'use strict';
+  function $(id) { return document.getElementById(id); }
+  var root = document.documentElement;
+  var DEFAULT_PRIMARY = '#00639b';
+
+  function setTheme(mode) {
+    if (mode === 'system') {
+      root.removeAttribute('data-theme');
+    } else {
+      root.setAttribute('data-theme', mode);
+    }
+    ['t-light', 't-dark', 't-system'].forEach(function (id) {
+      $(id).setAttribute('aria-pressed', String(id === 't-' + mode));
+    });
+    $('theme-msg').textContent = mode === 'system'
+      ? 'Theme follows the system setting.'
+      : 'Theme is set to ' + (mode === 'light' ? 'Light' : 'Dark') + '.';
+  }
+
+  function setPrimary(value) {
+    root.style.setProperty('--p', value);
+    $('theme-msg').textContent = 'Custom primary colour ' + value + ' overrides the kit colour.';
+  }
+
+  function useKit() {
+    root.style.removeProperty('--p');
+    $('primary').value = DEFAULT_PRIMARY;
+    $('theme-msg').textContent = 'The kit primary colour is in use again.';
+  }
+
+  $('t-light').addEventListener('click', function () { setTheme('light'); });
+  $('t-dark').addEventListener('click', function () { setTheme('dark'); });
+  $('t-system').addEventListener('click', function () { setTheme('system'); });
+  $('primary').addEventListener('input', function () { setPrimary($('primary').value); });
+  $('use-kit').addEventListener('click', useKit);
+
+  $('add').addEventListener('click', function () {
+    var text = $('item-text').value.trim();
+    if (!text) {
+      $('theme-msg').textContent = 'Type a name before adding it to the list.';
+      return;
+    }
+    var li = document.createElement('li');
+    li.textContent = text;
+    $('items').appendChild(li);
+    $('item-text').value = '';
+    $('theme-msg').textContent = 'Added ' + text + ' to the list.';
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    $('items').innerHTML = '<li>Kitchen</li><li>Hall</li>';
+    $('item-text').value = '';
+    $('sample-switch').checked = true;
+    useKit();
+    setTheme('system');
+    $('theme-msg').textContent = 'Put back to the first state. Theme follows the system setting.';
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Automation editor search</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.step { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 12px; background: var(--sl2); font-size: 14px; }
+.step mark { background: var(--amberc); color: var(--amber); border-radius: 4px; padding: 0 2px; }
+.step[aria-current="true"] { outline: 3px solid var(--p); outline-offset: 1px; }
+.depth-1 { margin-left: 24px; }
+.depth-2 { margin-left: 48px; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="automation-editor-search">
+  <h1>Automation editor: search the steps</h1>
+  <p class="muted">Search the steps of this pretend automation, move between the matches, or show only the steps that use one entity.</p>
+
+  <section class="card stack" aria-labelledby="search-h">
+    <h2 id="search-h" style="font-size:18px;margin:0">Search and filter</h2>
+    <label class="field" for="q">
+      <span>Search steps</span>
+      <input type="search" id="q" autocomplete="off" placeholder="Search steps">
+    </label>
+    <div class="row">
+      <span id="count" class="badge" aria-live="polite">0 matches</span>
+      <button type="button" class="tonal" id="prev">Previous match</button>
+      <button type="button" class="tonal" id="next">Next match</button>
+    </div>
+    <label class="field" for="entity">Show steps that use
+      <select id="entity">
+        <option value="">Every entity</option>
+        <option value="light.hall">light.hall</option>
+        <option value="light.porch">light.porch</option>
+        <option value="notify.phone">notify.phone</option>
+      </select>
+    </label>
+  </section>
+
+  <section class="card stack" aria-labelledby="steps-h">
+    <h2 id="steps-h" style="font-size:18px;margin:0">Steps</h2>
+    <div id="steps" class="stack"></div>
+  </section>
+
+  <p id="result" class="note good" aria-live="polite"></p>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var STEPS = [
+    { text: 'Trigger: motion in the hall', depth: 0, entity: null },
+    { text: 'Condition: time is after 22:00', depth: 0, entity: null },
+    { text: 'Then: turn on the hall light', depth: 0, entity: 'light.hall' },
+    { text: 'Group: when someone is home', depth: 0, entity: null },
+    { text: 'Turn on the porch light', depth: 1, entity: 'light.porch' },
+    { text: 'Notify the phone', depth: 1, entity: 'notify.phone' },
+    { text: 'Nested: wait for five minutes', depth: 2, entity: null },
+    { text: 'Turn off the hall light', depth: 2, entity: 'light.hall' }
+  ];
+
+  var q = document.getElementById('q');
+  var entity = document.getElementById('entity');
+  var stepsEl = document.getElementById('steps');
+  var countEl = document.getElementById('count');
+  var result = document.getElementById('result');
+  var matchIndex = -1;
+
+  function matches(step, word, ent) {
+    if (ent && step.entity !== ent) return false;
+    if (!word) return true;
+    return step.text.toLowerCase().indexOf(word) >= 0;
+  }
+
+  function highlight(text, word) {
+    if (!word) return document.createTextNode(text);
+    var frag = document.createDocumentFragment();
+    var lower = text.toLowerCase();
+    var at = 0;
+    var i;
+    while ((i = lower.indexOf(word, at)) >= 0) {
+      if (i > at) frag.appendChild(document.createTextNode(text.slice(at, i)));
+      var m = document.createElement('mark');
+      m.textContent = text.slice(i, i + word.length);
+      frag.appendChild(m);
+      at = i + word.length;
+    }
+    if (at < text.length) frag.appendChild(document.createTextNode(text.slice(at)));
+    return frag;
+  }
+
+  function render() {
+    var word = q.value.trim().toLowerCase();
+    var ent = entity.value;
+    var hits = [];
+    stepsEl.innerHTML = '';
+    STEPS.forEach(function (s, i) {
+      var ok = matches(s, word, ent);
+      if (!ok && (word || ent)) return;
+      var row = document.createElement('div');
+      row.className = 'step depth-' + s.depth;
+      row.dataset.index = String(i);
+      row.appendChild(highlight(s.text, word));
+      if (s.entity) {
+        var b = document.createElement('span');
+        b.className = 'badge';
+        b.textContent = s.entity;
+        row.appendChild(b);
+      }
+      if (ok && word) hits.push(i);
+      stepsEl.appendChild(row);
+    });
+    if (!hits.length && word) matchIndex = -1;
+    else if (hits.length && (matchIndex < 0 || hits.indexOf(matchIndex) < 0)) matchIndex = hits[0];
+
+    countEl.textContent = (word ? hits.length : 0) + ' match' + (hits.length === 1 ? '' : 'es');
+    stepsEl.querySelectorAll('.step').forEach(function (row) {
+      row.setAttribute('aria-current', Number(row.dataset.index) === matchIndex ? 'true' : 'false');
+    });
+    var shown = stepsEl.querySelectorAll('.step').length;
+    result.textContent = shown + ' step(s) shown' + (ent ? ' that use ' + ent : '') + (word ? '. Match ' + (hits.indexOf(matchIndex) + 1) + ' of ' + hits.length + '.' : '.');
+    var cur = stepsEl.querySelector('[aria-current="true"]');
+    if (cur && word) cur.scrollIntoView({ block: 'nearest' });
+  }
+
+  function move(delta) {
+    var word = q.value.trim().toLowerCase();
+    if (!word) { result.textContent = 'Type something to search first.'; return; }
+    var hits = [];
+    STEPS.forEach(function (s, i) { if (matches(s, word, entity.value)) hits.push(i); });
+    if (!hits.length) return;
+    var pos = hits.indexOf(matchIndex);
+    pos = pos < 0 ? 0 : (pos + delta + hits.length) % hits.length;
+    matchIndex = hits[pos];
+    render();
+  }
+
+  q.addEventListener('input', function () { matchIndex = -1; render(); });
+  entity.addEventListener('change', function () { matchIndex = -1; render(); });
+  document.getElementById('next').addEventListener('click', function () { move(1); });
+  document.getElementById('prev').addEventListener('click', function () { move(-1); });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    q.value = '';
+    entity.value = '';
+    matchIndex = -1;
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

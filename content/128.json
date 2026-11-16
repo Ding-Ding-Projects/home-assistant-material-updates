@@ -1,0 +1,25 @@
+{
+  "build": 128,
+  "headline": "Close other tabs now shows what stays, and the tab strip position is in Profile",
+  "summary": "The tab menus were tidied up. Close other tabs shows which tabs will stay open and why before anything closes, a grouped tab keeps its place inside its group when it moves, and the menu key opens exactly one menu. The Profile page has a new row for where the tab strip sits.",
+  "summary_yue": "分頁選單整理咗一輪。「關閉其他分頁」而家會先列出邊啲分頁會留低，每一個都寫明原因，之後先至會關。分組入面嘅分頁移去最前或者最後，都仲留喺組入面。選單鍵淨係開一個選單。「個人檔案」入面多咗一行，可以揀分頁列擺喺邊。",
+  "highlights": [
+    {
+      "id": "tab-close-others-and-strip-position",
+      "title": "Close other tabs shows what stays, and the strip position is in Profile",
+      "areas": ["interface"],
+      "what": "Close other tabs now shows a preview first. It lists every tab that will stay open, with the reason beside each one, such as being the selected tab or being pinned. Move to start or end keeps a grouped tab inside its group. The group picker no longer closes the search it was opened from. The menu key opens exactly one menu, Escape returns focus, and the selected tab scrolls fully into view. Profile has a new Tab strip position row, so the strip can sit at the top, bottom, left or right.",
+      "what_yue": "「關閉其他分頁」而家會先出預覽，列出每一個會留低嘅分頁，旁邊寫明原因，例如係揀咗嗰個，或者已經釘住。分組入面嘅分頁移去最前或者最後，都仲留喺組入面。揀分組嗰個選擇器，唔會再閂咗開佢嗰個搜尋。選單鍵只會開一個選單，Esc 會將焦點交返返去，揀咗嘅分頁會捲到完全入晒畫面。「個人檔案」入面多咗「分頁列位置」一行，分頁列可以放喺頂、底、左或者右。",
+      "why": "Closing many tabs at once was easy to do by mistake, because there was no preview of which tabs would be kept.",
+      "try": [
+        "Open the menu on a tab and choose Close other tabs to see the preview.",
+        "Read which tabs stay, and the reason beside each one.",
+        "Move a grouped tab to the start and check that it stays inside its group.",
+        "Change the tab strip position and see the strip move to the chosen edge."
+      ],
+      "sha": ["6330c10d9"],
+      "demo": "demos/128/tab-close-others-and-strip-position.html"
+    }
+  ],
+  "other": []
+}

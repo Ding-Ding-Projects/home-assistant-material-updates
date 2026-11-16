@@ -1,0 +1,560 @@
+{
+ "build": 457,
+ "core": "2026.11.1.457",
+ "supervisor": "2026.11.0.457",
+ "os": "18.5.457",
+ "tag": "v2026.11.1.457",
+ "source": "9b5bbbec2",
+ "date": "2026-11-16T14:43:34-05:00",
+ "previous_build": 441,
+ "changes": [
+  {
+   "sha": "9b5bbbec2",
+   "date": "2026-11-16T14:43:34-05:00",
+   "title": "Fix phone dashboard tools, the right-to-left footer and the sidebar search; record build 455",
+   "areas": [
+    "docs",
+    "interface"
+   ],
+   "detail": "The dashboard tools dialog thought a sentence was a headline and cut it off mid-thought on a phone; it now wraps. Its selection bar stops hovering over the search box like a nosy neighbour and sits in the flow on narrow screens. Device frames wider than the dialog scroll inside it instead of falling off the edge. The page footer isolates the version, date, time and language name as their own text runs, so a right-to-left page no longer shuffles the day, year and month or moves the colon, and the line starts at the page's start edge. The sidebar search used to eat the first letter before handing over to the command palette; a click or a typed key now opens the palette with every character intact. The automation editor's bottom bar is stacked above the problem badges. HANDOFF.md records build 455 and how release pages are published.",
+   "detail_yue": "手機版儀表板工具嗰句副標題唔再斬一半，識得轉行；揀選列唔再浮喺搜尋格上面 阻住晒；裝置框闊過對話框就喺入面打橫捲。頁腳喺由右至左嘅語言入面，日期、 版本同冒號終於肯排好隊。側欄搜尋以前會食咗第一個字先交畀指令面板，而家 一粒字都唔會走失。自動化編輯器底部列亦都疊返喺問題標記上面。"
+  },
+  {
+   "sha": "0622bb442",
+   "date": "2026-11-16T12:48:58-05:00",
+   "title": "Let Settings search offer pages inside the cards; record build 453",
+   "areas": [
+    "docs",
+    "interface"
+   ],
+   "detail": "Settings search only looked at the top-level cards, so a page one step further in, such as Camera recording under System, was never offered. A search now also offers those pages directly.\n\nThe handoff records what was seen in build 453 before the home instance moved to it, and what the look at never-seen features found.",
+   "detail_yue": "設定搜尋以前淨係睇最上面嗰排卡,入多一層嘅頁面(例如系統入面嘅 鏡頭錄影)點搵都搵唔到,好似搵鎖匙搵唔到自己袋咁。而家搜尋會直接 列出嗰啲頁面。交更簿亦記低咗 453 版轉機之前睇過啲乜。"
+  },
+  {
+   "sha": "915c77f71",
+   "date": "2026-11-16T12:25:24-05:00",
+   "title": "Fix breakpoint dots, phone dashboard tools, the 320 px editor bar, phone History and right-to-left text runs",
+   "areas": [
+    "interface"
+   ],
+   "detail": "The Steps tool of the automation editor listened for breakpoints before it had been given its automation, so the dots never appeared. It now starts when its context arrives, starts again when the automation changes, and drops late answers.\n\nOn a phone the dashboard tools' subtitle ran off the right edge and the \"Make phone friendly\" button was squeezed and cut. The subtitle wraps, the button sits under the text at its own width, and the custom size fields stack.\n\nAt 320 px the editor bar's Run now, Check and Dry run show only their icon, with a spoken label, so no label is cut or wrapped. The History toolbar wraps so the day navigator stays on the screen.\n\nEnglish text inside a right-to-left page keeps its own reading order on the home cards, the Settings page and cards, the help note, the editor bar and the version line.",
+   "detail_yue": "自動化編輯器嘅步驟工具未攞到自動化資料就開始聽中斷點,啲紅點永遠 唔出現,等咗個寂寞。而家等資料到咗先開始聽,換自動化會重新聽,遲到 嘅回覆直接掉。手機上儀表板工具嘅副題唔再衝出畫面,「Make phone friendly」掣搬去文字下面用返自己闊度。320 px 嘅編輯列三粒副掣淨係 顯示圖示。歷史頁工具列識得轉行,日期導覽唔再出界。由右至左頁面入面 嘅英文字保持自己嘅閱讀方向。"
+  },
+  {
+   "sha": "d114bb8b9",
+   "date": "2026-11-16T11:58:10-05:00",
+   "title": "Show the camera recording page before first setup and list it in Settings",
+   "areas": [
+    "interface"
+   ],
+   "detail": "Before a recording destination exists the server does not know the page's commands, so the page showed \"Unknown command.\" It now shows its empty state with the add button. The page is always listed in Settings, so search finds it and the first setup can start from the page itself.\n\nAdds small tests for the known-options logic of dictionary fields: merging, filtering keys already used, default values by type and number limits.",
+   "detail_yue": "未加第一個錄影目的地之前,伺服器根本唔識呢版嘅指令,所以版面彈 「Unknown command.」,好似入錯舖咁。而家改為顯示空白狀態同新增掣; 設定入面長期列出呢版,搜尋搵得到,第一次設定可以直接喺呢度開始。 另外補咗字典欄位已知選項嘅細測試。"
+  },
+  {
+   "sha": "c374c7d35",
+   "date": "2026-11-16T11:32:25-05:00",
+   "title": "Record the 16 November merges, cleanup, builds 448 and 449, and the recheck",
+   "areas": [
+    "docs"
+   ],
+   "detail": "The handoff now says what was merged into main, what the cleanup removed after its archive was read back, when the home instance moved to builds 448 and 449, what the recheck in 449 saw right and wrong, and what is still open.",
+   "detail_yue": "交更簿補返 11 月 16 號嘅嘢:邊啲分支併咗入 main、清理之前點樣存檔同 核對、屋企部機幾時轉去 448 同 449、喺 449 覆檢見到乜嘢啱乜嘢錯, 仲有邊啲未搞掂。寫低先唔使靠記性。"
+  },
+  {
+   "sha": "945c90a5f",
+   "date": "2026-11-16T11:31:32-05:00",
+   "title": "Fix the phone tools sheet, clock chip and save bar text; use product controls in the backup hosting dialog",
+   "areas": [
+    "interface"
+   ],
+   "detail": "The automation tools sheet on a phone counted the bottom bar's room twice, so the tool stopped 244 px above the bottom of the sheet. The sheet now keeps only the device's own inset and the tool fills it.\n\nThe clock chip was placed before the layout was drawn, so it landed inside the phone's bottom bar and inside the navigation pane. It is placed again a few times after load, and sits higher on a wide screen.\n\nThe save bar's hint is hidden when the bar is narrow, so the status text is no longer cut to \"No unsav...\".\n\nThe backup hosting dialog drew plain browser selects and inputs. It now uses the product's own select and input, which is what the native controls check asks for. The bundled changelog list is in step with CHANGELOG.md again, and a timer type in the dialog's test is fixed.",
+   "detail_yue": "手機上自動化工具面板計多咗一次底部列嘅空間,工具喺面板底對上 244 px 就停咗,好似食剩半碟餸咁。而家只留返部機自己嘅邊位,工具填滿成個面板。 時鐘細牌喺版面未畫好就擺位,結果踩咗入底部列同導覽欄;而家載入之後 再擺多幾次,闊螢幕上亦擺高少少。儲存列窄嘅時候收埋提示,狀態字唔再 被斬到得返半句。備份寄存對話框改用產品自己嘅選單同輸入欄,唔再用 瀏覽器原生控件;內置更新記錄同 CHANGELOG.md 對返齊。"
+  },
+  {
+   "sha": "642bce652",
+   "date": "2026-11-15T18:51:29-05:00",
+   "title": "Remove the Marketplace warning requirement",
+   "areas": [
+    "docs",
+    "core",
+    "interface"
+   ],
+   "detail": "Installing, adding a repository and uploading no longer refuse anyone who has not opened the Marketplace panel and accepted its warning, and the panel opens straight on the page asked for instead of behind the warning screen. Updates already install without it."
+  },
+  {
+   "sha": "9b95c44d8",
+   "date": "2026-11-15T18:27:24-05:00",
+   "title": "Let Marketplace updates install without the panel warning",
+   "areas": [
+    "docs",
+    "core",
+    "interface"
+   ],
+   "detail": "Installing an update of something the Marketplace already installed refused unless someone had opened the Marketplace panel and accepted its warning, so updates from Settings, automations and scripts all failed for anyone who never saw the panel. Updates now install straight away; the warning still guards adding something new from the panel.\n\nAn install the server refused also said Home Assistant did not report the new version. The update card and the activity tray now say the update did not start, that nothing was installed, and why."
+  },
+  {
+   "sha": "98f2f2f10",
+   "date": "2026-11-15T15:13:04-05:00",
+   "title": "List the required Deploy Assistant features that are still missing",
+   "areas": [
+    "deploy"
+   ],
+   "detail": "Compare the full required-feature list with the Deploy Assistant inventory and record every item not yet covered, covered in part, not checked, or not applicable, so nothing is skipped silently."
+  },
+  {
+   "sha": "e60248a2a",
+   "date": "2026-11-15T15:10:50-05:00",
+   "title": "Add around-the-clock camera recording and the event timeline",
+   "areas": [
+    "docs",
+    "core",
+    "design",
+    "interface"
+   ],
+   "detail": "Camera recording records each camera with ffmpeg in short MP4 segments to a folder or disk here, an external disk, a Windows share, or an SSH server over SFTP or SCP. A guided setup tests the connection for real before anything is saved, then asks for the cameras and the limits. Segments for remote places are staged here and copied every ten seconds, so recording never waits for the network; the oldest are removed past the age or space limit. Entities show recording state, pause each camera and report space used and segments waiting.\n\nThe camera view gains a timeline of the day under the player with recorded footage, gaps and the events of the camera's device, zooms, filters, keyboard control and an event list. Choosing a moment plays the recording with seek, speed and download. Settings, System, Camera recording lists every destination with its cameras and problems.\n\nA setup step split into columns now shows an error for the whole step once, above the fields, instead of once per field.\n\nDesign canvas 32 draws the timeline, the setup and the status page."
+  },
+  {
+   "sha": "02ff8125e",
+   "date": "2026-11-15T11:30:16-05:00",
+   "title": "Polish the Deploy Assistant layout",
+   "areas": [
+    "deploy"
+   ],
+   "detail": "Line up the Name, Port and Image fields, draw the current wizard step as a rounded pill and keep its name on a phone, give drop-down lists the text-field shape with a drawn chevron, wrap long status tags inside the deploy card, place page actions under the title on a phone, and centre the live chart's waiting message."
+  },
+  {
+   "sha": "ca7c7a5f2",
+   "date": "2026-11-15T04:02:46-05:00",
+   "title": "Record unfinished allowance-boundary handoff",
+   "areas": [
+    "docs"
+   ],
+   "detail": "Preserve the actual stop condition, source-ready expiry repair and remaining release barriers. An allowance boundary is a handoff, not a completion badge.",
+   "detail_yue": "額度界線照實交接，原始碼已準備好但實機驗證同發佈未完，唔會貼個完成章就當收工。"
+  },
+  {
+   "sha": "50ab99ee4",
+   "date": "2026-11-15T04:00:12-05:00",
+   "title": "Preserve current backup hosting continuation state",
+   "areas": [
+    "docs"
+   ],
+   "detail": "Record the expanded scope, delivered baseline, local candidates and exact remaining recovery boundaries. The pending upload and publication checks stay pending instead of being wished across the finish line.",
+   "detail_yue": "擴展範圍、已交付基線同本機候選逐樣寫清楚；未完成上載同發佈檢查繼續標明未完成，唔靠願望衝線。"
+  },
+  {
+   "sha": "c220618cf",
+   "date": "2026-11-15T03:57:49-05:00",
+   "title": "Resume retained uploads through trusted job bindings",
+   "areas": [
+    "deploy",
+    "docs"
+   ],
+   "detail": "Share owner-aware start validation across native IPC and the HTTPS bridge. An expired upload remains available only to its matching unfinished journal job with unchanged identity and options, and only while its regular files remain in the owned folder. New starts keep the original expiry: the ticket is not extended for everyone because one passenger needed to resume. All 110 focused Node 22 checks and main-process syntax validation pass; no live job was resumed.",
+   "detail_yue": "原生介面同 HTTPS 橋接共用擁有權驗證。過期輸入只畀身分同選項完全吻合嘅未完成工作續用，檔案亦要留喺自己嘅資料夾。唔會因為一個工作要續做，就幫所有入場券延長期限。一百一十項 Node 22 檢查同主程序語法檢查通過，冇重開真實工作。"
+  },
+  {
+   "sha": "b5dc03c93",
+   "date": "2026-11-15T03:47:59-05:00",
+   "title": "Record built backup hosting candidates and remaining acceptance",
+   "areas": [
+    "docs"
+   ],
+   "detail": "Keep real dialog, intake and resume results separate from the unfinished upload and publication baseline. A working progress card does not get to sign its own delivery receipt.",
+   "detail_yue": "真實對話框、匯入同繼續工作結果分清楚，未完成上載同發佈檢查照寫低；進度卡唔可以自己簽收自己。"
+  },
+  {
+   "sha": "e0b1e65e4",
+   "date": "2026-11-15T03:33:36-05:00",
+   "title": "Retain bounded backup diagnostics and wait for idle",
+   "areas": [
+    "deploy",
+    "docs"
+   ],
+   "detail": "Keep only validated HTTP status and fixed failure stage in the job journal and DTO, clearing stale details on another attempt or success. Require the receiver idle state before uploading: answering the door is not the same as having free hands. Preserve ownership, certificate checks and single-attempt POST behavior. All 99 focused Node 22 checks pass; the historical upload status remains unknown and no live job was retried.",
+   "detail_yue": "工作紀錄只保留驗證過嘅 HTTP 狀態同固定階段，下次嘗試或者成功就清走舊資料。上傳前要接收器真係閒置，肯開門唔代表雙手有空。擁有權、憑證檢查同唔自動重送 POST 照保留。九十九項 Node 22 檢查通過，舊上傳狀態仍然未知，冇重試真實工作。"
+  },
+  {
+   "sha": "e34891b3a",
+   "date": "2026-11-15T02:55:27-05:00",
+   "title": "Wait for fresh backup onboarding before upload",
+   "areas": [
+    "deploy",
+    "docs"
+   ],
+   "detail": "Use a bounded cancellable GET-only warmup that requires the real backup-info shape, preserves the transport identity and rejects configured targets. A preparation service answering the door no longer means Core has finished moving in. Keep upload and restore POSTs single-attempt, preserve submitted-restore reconciliation and expose native-only resume capability without changing ownership. All 91 focused Node 22 checks pass; no existing hosting job was resumed.",
+   "detail_yue": "先用有期限、可取消嘅 GET 等真正備份首次設定介面就緒，保留憑證身分，已設定嘅目標唔會覆寫。準備服務開門唔代表 Core 已經搬好屋。上傳同還原唔會自動重送，工作擁有權照保留。九十一項 Node 22 檢查通過，冇重開現有部署工作。"
+  },
+  {
+   "sha": "cfd88ab79",
+   "date": "2026-11-15T02:54:05-05:00",
+   "title": "Initialize backup hosting dialogs through the legacy context lifecycle",
+   "areas": [
+    "interface"
+   ],
+   "detail": "Use the existing persistent dialog contract so the manager supplies Home Assistant context before loading hosting state. Wait for both context and parameters, reset on reopen, and invalidate pending responses and timers on close. The dialog now receives the context it was waiting for instead of waiting forever.",
+   "detail_yue": "沿用現有持續對話框流程，等管理器提供 Home Assistant 內容後先載入託管狀態。必須同時有內容同參數，重開時重設，關閉時令未完成回應同計時器失效。對話框而家收到一直等緊嘅資料，唔使等到天荒地老。"
+  },
+  {
+   "sha": "b84d03c38",
+   "date": "2026-11-15T02:53:51-05:00",
+   "title": "Resume existing native backup jobs after restart",
+   "areas": [
+    "deploy"
+   ],
+   "detail": "Offer an explicit resume action only when the backend authorizes this native-owned job. Reuse its request, archive handle, and target without replacing saved image or port options. Read an optional key from its masked field and clear it immediately. The existing instance keeps its identity instead of receiving an accidental twin.",
+   "detail_yue": "只有後端批准本機擁有嘅工作先提供明確繼續按鈕，沿用原有要求、封存檔識別碼同目標，唔會覆蓋已儲存映像或連接埠。可選金鑰由遮罩欄位讀取後即刻清除，原有實例保留身分，唔會意外多個孖生兄弟。"
+  },
+  {
+   "sha": "455ef990c",
+   "date": "2026-11-15T02:19:27-05:00",
+   "title": "Honor effective PAX sizes in backup inventory",
+   "areas": [
+    "deploy",
+    "docs"
+   ],
+   "detail": "Reuse the installed Header and Pax implementations to walk metadata-aware payload boundaries, clear per-entry state and retain global state. A two-byte payload no longer fools the inventory into counting its contents as another header. Keep wire path checks and bounded metadata, and cover malformed records and oversized sizes without allocating a large archive. All 74 focused Node 22 checks and both unchanged fixture imports pass; no hosting job was created.",
+   "detail_yue": "跟返已安裝解析器嘅 Header 同 Pax 規則計算資料邊界，逐檔狀態用完清除，全域狀態繼續保留。兩個位元組唔再扮下一個標頭。原始路徑檢查同中繼資料上限照保留，七十四項 Node 22 檢查同兩個原封不動樣本通過，冇建立部署工作。"
+  },
+  {
+   "sha": "2970e94c2",
+   "date": "2026-11-15T02:13:27-05:00",
+   "title": "Reserve native caption space outside the scrollable viewport",
+   "areas": [
+    "deploy"
+   ],
+   "detail": "Measure the native window-controls overlay and place the application below it. Scroll the shell internally, preserve its scroll position, and clamp floating menus within the same usable viewport. Header padding could scroll away; the viewport boundary now stays on duty.",
+   "detail_yue": "按原生視窗控制區嘅實際尺寸保留空間，應用內容移到下方，改由內層介面捲動並保留位置，浮動選單亦限制喺同一可用範圍。標題留白會跟住捲走，視窗邊界就會留低看守。"
+  },
+  {
+   "sha": "3e5fe379f",
+   "date": "2026-11-15T02:09:26-05:00",
+   "title": "Require zero-sized tar root directory headers",
+   "areas": [
+    "deploy",
+    "docs"
+   ],
+   "detail": "Check the wire size before parser normalization can erase a root directory body. All 60 focused Node 22 checks pass, with the root remaining a true no-op instead of a hiding place.",
+   "detail_yue": "喺解析器改寫目錄大小之前先檢查原始標頭。六十項 Node 22 檢查通過，根目錄只可以係空操作，唔可以變成收埋資料嘅地方。"
+  },
+  {
+   "sha": "8f5e962ec",
+   "date": "2026-11-15T02:08:22-05:00",
+   "title": "Accept Core backup metadata tar prefixes safely",
+   "areas": [
+    "deploy",
+    "docs"
+   ],
+   "detail": "Recognize the leading dot-slash metadata path written by Core while checking canonical duplicates and retaining strict traversal, link and ZIP rules. Inspect raw tar headers before parser normalization so a backslash or root file cannot sneak through wearing a directory costume. All 59 focused Node 22 checks pass; the unchanged synthetic ZIP imports with its original preserved and no hosting jobs created.",
+   "detail_yue": "接納 Core 寫出嘅點斜線中繼資料路徑，同時保留重複名稱、越界、連結同 ZIP 檢查。先睇原始標頭，唔畀反斜線同根目錄檔案扮文件夾混入。五十九項 Node 22 檢查通過，原封不動測試 ZIP 成功匯入，原檔保留，冇建立部署工作。"
+  },
+  {
+   "sha": "8869dbbf9",
+   "date": "2026-11-15T02:02:36-05:00",
+   "title": "Record Node 22 backup option verification",
+   "areas": [
+    "docs"
+   ],
+   "detail": "Record all 45 focused native checks passing, including 19 explicit-option cases. Port zero stayed out of the defaults costume, and real provisioning remains honestly unverified.",
+   "detail_yue": "記低四十五項原生檢查全部通過，包括十九項明確選項個案。零連接埠唔再扮預設值，實際部署照樣清楚列明未核實。"
+  },
+  {
+   "sha": "28727b1fb",
+   "date": "2026-11-15T02:01:57-05:00",
+   "title": "Honor explicit backup host port and image options",
+   "areas": [
+    "deploy",
+    "docs"
+   ],
+   "detail": "Validate and retain selected container image tags and host ports through job admission, allocation and retries. A visible field no longer has a secret career as decoration. Reject zero and malformed ports, unsupported appliance options and conflicting retry selections; omitted options retain the existing defaults. Focused validation follows this checkpoint.",
+   "detail_yue": "將選定映像版本同連接埠帶到工作分配同重試，畫面個欄位終於唔使淨係做花瓶。零、錯誤格式、不適用選項同衝突重試會拒絕，冇填就保留原本預設值；先保存來源再驗證。"
+  },
+  {
+   "sha": "ad1a04cbb",
+   "date": "2026-11-15T02:01:18-05:00",
+   "title": "Preserve selected backup-hosting image and port",
+   "areas": [
+    "deploy"
+   ],
+   "detail": "Send the visible Docker and SSH image tag and the Docker, SSH, and VirtualBox port to the hosting API. Leave absent defaults untouched and reject invalid numeric ports before IPC. The controls now send their choices instead of merely looking helpful.",
+   "detail_yue": "將 Docker 同 SSH 畫面揀選嘅映像標籤，以及 Docker、SSH 同 VirtualBox 連接埠傳到託管 API。未填值保留預設，無效連接埠喺 IPC 前拒絕。控制項而家真係有交代，唔再淨係擺出幫到手嘅樣。"
+  },
+  {
+   "sha": "d36d4cce4",
+   "date": "2026-11-15T01:53:43-05:00",
+   "title": "Verify native installer with host-owned PowerShell modules",
+   "areas": [
+    "deploy"
+   ],
+   "detail": "Load the current host security module explicitly and require the complete Squirrel output set. An unavailable signature command now reports an incomplete check rather than a blank signature.",
+   "detail_yue": "驗證用返當前 PowerShell 自己嘅模組，仲要齊 RELEASES 同完整包；指令載入唔到就講未完成，唔再報個空白簽署狀態。"
+  },
+  {
+   "sha": "8be6c1b37",
+   "date": "2026-11-15T01:49:10-05:00",
+   "title": "Prepare desktop backup hosting candidate 1.6.0",
+   "areas": [
+    "deploy"
+   ],
+   "detail": "Reserve the new feature version for local packaging. This does not publish or verify a release.",
+   "detail_yue": "先為本機打包預留新功能版本，未發佈就唔當發佈咗，實際驗證仲未完成。"
+  },
+  {
+   "sha": "d28b16f0a",
+   "date": "2026-11-15T01:45:45-05:00",
+   "title": "Handle appliance cancellation and record offline image verification",
+   "areas": [
+    "deploy",
+    "docs"
+   ],
+   "detail": "Stop VMware provisioning after cancellation at every asynchronous boundary and expose a bounded address-only recovery operation. A cancelled setup should not sneak back later carrying a running machine.\n\nNine JavaScript tests pass under Node 22.14.0 and six synthetic partition tests pass in the built offline helper. The published release 439 VDI was prepared successfully with a synthetic TLS fixture; the source hash remained unchanged. Native encrypted storage, boot, restore and hardware acceptance remain pending.",
+   "detail_yue": "VMware 喺下載、私人映像準備同匯入之後都檢查取消狀態，並加入限時地址查詢。取消咗就唔好隔陣再帶部機返嚟報到。"
+  },
+  {
+   "sha": "bdbc730f9",
+   "date": "2026-11-15T01:45:20-05:00",
+   "title": "Record focused native backup verification",
+   "areas": [
+    "docs"
+   ],
+   "detail": "Record the 26 passing native checks and main-process syntax check against the exact composition commit. The tests checked the wiring; they did not magically boot a computer or write a card. Keep packaged runtime and real provisioning acceptance explicitly unverified.",
+   "detail_yue": "記低二十六項針對性檢查同主程序語法檢查全部通過。測試驗到接線，唔會隔空幫部機開機或者寫卡；實際部署同封裝版本相容性照樣列明未核實。"
+  },
+  {
+   "sha": "cc4b620b1",
+   "date": "2026-11-15T01:43:37-05:00",
+   "title": "Compose certificate-bound backup appliances",
+   "areas": [
+    "deploy",
+    "docs"
+   ],
+   "detail": "Connect pinned helper preparation to native backup jobs, virtual machines and removable-media workflows. A friendly hostname no longer gets to impersonate the newly prepared appliance: the job certificate must match. Preserve original automation activity and report missing preparation or readiness honestly. Focused verification follows this source checkpoint.",
+   "detail_yue": "接駁固定版本工具、原生備份工作同獨立裝置。今次唔再見到個熟口熟面主機名就當自己人，要對啱憑證先還原。保留自動化原本狀態，準備同就緒未核實就照直講；先保存來源，再做針對性驗證。"
+  },
+  {
+   "sha": "f8c70d079",
+   "date": "2026-11-15T01:41:03-05:00",
+   "title": "Record verified Core update and pending backup hosting acceptance",
+   "areas": [
+    "docs"
+   ],
+   "detail": "Keep completed checks separate from the next restore workflow. A source merge is not a working hosted copy, however tidy its progress bar looks.",
+   "detail_yue": "已驗證更新同新還原流程分清楚，原始碼合併唔代表新機已經開得，進度條靚都唔算數。"
+  },
+  {
+   "sha": "b2e5259ac",
+   "date": "2026-11-15T01:39:21-05:00",
+   "title": "Add bounded Raspberry Pi address entry and retry",
+   "areas": [
+    "deploy"
+   ],
+   "detail": "Accept up to sixteen explicit private IPv4 addresses in the backup workflow. Keep form values transient, reject ranges and public addresses, and resume a waiting device job with its existing request and opaque handle. Discovery gets an address list, not permission to tour the subnet.\n\nAdded focused address-validation and same-job retry tests. Tests, builds, and runtime verification remain unrun.",
+   "detail_yue": "備份流程接受最多十六個指定私人 IPv4 地址，表格資料只暫存喺視窗記憶體。拒絕地址範圍同公網地址，等候裝置嘅工作沿用原有要求同不透明識別碼繼續；搵裝置唔等於獲准遊遍成個子網。"
+  },
+  {
+   "sha": "0185886eb",
+   "date": "2026-11-15T01:37:16-05:00",
+   "title": "Keep build paths stable after argument parsing",
+   "areas": [
+    "build"
+   ],
+   "detail": "Capture the entrypoint directory before SHIFT moves positional parameters. The helper can now find its own script rather than hunting at the drive root.",
+   "detail_yue": "參數搬位之前先記低腳本位置，離線工具唔使走去磁碟根目錄尋親。"
+  },
+  {
+   "sha": "5ec5cfc3a",
+   "date": "2026-11-15T01:37:12-05:00",
+   "title": "Add explicit SSH host-key review to backup hosting",
+   "areas": [
+    "deploy",
+    "interface"
+   ],
+   "detail": "Review a job's exact saved SSH host through native confirmation before resuming its existing request. Declined or mismatched approval starts nothing. Keep cancelling active while the current operation settles; a pending cancellation has not crossed the finish line.\n\nFour focused renderer tests authored but not run. Builds and runtime verification remain pending.",
+   "detail_yue": "備份工作必須經原生確認核對已儲存 SSH 主機金鑰，先可以繼續原有要求。拒絕批准或主機唔相符都唔會啟動。取消期間清楚顯示目前操作仍在安全收尾，未到終點就唔會宣佈完場。"
+  },
+  {
+   "sha": "a8eb642fa",
+   "date": "2026-11-15T01:36:44-05:00",
+   "title": "Pin offline backup preparation helper inputs",
+   "areas": [
+    "build"
+   ],
+   "detail": "The helper now has exact base and package inputs. A private appliance disk is an input at runtime, never a souvenir in the published image.",
+   "detail_yue": "離線準備工具鎖定基底同套件版本，私人磁碟只喺運行時用，唔會變公開映像嘅手信。"
+  },
+  {
+   "sha": "fbfe9d7be",
+   "date": "2026-11-15T01:35:19-05:00",
+   "title": "Add explicit backup hosting build targets",
+   "areas": [
+    "build",
+    "docs"
+   ],
+   "detail": "Keep the image helper and Supervisor builds behind the root entrypoint, and select the desktop installer without taking the scenic route through an OS build. Runtime and final tests remain pending.",
+   "detail_yue": "加入明確建置目標，整桌面安裝包唔使先兜個作業系統大圈。實際運行同最後測試仍待驗證。"
+  },
+  {
+   "sha": "e75b8d731",
+   "date": "2026-11-15T01:33:53-05:00",
+   "title": "Add certificate-bound appliance bootstrap preparation",
+   "areas": [
+    "deploy",
+    "docs"
+   ],
+   "detail": "Prepare private copies of verified HAOS images using an offline, capability-free helper. Seed TLS only into fresh writable data, bind VMware restore to the job certificate, and provide the Pi writer with an internal preparation hook. A familiar hostname is no longer mistaken for an identity badge.\n\nSource preservation only. Focused tests are authored but not run; helper publication, native integration, first boot and restore verification remain pending.",
+   "detail_yue": "加入每項工作獨立嘅憑證開機準備：離線處理已核對映像，只寫入全新資料分割區，並保留原有自動化狀態。識答網址唔代表驗明正身，今次先查證再交資料。"
+  },
+  {
+   "sha": "7fb0e3e21",
+   "date": "2026-11-15T01:33:52-05:00",
+   "title": "Refine backup hosting start and sign-in verification",
+   "areas": [
+    "deploy",
+    "docs",
+    "interface"
+   ],
+   "detail": "Start an explicitly requested unprotected backup on its saved available target without an extra confirmation. Keep first-use setup, unresolved target choices, and existing jobs separate. Offer sign-in only with backend-verified LAN evidence; a login page is not a finished restoration.\n\nSource formatting and diff checks completed. Tests, builds, and runtime verification remain unrun in this preservation checkpoint.",
+   "detail_yue": "明確要求託管未加密備份時，直接使用已儲存而且可用嘅目標，唔使再撳多次。首次設定、未決定嘅目標同現有工作保持分開。登入連結必須有後端區域網絡驗證證據，見到登入頁唔代表還原已經交功課。"
+  },
+  {
+   "sha": "7c1ed4cfd",
+   "date": "2026-11-15T01:21:51-05:00",
+   "title": "Align native bridge endpoints and verified sign-in recovery",
+   "areas": [
+    "core",
+    "docs"
+   ],
+   "detail": "Accept only the explicitly selected private endpoint under the existing certificate pin. Preserve incomplete authentication state while exposing a sign-in action only with actual LAN verification evidence. Tests remain unrun.",
+   "detail_yue": "本機橋接地址同證書要對得上；需要登入驗證就清楚講，唔會冒充恢復完成。測試仍然未執行。"
+  },
+  {
+   "sha": "5916bf03b",
+   "date": "2026-11-15T01:21:47-05:00",
+   "title": "Bound backup hosting admission and secure restore transport",
+   "areas": [
+    "deploy",
+    "docs"
+   ],
+   "detail": "Reserve capacity and ports before provisioning, keep cancellation honest at asynchronous boundaries, and require verified SSH identity and protected restore transport. Regression source is included but unrun. Appliance composition and runtime acceptance remain unfinished.",
+   "detail_yue": "先留位先開工，取消唔可以口講停咗但轉頭又開機。SSH 先核對身份，備份同恢復金鑰走受保護通道。回歸測試已有源碼但未執行，實際驗證仍然待做。"
+  },
+  {
+   "sha": "8b3c2658b",
+   "date": "2026-11-15T00:47:14-05:00",
+   "title": "Preserve unfinished backup hosting interfaces",
+   "areas": [
+    "deploy",
+    "docs",
+    "interface"
+   ],
+   "detail": "Recovery checkpoint: backup actions, native upload workflow, pairing and real job-state views are written. Generated renderer output, tests, production build and runtime acceptance are still pending; do not treat this branch as a finished deployment.",
+   "detail_yue": "先保存未完成嘅備份託管介面：按鈕、上載流程同工作狀態已有源碼，產生檔、測試、建置同實際驗證仍然待做。唔會將保存點當成交付。"
+  },
+  {
+   "sha": "8ce22b404",
+   "date": "2026-11-15T00:46:09-05:00",
+   "title": "Preserve unfinished Core backup hosting coordination",
+   "areas": [
+    "core",
+    "docs",
+    "supervisor"
+   ],
+   "detail": "Recovery checkpoint: administrator commands, pinned local pairing, selected-backup streaming and job reconciliation are written. Pairing authority is excluded by both archive producers. Tests, runtime and cross-process acceptance remain unverified; this source is not a production delivery.",
+   "detail_yue": "先保存未完成嘅 Core 備份託管協調：配對、串流同工作狀態已有源碼，兩條備份路徑都排除配對權限。測試同實際驗證仍然未做，唔會提早當成交付。"
+  },
+  {
+   "sha": "abe0a929a",
+   "date": "2026-11-15T00:37:46-05:00",
+   "title": "Preserve unfinished backup hosting engine",
+   "areas": [
+    "deploy",
+    "docs"
+   ],
+   "detail": "Recovery checkpoint only: native archive handling, authenticated host bridge, job journal and restore coordinator are written. Tests and runtime acceptance have not run. Raspberry Pi identity and restored-auth completion still need implementation or proof; this is not a production delivery.",
+   "detail_yue": "保存未完成嘅備份託管引擎：先留低可恢復嘅源碼，唔會將未驗證嘅內容扮成已交付。測試、實際配對同恢復驗證仍然未做。"
+  },
+  {
+   "sha": "a07ea120a",
+   "date": "2026-11-13T19:57:55-05:00",
+   "title": "Record Raspberry Pi and backup progress recovery",
+   "areas": [
+    "docs"
+   ],
+   "detail": "Save the outstanding physical boot and packaging checks and the next backup upload and restore steps. This branch preserves unfinished work while the current release remains in service.",
+   "detail_yue": "記低 Raspberry Pi 實機驗證同備份進度頁嘅下一步。 改動先保留喺復原分支，等實機驗證完成先發佈。"
+  },
+  {
+   "sha": "d25b21b1d",
+   "date": "2026-11-13T19:55:14-05:00",
+   "title": "Preserve unfinished Raspberry Pi first-boot support",
+   "areas": [
+    "deploy",
+    "os"
+   ],
+   "detail": "Save the release-pinned ARM64 image selection, preparation fallback, and Deploy Assistant's separate verified write and readiness states. The previous readiness path could call a verified card a failed write. The source and simulated checks are available for review. Appliance builds, the packaged desktop flow, and physical startup remain pending.",
+   "detail_yue": "保留未完成嘅 Raspberry Pi 首次啟動改動。之前張卡驗證完，等唔到網絡就當寫卡失敗。 而家寫卡同等主機分開記錄；實機啟動、映像同安裝程式仲要驗證。"
+  },
+  {
+   "sha": "5edd11712",
+   "date": "2026-11-13T17:44:34-05:00",
+   "title": "WIP: checkpoint card drafts and reviewed media refinements",
+   "areas": [
+    "docs",
+    "interface"
+   ],
+   "detail": "Preserve the reviewed card-draft recovery and media selection improvements, with related tests and documentation. Recovery checkpoint only, not a release or merge to main. Browser interaction validation remains outstanding."
+  },
+  {
+   "sha": "ff07dc0c8",
+   "date": "2026-11-13T17:36:06-05:00",
+   "title": "WIP: checkpoint guarded dashboard restore and isolated simulation",
+   "areas": [
+    "core",
+    "docs",
+    "interface"
+   ],
+   "detail": "Add atomic in-memory compare-and-save guarding for dashboard revision restores, with reviewed configuration recovery and failed-save handling. Extend isolated simulation without inheriting unprovided live entity state. Preserve related regression tests and documentation. Recovery branch only; no main merge or release. Browser QA and full Core pytest remain outstanding."
+  },
+  {
+   "sha": "c80cf0843",
+   "date": "2026-11-13T17:27:05-05:00",
+   "title": "WIP: checkpoint local revisions and media shortcuts",
+   "areas": [
+    "docs",
+    "interface"
+   ],
+   "detail": "Preserve the reviewed second frontend batch: browser-local dashboard save journal with export, account-scoped media favorites and recent selections, and associated tests and documentation. This is a recovery checkpoint, not a release or merge to main. Full browser and aggregate verification remain outstanding."
+  },
+  {
+   "sha": "d41346347",
+   "date": "2026-11-13T17:23:17-05:00",
+   "title": "WIP: preserve frontend editor and live-state improvement batch",
+   "areas": [
+    "docs",
+    "interface"
+   ],
+   "detail": "Recovery checkpoint only, not release-ready. Adds live entity-state previews, trigger-ID simulation inputs, safe trace navigation, media breadcrumbs and request safeguards, screen preview controls, and reversible color changes. Existing features are preserved. Focused checks passed; full browser and aggregate verification remain outstanding. Based on 9249faf; newer main changes have deliberately not been overwritten or merged."
+  },
+  {
+   "sha": "3869dadf6",
+   "date": "2026-11-13T15:47:52-05:00",
+   "title": "Preserve nested playback data and generate the demo sample",
+   "areas": [
+    "interface"
+   ],
+   "detail": "Keep an already selected media object when legacy split fields coexist. Generate the sample tone in the browser so the demo does not need a binary fixture."
+  },
+  {
+   "sha": "960c972ed",
+   "date": "2026-11-13T15:41:00-05:00",
+   "title": "Add capability-aware action and dashboard editors",
+   "areas": [
+    "build",
+    "docs",
+    "core",
+    "interface"
+   ],
+   "detail": "Give action values controls that follow integration and entity metadata. Add relative calendar and irrigation scheduling controls, preserve existing media actions, support precise text insertion, and inherit the all-actions setting.\n\nProvide a visual Repairs form and a structured fallback for dashboard elements. Add sample media and dashboard editing to the demo, allow stalled transfers to be cancelled, and retain release build files for recovery."
+  }
+ ]
+}

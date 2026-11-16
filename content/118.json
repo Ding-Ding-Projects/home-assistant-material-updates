@@ -1,0 +1,11 @@
+{
+  "build": 118,
+  "headline": "Design boards of the Home Assistant pages drawn from a running copy",
+  "summary": "Build 118 adds a design canvas of fifteen boards. Each board shows one Home Assistant page at 1440 pixels and on a 390 pixel phone, in light and dark. The boards are drawn from the frontend of this repository while it runs against a core, so they show what the pages really look like.",
+  "summary_yue": "第 118 版加咗一塊設計畫布，有十五塊畫板。每塊板顯示一個 Home Assistant 頁面，分別喺 1440 像素同 390 像素嘅手機闊度，淺色同深色各一。畫板係由呢個儲存庫嘅前端，連住一個運行緊嘅核心畫出嚟嘅。",
+  "highlights": [],
+  "other": [
+    { "title": "Adds a design canvas with fifteen boards of the Home Assistant pages, drawn from a running copy of the frontend.", "sha": ["b1e08fd1c"] }
+  ],
+  "no_feature_note": "This version is design work only: it adds boards that show the pages, and nothing a person using the product would notice has changed."
+}

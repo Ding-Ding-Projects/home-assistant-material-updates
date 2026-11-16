@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>New tab catalog sections</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="new-tab-catalog-sections">
+  <h1>New tab catalog</h1>
+  <p class="muted">Search the catalog, open pages as tabs, and see the open tabs list fill the full width of the panel.</p>
+
+  <section class="card stack" aria-labelledby="cat-h">
+    <h2 id="cat-h" style="font-size:18px;margin:0">Catalog</h2>
+    <label class="field" for="catalog-search">
+      <span>Search pages</span>
+      <input type="search" id="catalog-search" placeholder="Search pages" autocomplete="off">
+    </label>
+    <div id="sections" class="stack"></div>
+    <div class="row"><button type="button" class="tonal" id="open-all">Open every tab</button></div>
+  </section>
+
+  <section class="card stack" aria-labelledby="open-h">
+    <h2 id="open-h" style="font-size:18px;margin:0">Open tabs</h2>
+    <ul class="list" id="open-list" aria-label="Open tabs"></ul>
+  </section>
+
+  <p id="result" class="note good" aria-live="polite"></p>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var SECTIONS = [
+    { title: 'Settings', pages: ['Profile', 'Appearance', 'Locks'] },
+    { title: 'Tools', pages: ['Energy report', 'Image store', 'Automation editor'] },
+    { title: 'Menus', pages: ['Pages sheet', 'Tab menu'] }
+  ];
+
+  var open = [];
+  var sectionsEl = document.getElementById('sections');
+  var openList = document.getElementById('open-list');
+  var search = document.getElementById('catalog-search');
+  var result = document.getElementById('result');
+
+  function isOpen(name) {
+    return open.indexOf(name) >= 0;
+  }
+
+  function openPage(name) {
+    if (isOpen(name)) {
+      result.textContent = 'Already open. ' + name + ' is focused.';
+    } else {
+      open.push(name);
+      result.textContent = 'Opened ' + name + ' as a tab.';
+    }
+    render();
+  }
+
+  function render() {
+    var q = search.value.trim().toLowerCase();
+    sectionsEl.innerHTML = '';
+    var shown = 0;
+    SECTIONS.forEach(function (sec) {
+      var pages = sec.pages.filter(function (p) { return !q || p.toLowerCase().indexOf(q) >= 0; });
+      if (!pages.length) return;
+      shown += pages.length;
+      var block = document.createElement('section');
+      block.setAttribute('aria-label', sec.title);
+      var h = document.createElement('h3');
+      h.style.fontSize = '15px';
+      h.style.margin = '0 0 8px';
+      h.textContent = sec.title;
+      block.appendChild(h);
+      var ul = document.createElement('ul');
+      ul.className = 'list';
+      pages.forEach(function (p) {
+        var li = document.createElement('li');
+        var span = document.createElement('span');
+        span.style.flex = '1';
+        span.textContent = p;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'tonal';
+        btn.textContent = 'Open';
+        btn.setAttribute('aria-label', 'Open ' + p + ' as a tab');
+        btn.addEventListener('click', function () { openPage(p); });
+        li.appendChild(span);
+        li.appendChild(btn);
+        ul.appendChild(li);
+      });
+      block.appendChild(ul);
+      sectionsEl.appendChild(block);
+    });
+    if (!shown) {
+      var none = document.createElement('p');
+      none.className = 'muted';
+      none.textContent = 'No page matches that word.';
+      sectionsEl.appendChild(none);
+    }
+
+    openList.innerHTML = '';
+    if (!open.length) {
+      var li0 = document.createElement('li');
+      li0.textContent = 'No tabs open yet.';
+      openList.appendChild(li0);
+    }
+    open.forEach(function (name) {
+      var li = document.createElement('li');
+      var span = document.createElement('span');
+      span.style.flex = '1';
+      span.textContent = name;
+      var close = document.createElement('button');
+      close.type = 'button';
+      close.className = 'tonal';
+      close.textContent = 'Close';
+      close.setAttribute('aria-label', 'Close ' + name);
+      close.addEventListener('click', function () {
+        open = open.filter(function (x) { return x !== name; });
+        result.textContent = 'Closed ' + name + '.';
+        render();
+      });
+      li.appendChild(span);
+      li.appendChild(close);
+      openList.appendChild(li);
+    });
+  }
+
+  search.addEventListener('input', render);
+
+  document.getElementById('open-all').addEventListener('click', function () {
+    var added = 0;
+    SECTIONS.forEach(function (sec) {
+      sec.pages.forEach(function (p) {
+        if (!isOpen(p)) { open.push(p); added++; }
+      });
+    });
+    result.textContent = 'Opened ' + added + ' more tab(s).';
+    render();
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    open = [];
+    search.value = '';
+    result.textContent = '';
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

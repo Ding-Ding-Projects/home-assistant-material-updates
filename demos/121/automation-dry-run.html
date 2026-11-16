@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Automation dry run demo</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="automation-dry-run">
+  <h1>Automation dry run</h1>
+  <p class="muted">Set the fake states, then dry-run the pretend automation. No service is called.</p>
+
+  <section class="card stack" aria-labelledby="h-auto">
+    <h2 id="h-auto" style="font-size:18px">Pretend automation</h2>
+    <p>When the hallway light turns on and it is night, run a pretend action.</p>
+    <label class="field" for="light">Fake state: hallway light
+      <select id="light">
+        <option value="off">off</option>
+        <option value="on">on</option>
+      </select>
+    </label>
+    <label class="field" for="time">Fake state: time of day
+      <select id="time">
+        <option value="day">day</option>
+        <option value="night">night</option>
+      </select>
+    </label>
+    <div class="row">
+      <button type="button" class="filled" id="dry">Dry run</button>
+      <button type="button" class="tonal" id="clear">Clear result</button>
+    </div>
+  </section>
+
+  <section class="card stack" aria-labelledby="h-res">
+    <h2 id="h-res" style="font-size:18px">Result</h2>
+    <ul class="list" id="conds"><li>Run a dry run to check the conditions.</li></ul>
+    <p class="note" id="verdict" aria-live="polite"></p>
+    <p class="small muted" id="calls">Dry runs: 0. Service calls: 0.</p>
+  </section>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var light = document.getElementById('light');
+  var time = document.getElementById('time');
+  var conds = document.getElementById('conds');
+  var verdict = document.getElementById('verdict');
+  var calls = document.getElementById('calls');
+  var runs = 0;
+
+  function badge(ok) {
+    var s = document.createElement('span');
+    s.className = ok ? 'badge good' : 'badge error';
+    s.textContent = ok ? 'Passed' : 'Failed';
+    return s;
+  }
+
+  function row(text, ok) {
+    var li = document.createElement('li');
+    var t = document.createElement('span');
+    t.textContent = text;
+    t.style.flex = '1';
+    li.appendChild(t);
+    li.appendChild(badge(ok));
+    return li;
+  }
+
+  function dryRun() {
+    runs += 1;
+    var lightOn = light.value === 'on';
+    var isNight = time.value === 'night';
+    conds.innerHTML = '';
+    conds.appendChild(row('Hallway light is on (fake state: ' + light.value + ')', lightOn));
+    conds.appendChild(row('It is night (fake state: ' + time.value + ')', isNight));
+    var wouldRun = lightOn && isNight;
+    verdict.className = wouldRun ? 'note good' : 'note warn';
+    verdict.textContent = wouldRun
+      ? 'The pretend action would run. No service was called.'
+      : 'The pretend action would not run. The conditions that failed are marked above. No service was called.';
+    calls.textContent = 'Dry runs: ' + runs + '. Service calls: 0.';
+  }
+
+  document.getElementById('dry').addEventListener('click', dryRun);
+  document.getElementById('clear').addEventListener('click', function () {
+    conds.innerHTML = '';
+    var li = document.createElement('li');
+    li.textContent = 'Run a dry run to check the conditions.';
+    conds.appendChild(li);
+    verdict.className = 'note';
+    verdict.textContent = 'Result cleared.';
+  });
+
+  function reset() {
+    light.value = 'off';
+    time.value = 'day';
+    runs = 0;
+    conds.innerHTML = '';
+    var li = document.createElement('li');
+    li.textContent = 'Run a dry run to check the conditions.';
+    conds.appendChild(li);
+    verdict.className = 'note';
+    verdict.textContent = '';
+    calls.textContent = 'Dry runs: 0. Service calls: 0.';
+  }
+  document.querySelectorAll('[data-demo-reset]').forEach(function (b) { b.addEventListener('click', reset); });
+  reset();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Repairs: no contradictory cards</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+  label.row { min-height: 48px; cursor: pointer; flex-wrap: nowrap; }
+  input[type="radio"] { width: 24px; height: 24px; flex: none; accent-color: var(--p); margin: 0; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="repairs-no-contradiction">
+  <h1>Repairs page: no contradictory cards</h1>
+  <p class="muted">Choose what the Supervisor reports about this installation. Watch which repair cards the Repairs page shows.</p>
+
+  <section class="card stack" aria-labelledby="state-h">
+    <h2 id="state-h" style="font-size:18px;margin:0">What the Supervisor reports</h2>
+    <fieldset style="border:0;margin:0;padding:0" class="stack">
+      <legend class="sr-only">Supervisor report</legend>
+      <label class="row"><input type="radio" name="sup" value="supported" checked> <span>The Supervisor says supported</span></label>
+      <label class="row"><input type="radio" name="sup" value="unsupported"> <span>The Supervisor says unsupported</span></label>
+      <label class="row"><input type="radio" name="sup" value="nothing"> <span>The Supervisor reports nothing</span></label>
+    </fieldset>
+    <label class="row" for="before">
+      <input type="checkbox" class="switch" id="before">
+      <span>Show the build before this fix</span>
+    </label>
+  </section>
+
+  <section class="card stack" aria-labelledby="cards-h">
+    <h2 id="cards-h" style="font-size:18px;margin:0">Repairs</h2>
+    <ul class="list" id="cards" aria-label="Repair cards"></ul>
+  </section>
+
+  <p id="result" class="note good" aria-live="polite"></p>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var cards = document.getElementById('cards');
+  var result = document.getElementById('result');
+  var before = document.getElementById('before');
+  var radios = document.querySelectorAll('input[name="sup"]');
+
+  var SUPERVISOR_TEXT = {
+    supported: 'Unsupported: Nothing. This installation is supported.',
+    unsupported: 'The Supervisor reports this installation as unsupported.',
+    nothing: 'The Supervisor reported nothing about this installation.'
+  };
+
+  function selected() {
+    var v = 'supported';
+    radios.forEach(function (r) { if (r.checked) v = r.value; });
+    return v;
+  }
+
+  function render() {
+    var s = selected();
+    // Before the fix, the start-up check raised its repair for every installation.
+    // After the fix, it raises the repair only when the Supervisor does not say supported.
+    var showRepair = before.checked ? true : s !== 'supported';
+    cards.innerHTML = '';
+
+    var a = document.createElement('li');
+    a.textContent = SUPERVISOR_TEXT[s];
+    cards.appendChild(a);
+
+    if (showRepair) {
+      var b = document.createElement('li');
+      b.textContent = 'Repair: Unsupported installation method.';
+      cards.appendChild(b);
+    }
+
+    var msg = showRepair ? 'The start-up repair is shown.' : 'No start-up repair is shown.';
+    if (before.checked && s === 'supported') {
+      msg += ' The old build shows the repair next to a card that says the installation is supported.';
+    }
+    result.textContent = msg;
+    result.className = (before.checked && s === 'supported') ? 'note error' : 'note good';
+  }
+
+  radios.forEach(function (r) { r.addEventListener('change', render); });
+  before.addEventListener('change', render);
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    radios.forEach(function (r) { r.checked = r.value === 'supported'; });
+    before.checked = false;
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

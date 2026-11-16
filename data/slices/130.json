@@ -1,0 +1,34 @@
+{
+ "build": 130,
+ "core": "2026.11.1.130",
+ "supervisor": "2026.11.0.130",
+ "os": "18.5.130",
+ "tag": "v2026.11.1.130",
+ "source": "8a37d4c04",
+ "date": "2026-11-12T06:33:52-05:00",
+ "previous_build": 128,
+ "changes": [
+  {
+   "sha": "8a37d4c04",
+   "date": "2026-11-12T06:33:52-05:00",
+   "title": "Section and phone tab options: fixes from the browser pass",
+   "areas": [
+    "docs",
+    "interface"
+   ],
+   "detail": "Batch 33. The previous commit shipped the settings section tab options and the phone Pages sheet options unseen. They have now been driven in a local build at 1440, 1000, 390 and 320 px, and the pass found real defects.\n\n- Most settings pages had no section tab menu at all, because the layout only passed the app state down when a page handed it one. It now falls back to the app element's own. - A chosen text colour did not show on a section tab; a toolbar rule won. - On a phone, lifting the finger after a long press ran the menu row under it. The lift's click is now swallowed and the menu stays open. - Phone bottom sheets stopped 16 px short of the right edge. - The phone Pages sheet lists and opens settings and tool tabs, and closing the tab in use goes to the neighbouring tab, there and from the wide strip's tab menu. - The group picker names a section's tabs by their labels.\n\nChecks: type check clean apart from the two known gallery errors; full suite passed apart from the 3 known build-script failures.",
+   "detail_yue": "第 33 批。上一個提交將設定分頁同手機頁面表嘅新功能未睇過就交咗出去，今次 喺本機 build 逐樣跑過，真係搵到問題：大部分設定頁根本冇分頁選單；揀咗嘅 字色唔出；手機長按一放手就當撳咗下面嗰行。全部修好再睇過。手機頁面表而家 識列設定同工具分頁，閂咗用緊嗰個會跳去隔籬。"
+  },
+  {
+   "sha": "875b30677",
+   "date": "2026-11-12T05:32:16-05:00",
+   "title": "Settings pages and tools as tabs; tab options for section tabs and phone",
+   "areas": [
+    "docs",
+    "interface"
+   ],
+   "detail": "Batch 32. Two halves with different amounts of proof, said plainly.\n\nSeen in a local build: - A settings page or a tool chosen in the New tab catalog opens as a tab of its own, with its icon and title. A second choice focuses the existing tab. The most specific open tab is the selected one. These tabs pin, group, lock and take a look like any other, are saved with the account, and came back after a reload and in a second browser. A page the account may not see is hidden, not deleted.\n\nNOT yet seen in a browser (unit tests, lint and type check only): - Settings section tabs: their own right-click menu, groups, per-tab looks, locks, hide by text with a preview and undo, a search in the More list, and a place in \"Search all tabs\". - Phone Pages sheet: locks, groups as foldable sections, per-page looks, move into and out of a group. - The phone Pages sheet does not list the new settings and tool tabs yet.\n\nChecks: type check clean apart from the two known gallery errors; full suite 7,014 passed with the 3 known build-script failures.",
+   "detail_yue": "第 32 批，兩半嘅證據唔同，照直講。喺本機 build 睇過：設定頁同工具可以自己 開成分頁，有圖示有標題，再揀一次就跳返去嗰個分頁，唔會開多個。未喺瀏覽器 睇過、只係過咗單元測試同型別檢查：設定分頁嘅右鍵選單、分組、外觀、鎖同 按文字隱藏；手機頁面表嘅鎖、分組同外觀。手機頁面表仲未識列新嘅設定分頁。"
+  }
+ ]
+}

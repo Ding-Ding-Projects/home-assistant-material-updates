@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deploy Assistant polish demo</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+  .stepper { display: flex; align-items: center; gap: 8px; }
+  .stepper button { width: 48px; padding: 0; }
+  .steps { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  .steps li { min-width: 48px; min-height: 48px; display: flex; align-items: center; justify-content: center; padding: 0 12px; border-radius: 12px; background: var(--sl2); }
+  .steps li[aria-current="step"] { background: var(--sc); color: var(--on-sc); font-weight: 500; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="deploy-assistant-polish">
+  <h1>Deploy Assistant polish</h1>
+  <p class="muted">Change the pretend backup count to see the wording, then move through the pretend setup steps.</p>
+
+  <section class="card stack" aria-labelledby="h-inst">
+    <div class="row" style="justify-content: space-between">
+      <h2 id="h-inst" style="font-size:18px">Pretend instance</h2>
+      <span class="badge" id="backup-label">1 backup</span>
+    </div>
+    <div class="stepper" role="group" aria-label="Number of pretend backups">
+      <button type="button" class="tonal" id="minus" aria-label="Remove a pretend backup">-</button>
+      <output id="count" aria-live="polite">1</output>
+      <button type="button" class="tonal" id="plus" aria-label="Add a pretend backup">+</button>
+    </div>
+  </section>
+
+  <section class="card stack" aria-labelledby="h-wiz">
+    <h2 id="h-wiz" style="font-size:18px">Pretend Minecraft server setup</h2>
+    <p id="current-name" class="note" aria-live="polite"></p>
+    <ol class="steps" id="steps" aria-label="Setup steps"></ol>
+    <div class="row">
+      <button type="button" class="tonal" id="back">Back</button>
+      <button type="button" class="filled" id="next">Next</button>
+    </div>
+  </section>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var NAMES = ['Pretend step one', 'Pretend step two', 'Pretend step three', 'Pretend step four'];
+  var backups = 1;
+  var current = 0;
+  var count = document.getElementById('count');
+  var label = document.getElementById('backup-label');
+  var steps = document.getElementById('steps');
+  var currentName = document.getElementById('current-name');
+  var back = document.getElementById('back');
+  var next = document.getElementById('next');
+
+  function plural(n) { return n + (n === 1 ? ' backup' : ' backups'); }
+
+  function renderBackups() {
+    count.textContent = String(backups);
+    label.textContent = plural(backups);
+    document.getElementById('minus').disabled = backups === 0;
+  }
+
+  function renderSteps() {
+    steps.innerHTML = '';
+    NAMES.forEach(function (name, i) {
+      var li = document.createElement('li');
+      if (i === current) {
+        li.setAttribute('aria-current', 'step');
+        li.textContent = name;
+      } else {
+        li.textContent = String(i + 1);
+        li.setAttribute('aria-label', 'Step ' + (i + 1));
+      }
+      steps.appendChild(li);
+    });
+    currentName.textContent = 'Current step: ' + NAMES[current] + '. The other steps show their numbers.';
+    back.disabled = current === 0;
+    next.textContent = current === NAMES.length - 1 ? 'Finish (pretend)' : 'Next';
+    if (current === NAMES.length - 1 && next.getAttribute('data-done') === 'yes') {
+      currentName.textContent = 'Finished the pretend setup. Nothing was really created.';
+    }
+  }
+
+  document.getElementById('minus').addEventListener('click', function () {
+    if (backups > 0) { backups -= 1; renderBackups(); }
+  });
+  document.getElementById('plus').addEventListener('click', function () {
+    if (backups < 5) { backups += 1; renderBackups(); }
+  });
+  back.addEventListener('click', function () {
+    if (current > 0) { current -= 1; next.removeAttribute('data-done'); renderSteps(); }
+  });
+  next.addEventListener('click', function () {
+    if (current < NAMES.length - 1) { current += 1; renderSteps(); }
+    else { next.setAttribute('data-done', 'yes'); renderSteps(); }
+  });
+
+  function reset() {
+    backups = 1;
+    current = 0;
+    next.removeAttribute('data-done');
+    renderBackups();
+    renderSteps();
+  }
+  document.querySelectorAll('[data-demo-reset]').forEach(function (b) { b.addEventListener('click', reset); });
+  reset();
+})();
+</script>
+</body>
+</html>

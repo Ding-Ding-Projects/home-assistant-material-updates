@@ -1,0 +1,121 @@
+{
+  "build": 347,
+  "headline": "Unlock a lock with an NFC tag, find problems on the exact card or step, and meet the new modern look",
+  "summary": "This version adds an NFC tag as a second way to unlock a lock, with a password kept as the backup. A dashboard card or automation step that names an entity Home Assistant does not know is now outlined where it sits, and the Repairs page lists the problems found in the current session with a Teleport to the exact spot. The new design kit becomes the default light and dark theme, and a new setting, One navigation pane, is off until you turn it on. Some of this has been checked only by unit tests so far, not yet on a real NFC tag or in a running build.",
+  "summary_yue": "今個版本加咗 NFC 標籤做開鎖嘅方法之一，密碼就留低做後備。儀表板卡或者自動化步驟如果寫住一個 Home Assistant 唔認識嘅實體，而家會喺原位畫框，修理頁會列出呢次工作階段搵到嘅問題，撳「跳去」就直接去到個位。全新設計套件成為預設嘅淺色同深色主題，另外有一個新設定「單一導覽窗格」，預設係關，想用要自己開。有啲改動暫時只係過咗單元測試，未試過真正嘅 NFC 標籤，亦未喺一個運行緊嘅版本入面睇過。",
+  "highlights": [
+    {
+      "id": "nfc-tag-unlock",
+      "title": "Unlock with an NFC tag, the password as backup",
+      "areas": ["interface", "docs"],
+      "what": "A lock can now open with an NFC tag. The set-up wizard asks for a password first, then for a tag, and either one opens the lock on its own. While the unlock prompt waits for a tag, Use password instead switches to the password. A tag is read by this browser's own NFC reader, or by a scan from the Home Assistant app, and the prompt says which of those it can hear. A wrong tag uses up an attempt, the same as a wrong password. Only a salted hash of the tag's identity is stored.",
+      "what_yue": "一個鎖而家可以用 NFC 標籤開。設定精靈先要你設密碼，之後先讀標籤，兩樣之中任何一樣都可以單獨開鎖。解鎖畫面等緊標籤嗰陣，撳「改用密碼」就轉去用密碼。標籤可以俾呢個瀏覽器自己嘅 NFC 讀頭讀，又可以由 Home Assistant 手機應用程式掃描，畫面會話你知聽到邊一種。掃錯個標籤會用走一次嘗試，同打錯密碼一樣。標籤嘅身份只會以加鹽嘅雜湊形式儲存。",
+      "why": "A tag is quicker than typing a password every time, and the password set first stays as the backup.",
+      "try": [
+        "Open the set-up wizard, type a password in both boxes and press Next.",
+        "On the tag step, choose a tag, press Read tag and then Next.",
+        "In the unlock prompt, scan tag A to open the lock, then scan tag B to see it refused."
+      ],
+      "sha": ["162ad2d1d"],
+      "demo": "demos/347/nfc-tag-unlock.html"
+    },
+    {
+      "id": "problem-detector",
+      "title": "Problem detector outlines the exact card or step",
+      "areas": ["interface", "docs"],
+      "what": "When a dashboard card or an automation step names an entity that Home Assistant does not know, that exact card or step is outlined where it is, with a Problem found badge. The badge opens the details: what is wrong, Fix when the app can fix it (turning the step off), numbered steps to fix it by hand when it cannot, and Ignore. The Repairs page lists every problem found in this session, with Fix, Fix all, Ignore and Teleport. The settings are in Profile, under Browser.",
+      "what_yue": "儀表板卡或者自動化步驟如果寫咗一個 Home Assistant 唔認識嘅實體，嗰個卡或者步驟會喺原位畫框，旁邊有「發現問題」標記。撳標記會打開詳情：邊度有問題；應用程式可以修嘅話有「修正」掣（即係將嗰個步驟關掉）；唔可以修嘅話就有逐步手動修理嘅步驟；仲有「忽略」。修理頁會列出呢次工作階段搵到嘅所有問題，每個都有修正、全部修正、忽略同跳去。設定喺個人檔案入面嘅瀏覽器一項。",
+      "why": "It shows exactly which card or step names an entity Home Assistant does not know, and what to do about it.",
+      "try": [
+        "Find the card with the Problem found badge in the dashboard demo.",
+        "Press the badge and read the details, then press Fix on the automation step.",
+        "Press Ignore on the card and watch its outline go."
+      ],
+      "sha": ["cfa0e7a13"],
+      "demo": "demos/347/problem-detector.html"
+    },
+    {
+      "id": "teleport-transition",
+      "title": "Jumps to an exact element play one short transition",
+      "areas": ["interface", "docs"],
+      "what": "Every jump to an exact element now plays one transition: a ring where the person pressed, a beam to the destination, the element appearing out of a bright blur under a scan line, and then a fading glow. It plays for Teleport from Repairs, for search results on Personal settings, backup settings and the AI page, and for the dashboard editor's card jumps. Reduce motion skips it. Problems found on other pages stay in this browser, so Repairs still lists them after a reload, and the spotlight now hugs the element instead of a large circle.",
+      "what_yue": "每次跳去一個指定嘅元素，而家都會播一段過場：撳嗰度會有一個圈，一道光束飛去目的地，元素由一片光霧慢慢現形，跟住一圈光暈慢慢淡走。修理頁嘅跳去、個人設定、備份設定同 AI 頁嘅搜尋結果，仲有儀表板編輯器入面跳去卡嗰度，都會播。開咗減少動態就跳過過場。其他頁面搵到嘅問題會留喺呢個瀏覽器，重新載入之後修理頁都仲睇到，聚光燈亦收窄到貼住個元素。",
+      "why": "It shows where a jump landed, so the element does not appear without any warning.",
+      "try": [
+        "Press Teleport on a problem in the Repairs list.",
+        "Watch the ring, the beam and the glow, then find the spotlight on the element.",
+        "Turn on Reduce motion in the demo, press Teleport again, and see the jump happen at once."
+      ],
+      "sha": ["cce97bf86"],
+      "demo": "demos/347/teleport-transition.html"
+    },
+    {
+      "id": "design-kit-theme",
+      "title": "The new modern look is the default theme",
+      "areas": ["interface", "docs"],
+      "what": "The app uses the new design kit as its default light and dark themes. Surfaces, outlines, text, the primary colour scale and the container colours for primary, tertiary, warning, error and success all follow it. Cards, buttons, switches, dialogs, menus, list items, chips, fields and table rows follow the same kit. Custom primary colours and user themes still override it. Motion turns off under reduced motion, whether the system setting or the accessibility tool asks for it. Not done yet: the segmented control, the select field and the per-row entrance animation.",
+      "what_yue": "全個應用程式預設用新嘅設計套件做淺色同深色主題。表面、框線、文字、主色階、同主色、第三色、警告、錯誤、成功嗰啲容器色都跟住套件。卡、按鈕、開關、對話框、選單、清單項目、小標籤、輸入框同表格列都跟住。自訂主色同用戶主題仍然可以覆蓋。系統或者無障礙工具要求減少動態嗰陣，動畫即刻停。仲未做嘅有分段按鈕、選擇欄，同逐行出現嘅動畫。",
+      "why": "Most screens looked different from the new design, and this changes them together instead of page by page.",
+      "try": [
+        "Press Light, Dark and System to see the theme change.",
+        "Pick a custom primary colour and see that it overrides the kit colour.",
+        "Add an item to the list, then press Start again to put the sample back."
+      ],
+      "sha": ["f4fd9046a"],
+      "demo": "demos/347/design-kit-theme.html"
+    },
+    {
+      "id": "one-navigation-pane",
+      "title": "One navigation pane, off by default",
+      "areas": ["docs", "interface"],
+      "what": "A new setting, One navigation pane, is off by default. It lives in the profile and syncs. When it is on, the side rail steps aside and the tab pane shows the Pages and System headings, Developer tools, Settings, Notifications with a count, a search field, and the person's name and a home button on a top or bottom bar. The rail's extras (edit mode, the update badge and Assist) are out of view while it is on. The lock removal prompt, opened from the page tool panel, now appears on top of that panel instead of underneath it.",
+      "what_yue": "新增咗一個設定「單一導覽窗格」，預設係關，設定放喺個人檔案，會同步。開咗之後，側邊欄會讓開，分頁窗格會顯示「頁面」同「系統」標題、開發人員工具、設定、附數字嘅通知、搜尋欄，以及你嘅名同主頁掣（喺頂或者底嗰條列）。側邊欄嘅額外項目（編輯模式、更新標記、Assist）開咗就睇唔到。另外，由頁面工具面板打開嘅移除鎖確認框，而家會顯示喺面板上面，唔會再畀面板壓住。",
+      "why": "It puts pages, settings, notifications and search in one pane, for people who want one place to look.",
+      "try": [
+        "Turn on One navigation pane in the demo and see the rail go and the top bar appear.",
+        "Type in the search field to filter the pages.",
+        "Turn the old layering switch on and off to compare the lock prompt with the panel over it."
+      ],
+      "sha": ["553db8c82"],
+      "demo": "demos/347/one-navigation-pane.html"
+    }
+  ],
+  "other": [
+    {
+      "title": "Notes on what was seen of the NFC tag set-up in a running build",
+      "sha": ["cc008ec81"]
+    },
+    {
+      "title": "Design files: the README and the index pages for the modern canvases 24 to 30",
+      "sha": ["54af22c48", "0f059e9b6", "dffd857bd", "f6cae556f", "4153a5809", "8b27f5587", "8782bab25", "3583e1ffd"]
+    },
+    {
+      "title": "Design boards for the modern editors canvas (30), redrawn in the new look",
+      "sha": ["d365409a0", "d43c264e6", "8eeca9a1d", "af032d728", "27093181e", "6da9ac845", "e794cf38d", "2a270fad4", "8c9622d57", "7b6a2bf09", "56df68e4d", "3d42f6d2f", "f72fbedfd", "ead1ef018", "792e98de4", "c93bae81c", "50a645062", "2be03b8a4", "c0491e563", "c87c307b7", "65d197f6a", "7508bc06a", "54ca54517", "f8a7b1cf7", "56a8ed79f", "e90f0e20e", "208f23c09", "2bf3233c4", "b6e6e2a79", "bc2a35f44", "accd336a2", "110266cd5"]
+    },
+    {
+      "title": "Design boards for the modern polish canvas (29), redrawn in the new look",
+      "sha": ["8ece2d90d", "87aa24985", "a8328385d", "320b9a0f2", "e20282ea3", "bc6fdedef", "d782e81ad", "7a00db017", "45264cf11", "4d819c8d6", "273222ef4", "8d932dd10", "7b4d7d077", "b7c275e97", "f0f22ae85", "9de842f4f", "5e3c02990", "67a2c7df8", "8ffac1880", "fb69c103f", "1f907da7c", "a8a275cac", "7a836185f", "7a0527041", "a4f1de472", "93c02b226", "1a35db99d", "0ea846c7d", "cbe6aa071", "5c22d3567", "1bc394d24", "cbb861f26", "aaf1e7fae", "0fdf3d305"]
+    },
+    {
+      "title": "Design boards for the modern features canvas (28), redrawn in the new look",
+      "sha": ["064eda872", "9df3ce57e", "1fea943ed", "94af4900c", "469e5358f", "e23accaf5", "5da909576", "cc196dbf2", "14579eaa4", "decb2afad", "c7efdb84c", "fede8b781", "bc4e81a84", "154b8e4c8", "87fb056e0", "9f64ef8e8", "7de01f20e", "6da44a002", "bda2854d5", "52dc1e4f7", "80534ba3a", "99eb25bee", "43e77bbc5", "383176965", "f63f71838", "48b137114", "df6abc235", "2583d8deb", "0aa51290f", "8e7ab34b9", "281644ef6", "1179a8132", "2127e5ee4", "c7a37a820", "e92279452", "5d11a7bf3", "567de8fb0", "b32cf2977", "0d61c1f7a", "f2e79d8f8", "328f0df65", "e866a86fe", "b8dd17871", "4d81f5e85", "09e14e265"]
+    },
+    {
+      "title": "Design boards for the modern protocols canvas (27), entity dialogs and network pages, redrawn in the new look",
+      "sha": ["c82abad4e", "741646014", "4d136b475", "b1a1deb73", "e6565414e", "004c0d1c2", "2f9a9b1dd", "315e33ec5", "353d1010c", "537484103", "767e7b5a7", "876267756", "b980ca389", "c48cf4e9c", "cb39b68fa", "8615f87b1", "af5cbf743", "43f280a4f", "982748ba9", "52384af46", "0406f898c", "92a03f8e7", "004e85484", "0afa4bf66"]
+    },
+    {
+      "title": "Design boards for the modern system canvas (26), developer tools and system pages, redrawn in the new look",
+      "sha": ["604e4a3c3", "2cf7c5aba", "80faf78d3", "109e36b5a", "d28695552", "9c9c2032b", "4b1030597", "1488bb105", "b3b447415", "fc4f91bee", "feef2e627", "b0b5063c9", "551af7eab", "1b9679dbe", "5a90c5742", "8707d4f81", "a473b1b94", "284e6462a", "5a511258a", "fb400c627", "f24c1c1d6", "702a0783a", "0a6fd5caf", "a36bafaca", "ed6862112", "d055f8930", "bec40bc6b", "3a21dc9c5", "fe2a4492e", "998075cd5"]
+    },
+    {
+      "title": "Design boards for the modern settings canvas (25), automations, entities and integrations, redrawn in the new look",
+      "sha": ["2e52d595e", "e1e5c761b", "f868070d6", "93d01b01f", "bd330e264", "4611cf8c7", "76cbcaefb", "b684ed116", "c4745c09f", "d48d787b8", "99558235e", "1cddfc204", "7ece81115", "659f9c936", "09c3e0376", "adb62b7f1", "5b17c98a6", "93284e7b7", "8ec7bdb80", "4e5eabf71", "c758a59b9", "d23217bf3", "765df0135", "70f1eb96c", "8975a7aac", "1eb946ed6", "c40e0fb1e", "9a6ecaeb8", "b5a916eef", "216680794"]
+    },
+    {
+      "title": "Design boards for the modern everyday canvas (24), home, lights, climate and first-run, redrawn in the new look",
+      "sha": ["2fe367b75", "c771a761c", "d65a58c84", "f2716ca92", "e1e691703", "06bbfe669", "2b64bbec1", "9ad8b14f1", "310920321", "7d5bd2b1c", "f6236f75d", "3c8e3cce6", "acb085a37", "12133faf6", "39520742e", "2297dbf38", "a55ae630f", "f85d00970", "c5bcb3e15", "a6491212b", "c829094ce", "7469b9696", "936485762", "996276761", "78d186355", "a10652235", "071de2194", "a200e8d96", "18d2b5920"]
+    }
+  ]
+}

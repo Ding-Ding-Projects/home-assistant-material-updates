@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: history comparison</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.chart { display: flex; align-items: flex-end; gap: 3px; height: 160px; padding: 8px; background: var(--sl1); border-radius: 16px; overflow: hidden; }
+.chart .col { flex: 1 1 0; min-width: 4px; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; }
+.chart .col i { display: block; background: var(--p); border-radius: 3px 3px 0 0; }
+.chart .col.prev i { background: var(--sc); }
+.legend { display: flex; gap: 16px; font-size: 13px; color: var(--onv); flex-wrap: wrap; }
+.legend span::before { content: ""; display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; background: var(--p); vertical-align: -1px; }
+.legend span.prev::before { background: var(--sc); }
+.fieldset-like { border: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.fieldset-like legend { font-size: 13px; color: var(--onv); padding: 0; margin-bottom: 4px; }
+.cmp-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="history-comparison">
+  <h1>History can compare an earlier time window</h1>
+  <p class="muted">Choose a period, then turn on comparison. Press a second period quickly: only the newest answer ends up on the chart.</p>
+
+  <section class="card stack" aria-labelledby="h-period">
+    <fieldset class="fieldset-like">
+      <legend id="h-period">Period</legend>
+      <div class="row" role="group" aria-labelledby="h-period">
+        <button type="button" class="chip" data-days="7" aria-pressed="false">Last 7 days</button>
+        <button type="button" class="chip" data-days="14" aria-pressed="false">Last 14 days</button>
+        <button type="button" class="chip" data-days="30" aria-pressed="false">Last 30 days</button>
+      </div>
+    </fieldset>
+
+    <div class="cmp-row">
+      <label for="cmp">Compare with the earlier period</label>
+      <input type="checkbox" class="switch" id="cmp">
+    </div>
+
+    <p id="status" class="note" aria-live="polite">Pick a period to load the chart.</p>
+
+    <div id="chart" class="chart" role="img" aria-label="Daily values for the chosen period"></div>
+    <div class="legend" aria-hidden="true"><span>Chosen period</span><span class="prev">Earlier period</span></div>
+    <p id="totals" class="small muted" aria-live="polite"></p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  // Pretend daily values for the last 60 days.
+  var DATA = [];
+  for (var i = 0; i < 60; i++) { DATA.push(10 + ((i * 37) % 23)); }
+  // Pretend answer times in ms: a 7-day request is deliberately slow.
+  var DELAY = { 7: 1200, 14: 300, 30: 800 };
+
+  var chips = document.querySelectorAll('[data-days]');
+  var cmp = document.getElementById('cmp');
+  var chart = document.getElementById('chart');
+  var status = document.getElementById('status');
+  var totals = document.getElementById('totals');
+
+  var seq = 0;        // id of the newest request
+  var shownDays = null;
+
+  function sum(a) { return a.reduce(function (s, v) { return s + v; }, 0); }
+
+  function render() {
+    chart.innerHTML = '';
+    if (!shownDays) { totals.textContent = ''; return; }
+    var n = shownDays;
+    var current = DATA.slice(DATA.length - n);
+    var earlier = cmp.checked ? DATA.slice(DATA.length - 2 * n, DATA.length - n) : [];
+    var max = Math.max.apply(null, current.concat(earlier));
+    function addCol(v, cls) {
+      var col = document.createElement('div');
+      col.className = 'col ' + cls;
+      var bar = document.createElement('i');
+      bar.style.height = Math.round((v / max) * 100) + '%';
+      col.appendChild(bar);
+      chart.appendChild(col);
+    }
+    if (cmp.checked) { earlier.forEach(function (v) { addCol(v, 'prev'); }); }
+    current.forEach(function (v) { addCol(v, ''); });
+    var text = 'Chosen period total: ' + sum(current) + '.';
+    if (cmp.checked) { text += ' Earlier period total: ' + sum(earlier) + '.'; }
+    totals.textContent = text;
+  }
+
+  function markChips(days) {
+    chips.forEach(function (c) {
+      c.setAttribute('aria-pressed', String(Number(c.getAttribute('data-days')) === days));
+    });
+  }
+
+  function request(days) {
+    var id = ++seq;
+    markChips(days);
+    status.textContent = 'Loading the last ' + days + ' days...';
+    setTimeout(function () {
+      if (id !== seq) { return; } // an older answer: ignored
+      shownDays = days;
+      status.textContent = 'Showing the last ' + days + ' days.';
+      render();
+    }, DELAY[days]);
+  }
+
+  chips.forEach(function (c) {
+    c.addEventListener('click', function () {
+      request(Number(c.getAttribute('data-days')));
+    });
+  });
+
+  cmp.addEventListener('change', function () {
+    status.textContent = cmp.checked ? 'Comparison on. Earlier period shown in a lighter colour.' : 'Comparison off.';
+    render();
+  });
+
+  function reset() {
+    seq++;               // any request still loading is now out of date
+    shownDays = null;
+    cmp.checked = false;
+    markChips(0);
+    chart.innerHTML = '';
+    totals.textContent = '';
+    status.textContent = 'Pick a period to load the chart.';
+  }
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', reset);
+})();
+</script>
+</body>
+</html>

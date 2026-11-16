@@ -1,0 +1,25 @@
+{
+  "build": 115,
+  "headline": "Phones get a tighter layout, and the top strip is gone from small screens",
+  "summary": "Build 115 tightens the layout for phones. The YAML tools page uses one column on a narrow screen, so names no longer break inside words. The slim strip at the top that named the current page is hidden on a phone, and the Pages button in the bottom bar does that job instead. The open menu also has less space around its header.",
+  "summary_yue": "第 115 版收緊咗手機版面。YAML 工具頁喺窄屏會用一欄，唔會再將字斬到一截截。頂部嗰條標示頁名嘅幼條，喺手機會唔見，底部嘅「頁面」掣負責呢份工。開住嘅選單，標頭附近嘅空位亦都收窄咗。",
+  "highlights": [
+    {
+      "id": "phone-layout",
+      "title": "Phone screens drop the top strip and use one column for YAML tools",
+      "areas": ["interface"],
+      "what": "On a phone, the slim strip at the top that named the current page is no longer shown, because the Pages button in the bottom bar does that job. Each page has its own header. The YAML tools page switches to one column on a narrow screen, so names no longer break inside words. The open menu uses less space around its header.",
+      "what_yue": "喺手機上，頂部標示頁名嘅幼條唔再出現，底部嘅「頁面」掣負責呢份工，每頁都有自己嘅標頭。YAML 工具頁喺窄屏會變成一欄，字唔會再斬開。開住嘅選單，標頭嗰度嘅空位亦都收窄咗。",
+      "why": "The top strip took up space on a small screen, and the YAML tools page was cramped into two columns that were too narrow for their names.",
+      "try": [
+        "Press Phone view to make the demo frame as narrow as a phone.",
+        "Look at the top of the frame: the strip is gone and the Pages button is at the bottom.",
+        "Compare the pretend YAML fields: in phone view they are in one column.",
+        "Press Start again to return to Wide view."
+      ],
+      "sha": ["b84711096"],
+      "demo": "demos/115/phone-layout.html"
+    }
+  ],
+  "other": []
+}

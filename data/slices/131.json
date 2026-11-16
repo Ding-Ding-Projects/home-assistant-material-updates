@@ -1,0 +1,33 @@
+{
+ "build": 131,
+ "core": "2026.11.1.131",
+ "supervisor": "2026.11.0.131",
+ "os": "18.5.131",
+ "tag": "v2026.11.1.131",
+ "source": "e163a99be",
+ "date": "2026-11-12T08:49:32-05:00",
+ "previous_build": 130,
+ "changes": [
+  {
+   "sha": "e163a99be",
+   "date": "2026-11-12T08:49:32-05:00",
+   "title": "New tab catalog: stop the strip's group pill styling the catalog sections",
+   "areas": [
+    "docs",
+    "interface"
+   ],
+   "detail": "Batch 34. In published build 130 the New tab catalog drew its page list in the right half of the panel and left the other half empty. The strip's tab groups and the catalog's sections share a class name and a shadow root, so every catalog section was laid out as a one-row group pill. The catalog sections are plain blocks again. Fixed in source; not yet seen in a build.\n\nAlso records batches 31 to 33: build 130 was opened in a browser on a throwaway instance (strip, section tab menu, catalog, phone sheet; no page errors), and the live instance was moved to it.",
+   "detail_yue": "第 34 批。130 版嘅「新分頁」目錄將頁面清單擠咗去右邊一半，左邊吉晒：分頁列 嘅分組同目錄嘅段落撞咗 class 名，又住喺同一個 shadow root，結果目錄每段都 當咗自己係一粒分組藥丸。而家還返佢做普通方塊。只係改咗源碼，未喺 build 睇過。 順手記低第 31 至 33 批嘅瀏覽器檢查同正式機已經升到 130。"
+  },
+  {
+   "sha": "17efc3cb3",
+   "date": "2026-11-12T06:35:18-05:00",
+   "title": "Name a settings section by its first tabs in \"Search all tabs\"",
+   "areas": [
+    "interface"
+   ],
+   "detail": "It used to be named by its address, which is a fine name for a computer and a poor one for a person.",
+   "detail_yue": "「搜尋所有分頁」入面，設定分區而家用頭幾個分頁嘅名嚟叫，唔再用網址。 網址畀電腦睇就啱，畀人睇就差啲。"
+  }
+ ]
+}

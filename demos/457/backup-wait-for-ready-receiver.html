@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Backup upload waits until setup is ready and the receiver is idle</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+  label.row { min-height: 48px; cursor: pointer; flex-wrap: nowrap; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="backup-wait-for-ready-receiver">
+  <h1>Backup upload waits until setup is ready and the receiver is idle</h1>
+  <p class="muted">Turn on both readiness checks, then press Upload. Choose a failing result to see the diagnostics kept for that one attempt.</p>
+
+  <section class="card stack" aria-labelledby="checks-heading">
+    <h2 id="checks-heading">Readiness checks (pretend)</h2>
+    <label class="row">
+      <input type="checkbox" class="switch" id="ready" role="switch">
+      <span>Setup ready: the backup setup page answered the read-only check</span>
+    </label>
+    <label class="row">
+      <input type="checkbox" class="switch" id="idle" role="switch">
+      <span>Receiver idle: the receiver says it has free hands</span>
+    </label>
+  </section>
+
+  <section class="card stack" aria-labelledby="stages-heading">
+    <h2 id="stages-heading">Stages</h2>
+    <ol id="stages" class="list"></ol>
+  </section>
+
+  <section class="card stack" aria-labelledby="upload-heading">
+    <h2 id="upload-heading">Upload</h2>
+    <label class="field" for="outcome">Pretend result of the single attempt</label>
+    <select id="outcome">
+      <option value="ok">Upload succeeds</option>
+      <option value="fail">Upload fails at the upload stage with HTTP 503</option>
+    </select>
+    <div class="row">
+      <button type="button" id="upload" class="filled" disabled>Upload once</button>
+    </div>
+    <p id="status" class="note" aria-live="polite">Upload is waiting for both checks.</p>
+    <div id="diag" class="note" aria-live="polite" hidden></div>
+  </section>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<style>[hidden] { display: none !important; }</style>
+<script>
+(function () {
+  var ready = document.getElementById('ready');
+  var idle = document.getElementById('idle');
+  var stages = document.getElementById('stages');
+  var outcome = document.getElementById('outcome');
+  var upload = document.getElementById('upload');
+  var status = document.getElementById('status');
+  var diag = document.getElementById('diag');
+
+  function setStatus(text, cls) {
+    status.textContent = text;
+    status.className = 'note' + (cls ? ' ' + cls : '');
+  }
+
+  function stageItem(label, done) {
+    var li = document.createElement('li');
+    var span = document.createElement('span');
+    span.style.flex = '1';
+    span.textContent = label;
+    var badge = document.createElement('span');
+    badge.className = done ? 'badge good' : 'badge';
+    badge.textContent = done ? 'Ready' : 'Waiting';
+    li.appendChild(span);
+    li.appendChild(badge);
+    return li;
+  }
+
+  function render() {
+    stages.textContent = '';
+    stages.appendChild(stageItem('1. Setup page ready', ready.checked));
+    stages.appendChild(stageItem('2. Receiver idle', idle.checked));
+    var both = ready.checked && idle.checked;
+    stages.appendChild(stageItem('3. Upload (one attempt, no automatic retry)', both));
+    upload.disabled = !both;
+    if (!both) {
+      setStatus('Upload is waiting for both checks.', '');
+    }
+  }
+
+  ready.addEventListener('change', render);
+  idle.addEventListener('change', render);
+
+  upload.addEventListener('click', function () {
+    if (upload.disabled) return;
+    if (outcome.value === 'ok') {
+      diag.hidden = true;
+      diag.textContent = '';
+      setStatus('Uploaded once. No failure details are kept.', 'good');
+    } else {
+      diag.hidden = false;
+      diag.className = 'note error';
+      diag.textContent = 'Last attempt: stage upload, HTTP status 503. No automatic retry was sent.';
+      setStatus('The single attempt failed. Press Upload once to try again by hand.', 'error');
+    }
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    ready.checked = false;
+    idle.checked = false;
+    outcome.value = 'ok';
+    diag.hidden = true;
+    diag.textContent = '';
+    setStatus('Upload is waiting for both checks.', '');
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

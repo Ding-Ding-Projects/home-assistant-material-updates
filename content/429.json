@@ -1,0 +1,44 @@
+{
+  "build": 429,
+  "headline": "Complete guides with working links, and visual action dictionaries",
+  "summary": "The feature guides and the wiki are published as linked articles, with sample pictures beside the demos. Action controls can show their dictionary, and the speech editor offers engine options. On a phone the navigation stays in view while the page scrolls, and dashboard resources can be uploaded from a file.",
+  "summary_yue": "功能指南同維基而家以互相連結嘅文章形式發佈，示範旁邊會有範例圖片。動作控制項可以顯示佢嘅字典，語音編輯器亦都會列出引擎嘅選項。手機上捲動頁面嗰陣，導覽列會留喺畫面度，儀表板資源可以由檔案上載。",
+  "highlights": [
+    {
+      "id": "guides-and-wiki-articles",
+      "title": "Guides and wiki pages open as linked articles",
+      "areas": ["docs", "interface"],
+      "what": "The feature guides and the wiki are published as articles that link to each other, so you can read a topic from start to finish on the site itself. Sample pictures load beside the demos, and the speech editor has a checked screenshot.",
+      "what_yue": "功能指南同維基而家以互相連結嘅文章形式發佈，你可以喺網站度由頭睇到尾。示範旁邊會載入範例圖片，語音編輯器有一張已經核實嘅截圖。",
+      "why": "Readers need to read the guides and the wiki in one place, and the demo pictures must load wherever the demo is opened.",
+      "why_yue": "讀者要喺同一個地方睇齊指南同維基，示範圖片喺邊度打開都要正常載入。",
+      "try": [
+        "Open the guide index and choose a category to filter the articles.",
+        "Open an article from the filtered list.",
+        "Follow the related link inside the article to read the next article."
+      ],
+      "sha": ["716b72745"],
+      "demo": "demos/429/guide-articles.html"
+    },
+    {
+      "id": "action-dictionaries",
+      "title": "Action dictionaries, phone navigation and file uploads",
+      "areas": ["interface", "core"],
+      "what": "Action controls can show their dictionary, and the speech editor offers engine options. On a phone, the navigation stays visible while you scroll, accessibility controls fit narrow widths, and dashboard resources can be uploaded from a file. Media can also be saved with touch.",
+      "what_yue": "動作控制項可以顯示佢嘅字典，語音編輯器亦有引擎嘅選項。手機上捲動嗰陣，導覽列會留喺畫面度，無障礙控制項喺窄畫面都放得落，儀表板資源可以由檔案上載，媒體用手指都可以儲存。",
+      "why": "On a phone the navigation was hard to reach while scrolling, and dashboards needed a way to take files.",
+      "why_yue": "手機捲動嗰陣導覽唔容易撳到，儀表板亦需要可以由檔案加資源。",
+      "try": [
+        "Open an action and find its dictionary.",
+        "Search the dictionary and see only the matching entries.",
+        "Choose a file for a dashboard resource and see it added to the list."
+      ],
+      "sha": ["bb55f1bb6"],
+      "demo": "demos/429/action-dictionaries.html"
+    }
+  ],
+  "other": [
+    { "title": "Recorded the closeout of 13 November: the live build 425, and what was and was not seen in a browser", "sha": ["c3be822e9"] },
+    { "title": "Saved unfinished work on known options for dictionary fields. A server command and a front-end model exist, but the interface does not use them yet, so nothing changes for people", "sha": ["86235d86f"] }
+  ]
+}

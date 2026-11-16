@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Modern page frame</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.shell { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+.nav-card { background: var(--sl1); border-radius: 28px; padding: 12px; width: 150px; flex: none; display: flex; flex-direction: column; gap: 6px; }
+.nav-card .item { min-height: 48px; display: flex; align-items: center; padding: 0 8px; border-radius: 12px; background: var(--sl2); }
+.page-card { background: var(--sl0); border-radius: 28px; padding: 12px; flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.tool-pill { background: var(--sl2); border-radius: 24px; padding: 4px 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 48px; }
+.phone-frame { width: 100%; max-width: 300px; background: var(--sl1); border-radius: 28px; padding: 12px; display: flex; flex-direction: column; gap: 12px; }
+.phone-bar { background: var(--sl3); border-radius: 24px; padding: 6px; display: flex; gap: 8px; justify-content: space-between; }
+.phone-bar button { flex: 1; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="modern-shell">
+  <h1>The modern page frame</h1>
+  <p class="muted">Pick where the navigation pane goes, use the magnifier in the tool pill, and switch to Phone view to see the bottom bar.</p>
+
+  <section class="card" aria-labelledby="frame-title">
+    <div class="stack">
+      <h2 id="frame-title">Preview</h2>
+      <div class="row">
+        <label class="field" for="nav-choice">Navigation
+          <select id="nav-choice">
+            <option value="left">Left pane (default)</option>
+            <option value="off">Off</option>
+          </select>
+        </label>
+        <label class="row"><input class="switch" type="checkbox" id="phone-view"> <span>Phone view</span></label>
+      </div>
+
+      <div class="shell" id="wide-view">
+        <nav class="nav-card" id="nav-pane" aria-label="Pretend navigation pane">
+          <div class="item">Overview</div>
+          <div class="item">Map</div>
+          <div class="item">Settings</div>
+        </nav>
+        <div class="page-card">
+          <div class="tool-pill">
+            <span>Overview (pretend page)</span>
+            <button type="button" class="icon" id="search-toggle" aria-expanded="false" aria-controls="page-search" aria-label="Search this page">&#x1F50D;</button>
+          </div>
+          <div id="page-search" hidden class="stack">
+            <label class="field" for="page-search-input">Search this page
+              <input type="search" id="page-search-input" placeholder="Type to search this page">
+            </label>
+          </div>
+          <p class="muted">Pretend page content.</p>
+        </div>
+      </div>
+
+      <div class="phone-frame" id="phone-view-box" hidden>
+        <p class="muted">Pretend phone screen</p>
+        <div class="bar">
+          <i style="width: 40%"></i>
+        </div>
+        <div class="phone-bar" role="group" aria-label="Phone bottom bar">
+          <button type="button" class="tonal" id="menu-button" aria-expanded="false" aria-controls="menu-note">Menu</button>
+          <button type="button" class="tonal">Settings</button>
+        </div>
+        <p class="note" id="menu-note" hidden>Menu drawer open. The accessibility tools are in this drawer.</p>
+      </div>
+
+      <div class="row">
+        <button type="button" data-demo-reset>Start again</button>
+      </div>
+      <p class="note" id="result" aria-live="polite">Showing the wide layout with the left pane on.</p>
+    </div>
+  </section>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var nav = document.getElementById('nav-pane');
+  var choice = document.getElementById('nav-choice');
+  var phone = document.getElementById('phone-view');
+  var wide = document.getElementById('wide-view');
+  var phoneBox = document.getElementById('phone-view-box');
+  var searchToggle = document.getElementById('search-toggle');
+  var searchBox = document.getElementById('page-search');
+  var searchInput = document.getElementById('page-search-input');
+  var menuButton = document.getElementById('menu-button');
+  var menuNote = document.getElementById('menu-note');
+  var result = document.getElementById('result');
+  var reset = document.querySelector('[data-demo-reset]');
+
+  function describe() {
+    var parts = [];
+    if (phone.checked) {
+      parts.push('Showing the phone layout with the floating bar at the bottom');
+    } else {
+      parts.push(choice.value === 'left'
+        ? 'Showing the wide layout with the left pane on'
+        : 'Showing the wide layout with the navigation pane off');
+    }
+    if (!searchBox.hidden && searchInput.value.trim() !== '') {
+      parts.push('searching this page for "' + searchInput.value.trim() + '"');
+    }
+    result.textContent = parts.join('. ') + '.';
+  }
+
+  function applyLayout() {
+    var isPhone = phone.checked;
+    wide.hidden = isPhone;
+    phoneBox.hidden = !isPhone;
+    nav.hidden = isPhone || choice.value === 'off';
+    describe();
+  }
+
+  choice.addEventListener('change', applyLayout);
+  phone.addEventListener('change', applyLayout);
+
+  searchToggle.addEventListener('click', function () {
+    var open = searchBox.hidden;
+    searchBox.hidden = !open;
+    searchToggle.setAttribute('aria-expanded', String(open));
+    if (open) searchInput.focus();
+    describe();
+  });
+
+  searchInput.addEventListener('input', describe);
+
+  menuButton.addEventListener('click', function () {
+    var open = menuNote.hidden;
+    menuNote.hidden = !open;
+    menuButton.setAttribute('aria-expanded', String(open));
+    describe();
+  });
+
+  reset.addEventListener('click', function () {
+    choice.value = 'left';
+    phone.checked = false;
+    searchBox.hidden = true;
+    searchToggle.setAttribute('aria-expanded', 'false');
+    searchInput.value = '';
+    menuNote.hidden = true;
+    menuButton.setAttribute('aria-expanded', 'false');
+    applyLayout();
+  });
+
+  applyLayout();
+})();
+</script>
+</body>
+</html>

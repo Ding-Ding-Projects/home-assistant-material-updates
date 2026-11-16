@@ -1,0 +1,25 @@
+{
+  "build": 132,
+  "headline": "Tab leftovers: a clearer hide dialog, and a phone order that matches the wide strip",
+  "summary": "The hide tabs dialog has a short placeholder in its search field, with the explanation sentence below the field. On a phone, the Pages sheet keeps each group in the same order as the wide strip. Menu actions in a section's tabs now save to that section, not to the main strip.",
+  "summary_yue": "隱藏分頁對話框嘅搜尋格而家有短嘅提示字，解釋嘅句子擺喺格下面。手機頁面表嘅分組次序而家同闊版分頁列一樣。分區分頁嘅選單動作會寫入嗰個分區，唔會寫去主分頁列。",
+  "highlights": [
+    {
+      "id": "tab-leftovers-hide-and-phone-order",
+      "title": "Hide dialog hints, phone sheet order and section menu actions",
+      "areas": ["interface"],
+      "what": "The hide tabs dialog now has a short placeholder in its search field, and the sentence that explains it sits below the field, where it can wrap onto more lines. On a phone, the Pages sheet keeps each group where its first member sits, the same as the wide strip. The shared tab menu actions for hiding many tabs, undoing and removing from a group now save to the section they belong to, not to the main strip.",
+      "what_yue": "隱藏分頁對話框嘅搜尋格而家有短嘅提示字，解釋嘅句子擺喺格下面，長嘅句子可以自然換行。手機頁面表會將每個分組擺喺佢第一個分頁嗰個位，同闊版分頁列一樣。分區分頁嘅共用選單，批量隱藏、撤銷同移出分組，都會寫入嗰個分區，唔會寫去主分頁列。",
+      "why": "The long sentence in the field was cut off when both languages were shown, and the phone order did not match the wide strip.",
+      "try": [
+        "Open the hide dialog and read the short placeholder in the search field.",
+        "Read the sentence below the field.",
+        "Choose Phone sheet, then Wide strip, and check that the group order matches.",
+        "Tick Show the build before this fix to see the old order, then press Start again."
+      ],
+      "sha": ["311d3508a"],
+      "demo": "demos/132/tab-leftovers-hide-and-phone-order.html"
+    }
+  ],
+  "other": []
+}

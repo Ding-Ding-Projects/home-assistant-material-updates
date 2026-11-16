@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build text from pieces</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.demo ol { margin: 0; padding: 0; list-style: none; }
+.demo ol > li { display: flex; flex-direction: column; gap: 8px; padding: 12px 0; border-top: 1px solid var(--outv); }
+.demo ol > li:first-child { border-top: none; }
+.demo code, .demo .code { font-family: var(--mono); font-size: 14px; word-break: break-word; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="string-builder">
+  <h1>Build text from pieces</h1>
+  <p class="muted">Add pieces to build a sentence. Change a piece to see the text and its preview change.</p>
+
+  <section class="card stack" aria-labelledby="pieces-h">
+    <h2 id="pieces-h">Pieces</h2>
+    <ol id="pieces"></ol>
+    <div class="row">
+      <label class="field" for="kind">Kind of piece to add</label>
+      <select id="kind">
+        <option value="text">Plain text</option>
+        <option value="state">Entity state</option>
+        <option value="time">Date and time</option>
+        <option value="number">Number with rounding</option>
+      </select>
+      <button type="button" id="add" class="tonal">Add piece</button>
+    </div>
+  </section>
+
+  <section class="card stack" aria-labelledby="out-h">
+    <h2 id="out-h">Template the builder writes</h2>
+    <p class="code" id="template"></p>
+    <h3>Preview with pretend values</h3>
+    <p id="preview" class="note" aria-live="polite"></p>
+    <p class="small muted">Plain text is escaped, so braces you type stay plain text.</p>
+  </section>
+
+  <div class="row">
+    <button type="button" data-demo-reset class="tonal">Start again</button>
+  </div>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var names = { text: 'Plain text', state: 'Entity state', time: 'Date and time', number: 'Number with rounding' };
+  var entities = {
+    'light.hall': { label: 'Hall light', shown: 'on' },
+    'sensor.kitchen_temperature': { label: 'Kitchen temperature', shown: '21.6' }
+  };
+  var start = [
+    { type: 'text', value: 'The hall light is ' },
+    { type: 'state', entity: 'light.hall' }
+  ];
+  var pieces = [];
+  var list = document.getElementById('pieces');
+  var kind = document.getElementById('kind');
+  var template = document.getElementById('template');
+  var preview = document.getElementById('preview');
+
+  function escapeText(s) {
+    return s.replace(/[{}]/g, function (c) { return '{{ "' + c + '" }}'; });
+  }
+
+  function toTemplate(p) {
+    if (p.type === 'text') return escapeText(p.value);
+    if (p.type === 'state') return '{{ states("' + p.entity + '") }}';
+    if (p.type === 'time') return p.format === '12' ? '{{ now().strftime("%I:%M %p") }}' : '{{ now().strftime("%H:%M") }}';
+    var n = Number(p.value);
+    return isNaN(n) ? '{{ "?" }}' : '{{ ' + n + ' | round(' + p.decimals + ') }}';
+  }
+
+  function toPreview(p) {
+    if (p.type === 'text') return p.value;
+    if (p.type === 'state') return entities[p.entity].shown;
+    if (p.type === 'time') return p.format === '12' ? '7:49 PM' : '19:49';
+    var n = Number(p.value);
+    return isNaN(n) ? '?' : String(Math.round(n * Math.pow(10, p.decimals)) / Math.pow(10, p.decimals));
+  }
+
+  function labelled(text, el) {
+    var l = document.createElement('label');
+    l.className = 'field';
+    l.textContent = text;
+    l.appendChild(el);
+    return l;
+  }
+
+  function update() {
+    template.textContent = pieces.length ? pieces.map(toTemplate).join('') : 'Add a piece to start.';
+    preview.textContent = pieces.length ? 'Shows: ' + pieces.map(toPreview).join('') : 'Nothing to show yet.';
+  }
+
+  function render() {
+    list.textContent = '';
+    pieces.forEach(function (p, i) {
+      var li = document.createElement('li');
+      var badge = document.createElement('span');
+      badge.className = 'badge';
+      badge.textContent = names[p.type] + ' ' + (i + 1);
+      li.appendChild(badge);
+
+      if (p.type === 'text') {
+        var t = document.createElement('input');
+        t.type = 'text';
+        t.value = p.value;
+        t.setAttribute('aria-label', 'Plain text piece ' + (i + 1));
+        t.addEventListener('input', function () { p.value = t.value; update(); });
+        li.appendChild(labelled('Text', t));
+      } else if (p.type === 'state') {
+        var s = document.createElement('select');
+        Object.keys(entities).forEach(function (id) {
+          var o = document.createElement('option');
+          o.value = id;
+          o.textContent = entities[id].label;
+          s.appendChild(o);
+        });
+        s.value = p.entity;
+        s.addEventListener('change', function () { p.entity = s.value; update(); });
+        li.appendChild(labelled('Entity', s));
+      } else if (p.type === 'time') {
+        var f = document.createElement('select');
+        [['24', '24-hour clock'], ['12', '12-hour clock']].forEach(function (pair) {
+          var o = document.createElement('option');
+          o.value = pair[0];
+          o.textContent = pair[1];
+          f.appendChild(o);
+        });
+        f.value = p.format;
+        f.addEventListener('change', function () { p.format = f.value; update(); });
+        li.appendChild(labelled('Format', f));
+      } else {
+        var num = document.createElement('input');
+        num.type = 'number';
+        num.value = p.value;
+        num.addEventListener('input', function () { p.value = num.value; update(); });
+        li.appendChild(labelled('Number', num));
+        var dec = document.createElement('select');
+        ['0', '1', '2'].forEach(function (d) {
+          var o = document.createElement('option');
+          o.value = d;
+          o.textContent = d + ' decimal place' + (d === '1' ? '' : 's');
+          dec.appendChild(o);
+        });
+        dec.value = String(p.decimals);
+        dec.addEventListener('change', function () { p.decimals = Number(dec.value); update(); });
+        li.appendChild(labelled('Rounding', dec));
+      }
+
+      var remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'text';
+      remove.textContent = 'Remove piece ' + (i + 1);
+      remove.addEventListener('click', function () {
+        pieces.splice(i, 1);
+        render();
+        update();
+      });
+      li.appendChild(remove);
+      list.appendChild(li);
+    });
+    update();
+  }
+
+  function newPiece(type) {
+    if (type === 'text') return { type: 'text', value: ' ' };
+    if (type === 'state') return { type: 'state', entity: 'sensor.kitchen_temperature' };
+    if (type === 'time') return { type: 'time', format: '24' };
+    return { type: 'number', value: 21.6, decimals: 0 };
+  }
+
+  document.getElementById('add').addEventListener('click', function () {
+    pieces.push(newPiece(kind.value));
+    render();
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    pieces = start.map(function (p) { return Object.assign({}, p); });
+    render();
+  });
+
+  pieces = start.map(function (p) { return Object.assign({}, p); });
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{
+  "build": 139,
+  "headline": "The tab strip can collapse to icons and float anywhere over the page",
+  "summary": "The tab strip can now sit on any edge or float over the page. A collapse button shows each tab as its icon only, with the name in a tooltip and for screen readers. A floating strip is dragged by its handle or moved with the arrow keys, and it always stays fully on screen.",
+  "summary_yue": "分頁列而家可以放喺任何一邊，亦可以浮喺頁面上面。收埋按鈕會淨係留返圖示，名就喺工具提示同螢幕閱讀器度讀到。浮動分頁列可以用手柄拖，或者用方向鍵郁，而且一定會留喺畫面入面。",
+  "highlights": [
+    {
+      "id": "tab-strip-collapse-and-float",
+      "title": "Tab strip collapses to icons and can float anywhere",
+      "areas": ["interface"],
+      "what": "The tab strip can now collapse to icons, using a button at its start, an entry in its menu, or a switch in your profile settings. Collapsed, each tab shows only its icon, and its name appears in a tooltip and to screen readers. A new floating position lets the strip sit over the page without taking room from it: drag it by its handle, or focus the handle and use the arrow keys, with Shift for bigger steps. Your choices are saved for each strip, and the strip stays in place at other window sizes.",
+      "what_yue": "分頁列而家可以收埋成淨係得圖示，可以撳起始位嗰個按鈕、揀選單入面嘅項目，或者開個人檔案入面嘅開關。收埋之後，每個分頁只得圖示，名會喺工具提示同螢幕閱讀器度讀到。新加嘅浮動位置可以令分頁列浮喺頁面上面，唔搶位：用手柄拖，或者將焦點放喺手柄上用方向鍵郁，按住 Shift 就跳得遠啲。位置會按視窗大小嘅比例記低，喺另一個視窗大小都留喺原位，而且一定會留喺畫面入面。",
+      "why": "The strip could only stay where it was at full size, which left less room for the page than people sometimes wanted.",
+      "try": [
+        "Press Collapse to icons and see each tab shrink to its icon.",
+        "Choose Float and drag the strip by its handle.",
+        "Focus the handle and press the arrow keys, then hold Shift with an arrow key for bigger steps.",
+        "Choose Left and see the page take the room back."
+      ],
+      "sha": ["f417d4c11"],
+      "demo": "demos/139/tab-strip-collapse-and-float.html"
+    }
+  ],
+  "other": [
+    { "title": "Design file: a modern remake of the navigation and the polished pages, drawn as a design canvas", "sha": ["e09d4cad5"] }
+  ]
+}

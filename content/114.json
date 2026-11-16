@@ -1,0 +1,11 @@
+{
+  "build": 114,
+  "headline": "Records housekeeping: one broken table row in the documentation is repaired",
+  "summary": "Build 114 repairs one row of a table in the project records. An earlier change had cut the row short and left a stray code mark, and the reference to the post-build script is restored. Nothing about the Home Assistant product itself changed in this version.",
+  "summary_yue": "第 114 版只係修好項目紀錄入面一行表格。上一次改動令嗰行俾人截咗半截，留低一個孤零零嘅反引號，而家已經駁返好，後建置腳本嗰個參照亦都返咗。Home Assistant 產品本身喺呢版冇改動。",
+  "highlights": [],
+  "other": [
+    { "title": "Repairs a table row in the records that an earlier change had cut short, restoring a file reference and its code mark. Documentation only.", "sha": ["f2e88d817"] }
+  ],
+  "no_feature_note": "This version is housekeeping: a documentation fix to one table row, with nothing a person using the product would notice."
+}

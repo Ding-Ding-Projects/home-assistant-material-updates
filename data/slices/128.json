@@ -1,0 +1,23 @@
+{
+ "build": 128,
+ "core": "2026.11.1.128",
+ "supervisor": "2026.11.0.128",
+ "os": "18.5.128",
+ "tag": "v2026.11.1.128",
+ "source": "6330c10d9",
+ "date": "2026-11-12T04:43:42-05:00",
+ "previous_build": 127,
+ "changes": [
+  {
+   "sha": "6330c10d9",
+   "date": "2026-11-12T04:43:42-05:00",
+   "title": "Tab options: close the known gaps, add a dock setting",
+   "areas": [
+    "docs",
+    "interface"
+   ],
+   "detail": "Batch 31. The leftovers from the first tab pass, each fixed and then seen in a local build. The menu key used to open two menus at once, which is one more than anybody asked for.\n\n- \"Close other tabs\" preview lists every tab that stays, with its reason. - The group picker no longer closes the all-tabs search it was opened from. - Move to start/end for a grouped tab stays inside its group. - Menu key and Shift+F10 open exactly one menu; Escape returns focus. - Search and name fields in tab panels take focus on open. - The selected tab scrolls fully into view. - Automation editor save bar sits at the page bottom with a bottom strip. - New \"Tab strip position\" row in Profile.\n\nStill not built, recorded in the changelog: settings pages and tools as tabs of their own; groups, looks and locks for settings section tabs and the phone Pages sheet.\n\nChecks: type check clean apart from the two known gallery errors; full suite 6,896 passed with the 3 known build-script failures.",
+   "detail_yue": "第 31 批。分頁功能第一輪留低嘅手尾，逐樣修好再喺本機 build 睇過。選單鍵 以前一撳出兩個選單，多咗一個冇人要嘅。仲未做嘅照直寫喺更新紀錄：設定頁 同工具未可以自己開成分頁；設定分頁同手機頁面表未有分組、外觀同鎖。"
+  }
+ ]
+}

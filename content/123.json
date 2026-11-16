@@ -1,0 +1,25 @@
+{
+  "build": 123,
+  "headline": "Operating system updates say when a restart is still needed",
+  "summary": "Build 123 corrects two problems from build 122. An operating system update that has been staged now says it will take effect after a restart, offers Restart now and Later, and checks the running version after the restart. Stacked messages are placed correctly again, so their buttons stay on the screen of a phone. Build 122 should be skipped.",
+  "summary_yue": "第 123 版改正咗第 122 版嘅兩個問題。作業系統更新裝好咗之後，會話你知要重開先至生效，並且有「即刻重開」同「遲啲再算」兩個掣；重開之後會核對運行緊嘅版本。疊埋嘅訊息又擺返正確位置，手機上面個掣唔會跑出畫面。第 122 版請跳過。",
+  "highlights": [
+    {
+      "id": "os-update-restart",
+      "title": "Operating system updates say when a restart finishes them",
+      "areas": ["core", "interface"],
+      "what": "An operating system update is staged first and takes effect after a restart. The update row now ends with the words Installed. Restart to finish, and offers Restart now and Later. After the restart, the page checks the running version and tells you if the old one came back. The same build also shows reboot, shutdown and data-disk moving only where the Supervisor lists them.",
+      "what_yue": "作業系統更新會先裝好，要重開先至生效。更新列最後會顯示「裝好咗，重開先至生效」，同時有「即刻重開」同「遲啲再算」兩個掣。重開之後頁面會核對運行緊嘅版本，如果舊版本返咗嚟，會老實話你知。",
+      "why": "The update used to look finished straight away, even though the restart had not happened, and nothing showed whether the new version was actually running afterwards.",
+      "try": [
+        "Press Stage update to start the pretend update.",
+        "When it says Installed. Restart to finish, press Restart now.",
+        "Choose whether the new version or the old version came back, then press Check version.",
+        "You should see the new version confirmed, or a warning that the old version is still running."
+      ],
+      "sha": ["003ecf227"],
+      "demo": "demos/123/os-update-restart.html"
+    }
+  ],
+  "other": []
+}

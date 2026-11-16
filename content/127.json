@@ -1,0 +1,43 @@
+{
+  "build": 127,
+  "headline": "Picture folders, file tools in Manage, and search in the automation editor",
+  "summary": "The image store can now keep pictures in folders. The Manage dialog can download, rename and convert files, and the automation editor can search every step and filter by the entities an automation uses. Upload limits went up for the media library and the image store, and phones can add media from their Pages menu.",
+  "summary_yue": "圖片庫而家可以用資料夾整理相片。「管理」可以下載、改名同轉格式，自動化編輯器可以搜尋每一步，又可以按用到嘅實體篩選。媒體庫同圖片庫嘅上載上限都提高咗，手機嘅頁面選單亦可以加入媒體。",
+  "highlights": [
+    {
+      "id": "image-store-folders",
+      "title": "Picture folders, and Manage for downloads, renames and conversions",
+      "areas": ["interface", "core"],
+      "what": "The image store now has folders. You can create a folder, open it, rename it, move pictures into it, or remove it; when a folder is removed its pictures move up one level and none is deleted. Manage can download one item, or a selection as a zip of up to 200 MB, rename an item, and convert a picture with the built-in converter into a new item beside the original. On about one launch in ten, a small card with a dish picture appears; school mode hides it, and its switch does not turn it off.",
+      "what_yue": "圖片庫而家可以開資料夾。你可以新建、打開、改名、將圖片移入去，或者刪除資料夾；刪咗資料夾，入面嘅圖片會升一級，乜嘢都唔會被刪走。「管理」可以下載一項，或者將揀咗嘅圖打包成最多 200 MB 嘅 zip，亦可以改名，又可以用內置嘅轉檔器轉成一個新項目，放喺原圖隔籬。大約每十次開機有一次，會彈出一張細細張嘅點心圖卡；學校模式會將佢收埋，但個開關唔可以熄佢。",
+      "why": "Pictures had been one long list, and people often want their files back out of it, in the format they need.",
+      "try": [
+        "Open the image store and create a folder with a name you choose.",
+        "Tick two pictures, choose the folder in the move control and press Move selected.",
+        "Choose one picture, type a new name and press Rename, then press Convert to a new copy.",
+        "Look for the new converted item beside the original, and check that the original is still there."
+      ],
+      "sha": ["4b47fc250"],
+      "demo": "demos/127/image-store-folders.html"
+    },
+    {
+      "id": "automation-editor-search",
+      "title": "Search across automation steps, and filter by entity",
+      "areas": ["interface"],
+      "what": "The automation and script editor has a search bar that covers every step, however deeply it is nested. It shows how many matches there are, and the next and previous buttons move between them. Each nested list has its own search, and a filter shows only the steps that use a chosen entity. The search bar was made smaller after a test on a phone, so it takes less of the screen.",
+      "what_yue": "自動化同腳本編輯器而家有搜尋列，會搜尋每一步，就算藏得幾深都搵得到。佢會話你搵到幾多個，撳上一個、下一個就可以跳去嗰個位。每個巢狀清單都有自己嘅搜尋，仲可以按某個實體篩選，只睇用到嗰個實體嘅步驟。喺手機測試過之後，搜尋列細咗，唔會佔晒成個螢幕。",
+      "why": "A long automation was hard to read through, and finding one step meant scrolling past everything else.",
+      "try": [
+        "Type light into the search box and read the match count.",
+        "Press Next match and Previous match to move between the matches.",
+        "Choose one entity in the filter to show only the steps that use it.",
+        "Press Start again to clear the search and the filter."
+      ],
+      "sha": ["7b23aef30"],
+      "demo": "demos/127/automation-editor-search.html"
+    }
+  ],
+  "other": [
+    { "title": "Documentation: the handoff, closeout note and feature status brought up to date for the last few builds", "sha": ["81e559530"] }
+  ]
+}

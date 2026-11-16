@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Automatic app updates</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="automatic-updates">
+  <h1>Automatic app updates</h1>
+  <p class="muted">Switch automatic updates on for everything or for single apps, then run them. Core, the Supervisor and the operating system are never updated automatically.</p>
+
+  <section class="card stack" aria-labelledby="auto-title">
+    <h2 id="auto-title" class="small">Automatic updates</h2>
+    <label class="row">
+      <input type="checkbox" class="switch" id="all">
+      <span>Update everything automatically</span>
+    </label>
+    <label class="row">
+      <input type="checkbox" class="switch" id="fail">
+      <span>Pretend the next install fails</span>
+    </label>
+  </section>
+
+  <section class="card stack" aria-labelledby="rows-title">
+    <h2 id="rows-title" class="small">Updates</h2>
+    <ul class="list" id="rows" aria-label="Updates"></ul>
+    <div class="row">
+      <button type="button" class="filled" id="run">Run automatic updates</button>
+    </div>
+  </section>
+
+  <section class="card stack" aria-labelledby="res-title">
+    <h2 id="res-title" class="small">Last automatic result</h2>
+    <ul class="list" id="log" aria-label="Results"></ul>
+  </section>
+
+  <p id="status" aria-live="polite" class="note">Nothing has run yet.</p>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var START = [
+    { id: 'weather', name: 'Pretend weather add-on', to: '1.2.0', protected: false },
+    { id: 'backup', name: 'Pretend backup add-on', to: '2.0.1', protected: false },
+    { id: 'core', name: 'Home Assistant Core', to: '2026.11.2', protected: true },
+    { id: 'supervisor', name: 'Supervisor', to: '2026.11.1', protected: true },
+    { id: 'os', name: 'Operating system', to: '18.6', protected: true }
+  ];
+
+  var rows = [];
+  var all = document.getElementById('all');
+  var fail = document.getElementById('fail');
+  var list = document.getElementById('rows');
+  var log = document.getElementById('log');
+  var status = document.getElementById('status');
+  var runBtn = document.getElementById('run');
+  var lastResult = '';
+
+  function hhmm() {
+    var d = new Date();
+    var h = String(d.getHours());
+    var m = String(d.getMinutes());
+    if (h.length < 2) { h = '0' + h; }
+    if (m.length < 2) { m = '0' + m; }
+    return h + ':' + m;
+  }
+
+  function say(msg) { status.textContent = msg; }
+
+  function render() {
+    list.innerHTML = '';
+    rows.forEach(function (r) {
+      var li = document.createElement('li');
+      var text = document.createElement('span');
+      text.style.flex = '1';
+      text.textContent = r.name + ' to ' + r.to + (r.state ? ' (' + r.state + ')' : '');
+      li.appendChild(text);
+
+      if (r.protected) {
+        var note = document.createElement('span');
+        note.className = 'badge';
+        note.textContent = 'Never automatic';
+        li.appendChild(note);
+      } else {
+        var lbl = document.createElement('label');
+        lbl.className = 'row';
+        var cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.className = 'switch';
+        cb.checked = r.auto;
+        cb.disabled = all.checked;
+        cb.setAttribute('aria-label', 'Automatic for ' + r.name);
+        cb.addEventListener('change', function () {
+          r.auto = cb.checked;
+          say(r.name + ' automatic is ' + (cb.checked ? 'on' : 'off') + '.');
+        });
+        lbl.appendChild(cb);
+        lbl.appendChild(document.createTextNode(' Automatic'));
+        li.appendChild(lbl);
+
+        var skip = document.createElement('button');
+        skip.type = 'button';
+        skip.className = 'tonal';
+        skip.textContent = 'Skip this version';
+        skip.setAttribute('aria-label', 'Skip this version for ' + r.name);
+        skip.addEventListener('click', function () {
+          r.skipped = true;
+          render();
+          say('Skipped ' + r.to + ' for ' + r.name + '. It will be left alone.');
+        });
+        li.appendChild(skip);
+      }
+      list.appendChild(li);
+    });
+    renderLog();
+  }
+
+  function renderLog() {
+    log.innerHTML = '';
+    if (lastResult === '') {
+      var li = document.createElement('li');
+      li.textContent = 'No automatic run has finished yet.';
+      log.appendChild(li);
+      return;
+    }
+    lastResult.split('\n').forEach(function (line) {
+      var li = document.createElement('li');
+      li.textContent = line;
+      log.appendChild(li);
+    });
+  }
+
+  runBtn.addEventListener('click', function () {
+    var lines = [];
+    var failedOnce = fail.checked;
+    rows.forEach(function (r) {
+      if (r.protected) {
+        lines.push(r.name + ': refused, it is never updated automatically.');
+        return;
+      }
+      if (r.skipped) {
+        lines.push(r.name + ': skipped version left alone.');
+        return;
+      }
+      if (r.failed) {
+        lines.push(r.name + ': failed earlier, not retried.');
+        return;
+      }
+      if (!(all.checked || r.auto)) {
+        lines.push(r.name + ': automatic is off, nothing installed.');
+        return;
+      }
+      if (failedOnce) {
+        failedOnce = false;
+        r.failed = true;
+        r.state = 'failed';
+        lines.push(r.name + ': install failed and was recorded. It will not be retried.');
+        return;
+      }
+      r.state = 'installed';
+      lines.push(r.name + ': installed ' + r.to + ', one at a time.');
+    });
+    lastResult = 'At ' + hhmm() + ' (24-hour time)\n' + lines.join('\n');
+    render();
+    say('Automatic run finished at ' + hhmm() + '.');
+  });
+
+  all.addEventListener('change', function () {
+    render();
+    say(all.checked ? 'Everything is set to update automatically.' : 'Choose apps one by one with their switches.');
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    rows = START.map(function (r) {
+      return { id: r.id, name: r.name, to: r.to, protected: r.protected, auto: false, skipped: false, failed: false, state: '' };
+    });
+    all.checked = false;
+    fail.checked = false;
+    lastResult = '';
+    render();
+    say('Nothing has run yet.');
+  });
+
+  rows = START.map(function (r) {
+    return { id: r.id, name: r.name, to: r.to, protected: r.protected, auto: false, skipped: false, failed: false, state: '' };
+  });
+  render();
+})();
+</script>
+</body>
+</html>

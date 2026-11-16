@@ -1,0 +1,196 @@
+{
+  "build": 413,
+  "headline": "Add from a ZIP file, select by rule, and preview a scene before it changes the room",
+  "summary": "Version 413 adds a second way into Marketplace: a ZIP file of a repository folder, which the product looks inside before anything is added. Automation and script editors get a text builder, a way to add a step between any two steps, and the T, C and A keys. Settings lists can select entities by rule, the recorder can keep history for each entity, scenes can be previewed for 30 seconds, and views can be shown or hidden by entity state. Many design board updates for the same canvas are included too; they change no behaviour.",
+  "summary_yue": "413 版加咗第二個入 Marketplace 嘅方法：一個 ZIP 檔，產品會先睇清楚入面有乜嘢，先至加。自動化同腳本編輯器多咗文字砌件工具、兩個步驟之間加一步嘅位，仲有 T、C、A 三粒鍵。設定清單可以按規則揀實體，記錄器可以逐個實體決定保留歷史，場景可以先預覽 30 秒，視圖亦可以跟實體狀態顯示或者收埋。另外仲有好多幅設計圖更新，但係唔會改任何功能。",
+  "highlights": [
+    {
+      "id": "marketplace-zip-import",
+      "title": "Add an integration or theme from a ZIP file",
+      "areas": ["core", "interface"],
+      "what": "Marketplace now takes a ZIP file of a repository folder as well as a GitHub link. It reads the marker files inside, such as an integration manifest, a dashboard card script or theme files, and says what it found, even when the archive has no history folder. The list shows how each item was recognised and what Add will do. Items that run code need a two-step confirmation before they are added. Apps are recognised but are not added from a file.",
+      "what_yue": "Marketplace 而家可以掟入一個 ZIP 檔，就算冇 .git 資料夾都得。佢會睇入面嘅標記檔案，例如整合嘅 manifest、卡片嘅腳本或者主題檔，然後話你知搵到乜嘢。清單會寫明每件嘢係點樣認出嚟，加入之後會做乜。會執行程式嘅嘢要先經過兩步確認，先至加得。應用程式淨係會認得出嚟，唔會由檔案加入。",
+      "why": "The owner asked for a second way in beside a GitHub link: upload a ZIP of a repository folder and let the product say what it found, with a check on anything unsafe.",
+      "try": [
+        "Open Marketplace and find the ZIP option beside Add from a GitHub link.",
+        "In the demo, choose garden-lights.zip and press Look inside. Read what the product found.",
+        "Tick the confirmation, then press Add. The item appears in the Installed list.",
+        "Choose escape.zip or sealed.zip and press Look inside. You should see the archive refused, with the reason."
+      ],
+      "sha": ["439905def"],
+      "demo": "demos/413/marketplace-zip-import.html"
+    },
+    {
+      "id": "string-builder",
+      "title": "Build text from pieces instead of template code",
+      "areas": ["interface"],
+      "what": "Text fields in automation and script actions, and on the template editor, have a Build text button beside them. It opens a dialog, or a bottom sheet on a phone, where the text is put together from pieces: plain text, an entity's state or attribute, its name or area, date and time (24-hour by default), numbers with rounding, comparisons and a raw template piece for anything else. A live preview comes from the server's own template rendering. Text the builder wrote opens as pieces again.",
+      "what_yue": "自動化同腳本嘅動作文字欄，仲有模板編輯器，旁邊而家多咗「砌文字」掣。撳落會彈出一個對話框（手機上係底部面板），用件頭砌句子，唔使識模板語法：純文字、實體狀態或者屬性、日期時間（預設 24 小時制）、數字四捨五入、比較，仲有一件原始模板件頭。下面會即時睇到伺服器計出嚟嘅結果。砌過嘅文字再開返，會還原成件頭。",
+      "why": "The owner wanted to add an entity state or a date and time comparison on a phone without writing template code.",
+      "try": [
+        "Open an automation action that has a text field, and press Build text beside it.",
+        "Add a plain text piece and type a brace. See that it is escaped and stays plain text.",
+        "Add an entity state piece and choose an entity. Watch the template and the preview change.",
+        "Press Start again to go back to the starting sentence. The preview in the demo uses pretend values."
+      ],
+      "sha": ["27fa6f723"],
+      "demo": "demos/413/string-builder.html"
+    },
+    {
+      "id": "two-key-confirmation",
+      "title": "Two keys and a slider to confirm",
+      "areas": ["core", "interface"],
+      "what": "Confirmations now use two keys and a slider on every device, in place of a typed word. The same batch also brings a fast mode for very large automations, trigger groups, performance diagnostics and multi-select on dashboards. Confirmation titles wrap instead of being cut off.",
+      "what_yue": "確認嘅時候而家每部機都用兩粒鍵加一條滑桿，唔使打字。之前跟設計圖整過一個「打字再撳住」嘅版本，屋主話唔要，已經收返。同一批亦加咗自動化嘅快速模式（給好大嘅自動化用）、觸發條件分組、效能診斷，同埋儀表板多選。確認嘅標題而家會換行，唔會切走。",
+      "why": "The owner does not want anything typed. The typed-word form from the design board was dropped in favour of two keys and a slider.",
+      "try": [
+        "In the demo, press Key one and Key two so that both say turned.",
+        "Slide the slider all the way to the end. Then press Delete dashboard.",
+        "Move the slider before both keys are turned, or let go before the end, and see it reset.",
+        "Press Start again to put the demo back to its first state."
+      ],
+      "sha": ["06b6b82c0"],
+      "demo": "demos/413/two-key-confirmation.html"
+    },
+    {
+      "id": "add-step-between",
+      "title": "Add a step between any two steps, and T, C and A keys",
+      "areas": ["interface"],
+      "what": "In automation and script editors, a slim Add a step here control now sits between any two steps, in the root list and in nested lists. The new step lands at that position, not at the end. Between two triggers of a group, it joins the group. In the visual editor, T adds a trigger, C a condition and A an action. The keys do nothing while you type in a field, inside a dialog, with a modifier key held, or when keyboard shortcuts are switched off. The three keys are listed in the shortcuts dialog.",
+      "what_yue": "自動化同腳本嘅編輯器，兩個步驟之間多咗一粒「喺度加一步」掣。加嘅嘢會落喺嗰個位，唔使加完再拖返上去。喺可視化編輯器撳 T 加觸發、C 加條件、A 加動作；打緊字、開緊對話框或者按住修飾鍵嗰陣，唔會彈出嚟。三粒鍵都列喺快捷鍵對話框入面。",
+      "why": "A new step used to go to the end of the list, so putting one in the middle meant dragging it back up.",
+      "try": [
+        "Open the demo and press Add a step here between two steps.",
+        "Choose a kind of step and press Place it here. The step appears at that position.",
+        "Click outside any field and press T, C or A. A step is added at the end.",
+        "Click into a field and press T. Nothing is added while you type."
+      ],
+      "sha": ["9a36a2146"],
+      "demo": "demos/413/add-step-between.html"
+    },
+    {
+      "id": "select-by-rule",
+      "title": "Select entities by rule in every settings list",
+      "areas": ["interface"],
+      "what": "Settings lists can now select entities by rule. A rule can check whether a name contains or does not contain some text, starts or ends with it, or matches a pattern, and whether an entity has a label. It can also check the area, integration, domain or state. Rules combine with all, any or none, and the result is applied as replace, add, remove or keep only. A live count shows how many entities match before anything is applied.",
+      "what_yue": "設定入面嘅清單而家可以「按規則揀」。條件可以係名有冇某段字、有冇某個標籤、邊個區域、邊個整合、網域或者狀態，仲可以用「全部符合」「任何一個」「全部唔符合」砌組合。揀之前會先睇到幾多個符合，然後先決定係取代、加入、移除，定係淨係留低符合嗰啲。",
+      "why": "Ticking a long list one entity at a time is slow. A rule picks the matching entities in one step, and the count shows the result first.",
+      "try": [
+        "Open a settings list of entities and start selecting by rule.",
+        "In the demo, the rule is Area is Hall. Read the count, then press Apply to selection.",
+        "Add a second rule, switch between All, Any and None, and watch the count change.",
+        "The demo has three kinds of rule. The product has more, as described above."
+      ],
+      "sha": ["95505d935"],
+      "demo": "demos/413/select-by-rule.html"
+    },
+    {
+      "id": "recorder-keep-history",
+      "title": "Keep history per entity, with a minimum time between repeats",
+      "areas": ["core", "interface"],
+      "what": "The recorder can now be set for each entity. A keep history switch turns recording on or off for one entity, and a minimum interval sets how soon a repeated value is recorded again. Both are stored and applied at once. A change to a different value is always recorded, so a door that opens is never thinned out; only repeats are. The YAML filter still wins. The storage view for an entity shows both controls, with the estimated saving first. On a phone, page tools fold into one More sheet.",
+      "what_yue": "記錄器而家可以逐個實體設定。「保留歷史」掣可以開或者熄，另一樣係重複嘅值要隔幾耐先再錄一次；設定即時生效。如果真係變咗另一個值，一定即刻錄，道門開咗唔會畀人慳咗，慳嘅只係重複嗰啲。原本嘅 YAML 過濾仲係最後話事。實體嘅儲存空間頁有呢兩個控制，頂部會先睇到預計慳到幾多。手機上，頁面工具收埋入一個「更多」面板。",
+      "why": "Storage grows with every repeat of every value. This lets each entity keep less, while a real change is still always recorded.",
+      "try": [
+        "Turn Keep history off for a sensor, then send a value. Nothing is recorded.",
+        "The front door has a 60 second minimum. Press Send same value. Nothing is added.",
+        "Press Wait 30 seconds, then Send same value again. Still nothing is added.",
+        "Press Wait 30 seconds once more, then Send same value. One repeat row is added. Press Send a different value at any time to see it always recorded."
+      ],
+      "sha": ["c4996b2da"],
+      "demo": "demos/413/recorder-keep-history.html"
+    },
+    {
+      "id": "scene-preview",
+      "title": "Preview a scene for 30 seconds before it changes the room",
+      "areas": ["interface"],
+      "what": "Scenes can now be previewed. Preview asks first, then applies the scene for 30 seconds and puts the devices back from a snapshot taken before it started. Editing a scene no longer changes the room while you edit it. The same batch also adds Go to line, a status bar and a Replace entity option to the raw editor, and presentation roles, which hide things and are not access control.",
+      "what_yue": "場景而家可以先預覽。預覽會先問你，然後將場景套用 30 秒，之後用開始之前影低嘅快照還原設備。改緊場景嗰陣唔會再即刻郁到個房。同一批仲加咗原始編輯器嘅跳去指定行、狀態列同換實體，另外有「展示角色」，只係收埋嘢，唔係權限。",
+      "why": "Editing a scene used to change the room while the edit was still being made. Now a preview asks first and puts everything back.",
+      "try": [
+        "Press Preview scene. Press Cancel and see that nothing changed.",
+        "Press Preview scene again and then Start preview.",
+        "Watch the countdown from 30 seconds while the devices take the scene values.",
+        "When the countdown reaches zero, the devices return to where they were. Press Start again to reset the demo."
+      ],
+      "sha": ["e39dfae0e"],
+      "demo": "demos/413/scene-preview.html"
+    },
+    {
+      "id": "visibility-by-state",
+      "title": "Show or hide views by entity state",
+      "areas": ["interface"],
+      "what": "Views and whole dashboards can now be shown or hidden according to the state of entities. Conditions combine in And, Or and Not groups. This tidies up navigation; it is not access control, and the interface says so. The new tag dialog can scan a tag, with a note where the browser has no reader. Times default to the 24-hour clock.",
+      "what_yue": "檢視同整個儀表板而家可以跟實體狀態顯示或者收埋，條件可以用「而且」「或者」「唔係」砌成一組。咁樣只係幫手整理導覽，唔係權限控制，介面會寫明。新增標籤嗰個對話框可以掃描標籤；瀏覽器冇讀卡器嘅時候會老實寫明。時間預設跟 24 小時制。",
+      "why": "Some views only matter at certain times, such as while the front door is open, so the navigation can show them only then.",
+      "try": [
+        "In the demo, find the Security view. It starts with both states in use and shows when any condition matches. Untick Use: front door is open for it, or change its group.",
+        "Turn the pretend states on or off and watch the navigation list change.",
+        "Look at the Hidden now line under the navigation list.",
+        "Press Start again to return to the starting rules."
+      ],
+      "sha": ["06fd15aeb"],
+      "demo": "demos/413/visibility-by-state.html"
+    }
+  ],
+  "other": [
+    { "title": "Keep the three Add buttons at the top of the automation editor, not below the starting points", "sha": ["2f3be2c0f"] },
+    { "title": "Built the boards that earlier batches had skipped, with matching server calls for storage and automation debugging", "sha": ["f29a0450b"] },
+    { "title": "Design README: canvas 31 holds 44 boards", "sha": ["fd8d477b5"] },
+    { "title": "Updated the index and source files for the modern requests design canvas", "sha": ["5bda9dd24"] },
+    { "title": "Redrew the design board for adding a trigger, condition or action", "sha": ["5b14e035b"] },
+    { "title": "Updated the index and source files for the modern requests design canvas", "sha": ["b1ec9e346"] },
+    { "title": "Redrew the design board for device notes and setup on a phone", "sha": ["a6fc72cfe"] },
+    { "title": "Redrew the design board for swiping between dashboards, and turning it off", "sha": ["02155575d"] },
+    { "title": "Redrew the design board for sidebar labels and defaults", "sha": ["ede1ab9b0"] },
+    { "title": "Redrew the design board for an automatic list of dashboards, and swiping between them", "sha": ["b0ca8be0d"] },
+    { "title": "Design README now lists canvas 31 with 42 boards, one category per page", "sha": ["231bb045e"] },
+    { "title": "Updated the index and source files for the modern requests design canvas", "sha": ["d835fe624"] },
+    { "title": "Redrew the design board for dashboards, notes and setup on a phone", "sha": ["ae0447d17"] },
+    { "title": "Redrew the design board for a dark mode readability check", "sha": ["960a8fe7a"] },
+    { "title": "Redrew the design board for outside links in a new tab, and a quick bar that remembers", "sha": ["983f8f16a"] },
+    { "title": "Redrew the design board for sidebar labels and defaults", "sha": ["2931797f1"] },
+    { "title": "Redrew the design board for keyboard shortcuts in the YAML editor", "sha": ["1a3b8da74"] },
+    { "title": "Redrew the design board for notes on devices and entities", "sha": ["9a9224acc"] },
+    { "title": "Redrew the design board for an accessible entity picker", "sha": ["dbc99e78f"] },
+    { "title": "Redrew the design board for fields that show only when they apply", "sha": ["6ceb66f86"] },
+    { "title": "Redrew the design board for setup forms with two columns and folding sections", "sha": ["15465c3c1"] },
+    { "title": "Redrew the design board for widgets, the car and offline", "sha": ["32422b5a3"] },
+    { "title": "Redrew the design board for waking, sleeping and reloading tablets from anywhere", "sha": ["9f8fdfc05"] },
+    { "title": "Redrew the design board for built-in wall tablet mode", "sha": ["7233c3a36"] },
+    { "title": "Redrew the design board for the rainbow colour picker", "sha": ["52b0f46b3"] },
+    { "title": "Redrew the design board for energy colours from the theme, or per device", "sha": ["bc43716e4"] },
+    { "title": "Redrew the design board for a brightness slider on the light card", "sha": ["9379e3544"] },
+    { "title": "Redrew the design board for an automatic list of dashboards, and swiping between them", "sha": ["dfa4589f1"] },
+    { "title": "Redrew the design board for duplicate views and dashboards", "sha": ["bf1bfd831"] },
+    { "title": "Redrew the design board for a clipboard shared between tabs", "sha": ["49f44abac"] },
+    { "title": "Redrew the design board for selecting many cards at once", "sha": ["65dbd2366"] },
+    { "title": "Redrew the design board for offline cache health and repair", "sha": ["de41a235c"] },
+    { "title": "Redrew the design board for dashboard load diagnostics", "sha": ["eb080661a"] },
+    { "title": "Redrew the design board for simple and advanced modes", "sha": ["3afe64434"] },
+    { "title": "Redrew the design board for relationships between triggers and steps", "sha": ["814168c3b"] },
+    { "title": "Redrew the design board for trigger groups", "sha": ["97de33e39"] },
+    { "title": "Redrew the design board for a fast editor for very large automations", "sha": ["2250af1da"] },
+    { "title": "Redrew the design board for custom history graph controls", "sha": ["110c1f576"] },
+    { "title": "Redrew the design board for native card styling in the visual editor", "sha": ["8147f9840"] },
+    { "title": "Design README lists canvas 31 for the community requests", "sha": ["7d9a5df4d"] },
+    { "title": "Updated the index and source files for the modern requests design canvas", "sha": ["4c5e708e4"] },
+    { "title": "Redrew the design board for pop-ups, storage and roles on a phone", "sha": ["6c7477b32"] },
+    { "title": "Redrew the design board for scenes, the raw editor and live states on a phone", "sha": ["7b23e033a"] },
+    { "title": "Redrew the design board for room-first layouts", "sha": ["891b0ac46"] },
+    { "title": "Redrew the design board for who can see this, from any card", "sha": ["cd51e473a"] },
+    { "title": "Redrew the design board for granular role-based access", "sha": ["f23f46e11"] },
+    { "title": "Redrew the design board for system-wide default dashboards", "sha": ["0ddbdef98"] },
+    { "title": "Redrew the design board for custom history graph controls", "sha": ["4fcc1fdf0"] },
+    { "title": "Redrew the design board for building a pop-up", "sha": ["7dee2ff2e"] },
+    { "title": "Redrew the design board for interactive pop-up cards", "sha": ["9056b589b"] },
+    { "title": "Redrew the design board for native card styling in the visual editor", "sha": ["87165136f"] },
+    { "title": "Redrew the design board for one entity: why it is big and how to shrink it", "sha": ["38285f01f"] },
+    { "title": "Redrew the design board for the database and storage breakdown", "sha": ["c32db0a63"] },
+    { "title": "Redrew the design board for live entity states in the automation editor", "sha": ["234b5b9d1"] },
+    { "title": "Redrew the design board for swapping an entity id safely", "sha": ["15ec55bba"] },
+    { "title": "Redrew the design board for search and replace in the raw configuration editor", "sha": ["8058e025c"] },
+    { "title": "Redrew the design board for scene preview with automatic restore", "sha": ["0d18c6650"] },
+    { "title": "Redrew the design board for non-destructive scene editing", "sha": ["9d4b77d37"] }
+  ]
+}

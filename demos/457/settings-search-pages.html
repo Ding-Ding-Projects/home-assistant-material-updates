@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings search finds pages inside the cards</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="settings-search-pages">
+  <h1>Settings search finds pages inside the cards</h1>
+  <p class="muted">Type a word such as camera, choose a result, and the page opens below.</p>
+
+  <section class="card stack" aria-labelledby="search-heading">
+    <h2 id="search-heading">Search settings</h2>
+    <label class="field" for="q">Search word</label>
+    <input type="search" id="q" autocomplete="off">
+    <p id="count" class="small muted" aria-live="polite"></p>
+    <ul id="results" class="list"></ul>
+  </section>
+
+  <section class="card stack" aria-labelledby="page-title">
+    <h2 id="page-title">Choose a result</h2>
+    <div id="page" class="stack"></div>
+    <p id="status" class="small" aria-live="polite"></p>
+  </section>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var pages = [
+    { card: 'System', name: 'Camera recording' },
+    { card: 'System', name: 'Backups' },
+    { card: 'Devices', name: 'Cameras' },
+    { card: 'Appearance', name: 'Theme' }
+  ];
+  var q = document.getElementById('q');
+  var count = document.getElementById('count');
+  var results = document.getElementById('results');
+  var page = document.getElementById('page');
+  var title = document.getElementById('page-title');
+  var status = document.getElementById('status');
+  var destinations = 0;
+
+  function renderResults() {
+    var term = q.value.trim().toLowerCase();
+    var hits = pages.filter(function (p) {
+      return term === '' || p.name.toLowerCase().indexOf(term) !== -1 || p.card.toLowerCase().indexOf(term) !== -1;
+    });
+    results.textContent = '';
+    if (term === '') {
+      count.textContent = 'Showing all ' + pages.length + ' pages (pretend list).';
+    } else if (hits.length === 0) {
+      count.textContent = 'No page matches that word.';
+    } else {
+      count.textContent = hits.length + ' page(s) found.';
+    }
+    hits.forEach(function (p) {
+      var li = document.createElement('li');
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'chip';
+      b.textContent = p.name + ' (inside ' + p.card + ')';
+      b.addEventListener('click', function () { openPage(p); });
+      li.appendChild(b);
+      results.appendChild(li);
+    });
+  }
+
+  function openPage(p) {
+    title.textContent = p.name;
+    page.textContent = '';
+    status.textContent = '';
+    if (p.name !== 'Camera recording') {
+      var info = document.createElement('p');
+      info.className = 'muted';
+      info.textContent = 'Pretend settings for ' + p.name + ' would appear here.';
+      page.appendChild(info);
+      return;
+    }
+    if (destinations === 0) {
+      var empty = document.createElement('div');
+      empty.className = 'note';
+      empty.textContent = 'No recording destination yet. Add one to start the first setup from this page.';
+      page.appendChild(empty);
+      var add = document.createElement('button');
+      add.type = 'button';
+      add.className = 'filled';
+      add.textContent = 'Add a destination';
+      add.addEventListener('click', function () {
+        destinations = 1;
+        status.textContent = 'Destination added: a pretend folder on this computer.';
+        openPage(p);
+        status.textContent = 'Destination added: a pretend folder on this computer.';
+      });
+      page.appendChild(add);
+    } else {
+      var good = document.createElement('div');
+      good.className = 'note good';
+      good.textContent = '1 destination (pretend folder on this computer) with 2 cameras (pretend).';
+      page.appendChild(good);
+    }
+  }
+
+  q.addEventListener('input', renderResults);
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    q.value = '';
+    destinations = 0;
+    title.textContent = 'Choose a result';
+    page.textContent = '';
+    status.textContent = '';
+    renderResults();
+  });
+
+  renderResults();
+})();
+</script>
+</body>
+</html>

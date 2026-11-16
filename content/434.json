@@ -1,0 +1,28 @@
+{
+  "build": 434,
+  "headline": "Older browsers can now get past the startup screen of the public demo",
+  "summary": "This version is mostly records of checks. The one change people will see is in the public demo. It now has a second build for browsers outside the modern range, so those browsers can leave the startup screen. The modern build and the modern-only test build both stay in use.",
+  "summary_yue": "今個版本大部分都係檢查紀錄。最明顯嘅改動喺公開示範版。而家有兩個版本，超出現代瀏覽器範圍嘅瀏覽器會載入後備版本，就可以離開啟動畫面。現代瀏覽器繼續用現代版，只限現代瀏覽器嘅測試版都保留。",
+  "highlights": [
+    {
+      "id": "older-browser-startup",
+      "title": "Older browsers can leave the startup screen",
+      "areas": ["interface"],
+      "what": "The public demo is now built for two kinds of browser. Browsers outside the modern range load a legacy bundle, which lets them move past the startup screen. Modern browsers keep using the modern build, and the modern-only test build is still kept.",
+      "what_yue": "公開示範而家分開兩種瀏覽器用嘅版本。超出現代範圍嘅瀏覽器會載入舊版套件，就可以離開啟動畫面。現代瀏覽器繼續用現代版，只限現代瀏覽器嘅測試版亦都保留。",
+      "why": "Browsers outside the modern range could not leave the startup screen of the public demo.",
+      "why_yue": "超出現代範圍嘅瀏覽器以前走唔出公開示範嘅啟動畫面。",
+      "try": [
+        "Open the demo and choose a browser type: modern or older.",
+        "Switch off the legacy bundle, then start the demo with the older browser type. The startup screen stays up.",
+        "Switch the legacy bundle back on and start again. The demo leaves the startup screen and shows the home view."
+      ],
+      "sha": ["9249faf8f"],
+      "demo": "demos/434/older-browser-startup.html"
+    }
+  ],
+  "other": [
+    { "title": "Recorded the browser compatibility checks: the dual-browser loader, the fixed navigation and speech options, and the media and mixed-light checks of the Core image", "sha": ["9372c295b"] },
+    { "title": "Recorded the isolated acceptance of Core 431, the live health check, the recovered 429 release and the current update feed", "sha": ["3c6f62fc7"] }
+  ]
+}

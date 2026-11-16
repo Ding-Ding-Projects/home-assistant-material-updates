@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Visual action and dashboard editors</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+  #elements > li { flex-wrap: wrap; }
+  #elements > li > span { flex: 1 1 100% !important; min-width: 0; overflow-wrap: anywhere; }
+  #elements > li > button { flex: 1 1 auto; }
+  #pieces .chip { max-width: 100%; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="visual-action-editor">
+  <h1>Visual action and dashboard editors</h1>
+  <p class="muted">Pick a device to see only the actions it supports, insert a text piece at the cursor, and change the dashboard elements with the buttons.</p>
+
+  <section class="card stack" aria-labelledby="action-title">
+    <h2 id="action-title" class="small">Action</h2>
+    <label class="field">
+      Device
+      <select id="device"></select>
+    </label>
+    <label class="field">
+      Action (only what this device supports)
+      <select id="action"></select>
+    </label>
+  </section>
+
+  <section class="card stack" aria-labelledby="text-title">
+    <h2 id="text-title" class="small">Text pieces</h2>
+    <label class="field">
+      Message text
+      <textarea id="text" rows="3">Good evening, the </textarea>
+    </label>
+    <div class="row" id="pieces"></div>
+  </section>
+
+  <section class="card stack" aria-labelledby="dash-title">
+    <h2 id="dash-title" class="small">Dashboard elements</h2>
+    <ol class="list" id="elements"></ol>
+    <div class="row">
+      <label class="field">
+        Element to add
+        <select id="addPick">
+          <option>Speaker card</option>
+          <option>Heater card</option>
+          <option>Garden card</option>
+        </select>
+      </label>
+      <button type="button" class="tonal" id="add">Add element</button>
+    </div>
+  </section>
+
+  <p id="result" aria-live="polite" class="note">Ready.</p>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var DEVICES = [
+    { id: 'lamp', name: 'Pretend desk lamp', actions: ['Turn on', 'Set brightness'] },
+    { id: 'heater', name: 'Pretend heater', actions: ['Turn on', 'Set target temperature'] },
+    { id: 'speaker', name: 'Pretend speaker', actions: ['Play', 'Pause'] }
+  ];
+  var PIECES = ['Desk lamp', '7 pm', 'on'];
+  var START_ELEMENTS = ['Clock', 'Lamp card', 'Weather card'];
+
+  var deviceSel = document.getElementById('device');
+  var actionSel = document.getElementById('action');
+  var text = document.getElementById('text');
+  var piecesEl = document.getElementById('pieces');
+  var elementsEl = document.getElementById('elements');
+  var addPick = document.getElementById('addPick');
+  var result = document.getElementById('result');
+  var elements = [];
+
+  function say(msg) { result.textContent = msg; }
+
+  function fillDevices() {
+    deviceSel.innerHTML = '';
+    DEVICES.forEach(function (d) {
+      var o = document.createElement('option');
+      o.value = d.id;
+      o.textContent = d.name;
+      deviceSel.appendChild(o);
+    });
+  }
+
+  function fillActions() {
+    var d = DEVICES.filter(function (x) { return x.id === deviceSel.value; })[0];
+    actionSel.innerHTML = '';
+    d.actions.forEach(function (a) {
+      var o = document.createElement('option');
+      o.textContent = a;
+      actionSel.appendChild(o);
+    });
+  }
+
+  function buildPieces() {
+    piecesEl.innerHTML = '';
+    PIECES.forEach(function (p) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'chip';
+      b.textContent = 'Insert "' + p + '"';
+      b.addEventListener('click', function () {
+        var s = text.selectionStart;
+        var e = text.selectionEnd;
+        var v = text.value;
+        text.value = v.slice(0, s) + p + v.slice(e);
+        var pos = s + p.length;
+        text.focus();
+        text.setSelectionRange(pos, pos);
+        say('Inserted "' + p + '" at the cursor.');
+      });
+      piecesEl.appendChild(b);
+    });
+  }
+
+  function renderElements() {
+    elementsEl.innerHTML = '';
+    if (elements.length === 0) {
+      var li = document.createElement('li');
+      li.textContent = 'No dashboard elements yet. Add one below.';
+      elementsEl.appendChild(li);
+      return;
+    }
+    elements.forEach(function (name, i) {
+      var li = document.createElement('li');
+      var label = document.createElement('span');
+      label.textContent = (i + 1) + '. ' + name;
+      label.style.flex = '1';
+      li.appendChild(label);
+      li.appendChild(makeBtn('Move up', name, function () {
+        if (i > 0) { swap(i, i - 1); say('Moved ' + name + ' up.'); }
+      }));
+      li.appendChild(makeBtn('Move down', name, function () {
+        if (i < elements.length - 1) { swap(i, i + 1); say('Moved ' + name + ' down.'); }
+      }));
+      li.appendChild(makeBtn('Remove', name, function () {
+        elements.splice(i, 1);
+        renderElements();
+        say('Removed ' + name + '.');
+      }));
+      elementsEl.appendChild(li);
+    });
+  }
+
+  function makeBtn(label, aria, fn) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'tonal';
+    b.textContent = label;
+    b.setAttribute('aria-label', label + ': ' + aria);
+    b.addEventListener('click', fn);
+    return b;
+  }
+
+  function swap(a, b) {
+    var t = elements[a];
+    elements[a] = elements[b];
+    elements[b] = t;
+    renderElements();
+  }
+
+  deviceSel.addEventListener('change', function () {
+    fillActions();
+    say('Actions now match ' + deviceSel.options[deviceSel.selectedIndex].text + '.');
+  });
+  actionSel.addEventListener('change', function () {
+    say('Chosen action: ' + actionSel.value + '.');
+  });
+  document.getElementById('add').addEventListener('click', function () {
+    elements.push(addPick.value);
+    renderElements();
+    say('Added ' + addPick.value + '.');
+  });
+
+  function reset() {
+    fillDevices();
+    deviceSel.value = 'lamp';
+    fillActions();
+    text.value = 'Good evening, the ';
+    elements = START_ELEMENTS.slice();
+    addPick.value = 'Speaker card';
+    renderElements();
+    say('Ready.');
+  }
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', reset);
+  fillDevices();
+  buildPieces();
+  reset();
+})();
+</script>
+</body>
+</html>

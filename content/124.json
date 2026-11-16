@@ -1,0 +1,25 @@
+{
+  "build": 124,
+  "headline": "Tabs can dock to any edge and be grouped, pinned and locked",
+  "summary": "Build 124 gives the tab strip much more control. The strip can sit on any edge of the screen, tabs can be pinned, locked and put into groups, and four separate searches help you find a tab. While an app installs, a progress bar and a log now show what is happening, and you can drop a picture, video or audio file on any page to upload it. Larger uploads, automatic conversion of dropped files and a phone entry point are still being built.",
+  "summary_yue": "第 124 版大幅加強咗分頁條。分頁條可以泊喺螢幕任何一邊，分頁可以釘住、上鎖同分組，仲有四種獨立搜尋方法幫你搵分頁。應用程式安裝期間會有進度條同日誌，將相片、影片或者音訊檔案拖落任何一頁就可以上載。上載加大、拖落嘅檔案自動轉檔同手機入口仲未完成。",
+  "highlights": [
+    {
+      "id": "tab-options",
+      "title": "Tabs can dock to any edge, group, pin and lock",
+      "areas": ["interface"],
+      "what": "The tab strip can sit on the top, bottom, left or right edge of the screen. Tabs can be pinned so they stay at the front, locked so they cannot be closed by mistake, and put into groups. Each tab has its own right-click menu, and a bulk close shows you a preview before it closes anything.",
+      "what_yue": "分頁條可以泊喺螢幕頂、底、左或者右任何一邊。分頁可以釘住，排喺最前；亦可以上鎖，唔會因為手快而閂咗；仲可以分組。每個分頁都有自己嘅右鍵選單，批量關閉之前會先俾你睇預覽。",
+      "why": "The old tab strip was a plain row of buttons. It could not be moved, grouped or protected, and it gave no help when there were many tabs to choose from.",
+      "try": [
+        "Choose an edge in the Strip edge box and watch the strip move to that side.",
+        "Press Pin on a tab, then press Lock on another tab and try to press its Close button.",
+        "Type part of a tab name in the search box to narrow the list.",
+        "You should see pinned tabs at the top, locked tabs with Close switched off, and the list shrink as you search."
+      ],
+      "sha": ["447cde08f"],
+      "demo": "demos/124/tab-options.html"
+    }
+  ],
+  "other": []
+}

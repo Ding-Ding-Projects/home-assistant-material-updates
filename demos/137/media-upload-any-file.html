@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Media upload: any file</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+  input[type="file"] { font: inherit; min-height: 56px; width: 100%; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--out); background: var(--sl0); color: var(--on); }
+  input[type="file"]::file-selector-button { font: inherit; min-height: 40px; margin-right: 12px; padding: 0 16px; border-radius: 20px; border: 0; background: var(--sc); color: var(--on-sc); cursor: pointer; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="media-upload-any-file">
+  <h1>Media upload: choose any file</h1>
+  <p class="muted">Choose one or more files of any type. Pictures, video and audio are kept. Anything else is refused here, and the message names it.</p>
+
+  <section class="card stack" aria-labelledby="pick-h">
+    <h2 id="pick-h" style="font-size:18px;margin:0">Files</h2>
+    <label class="field" for="files">Choose files</label>
+    <input type="file" id="files" multiple>
+    <div class="row">
+      <button type="button" class="tonal" id="pretend">Use pretend files</button>
+    </div>
+    <p class="small muted">No files to hand? Use pretend files: a photo, a video clip, an Ogg voice note with no type, and a text file.</p>
+    <p id="refused" class="note error" role="status" hidden></p>
+    <ul class="list" id="items" aria-label="Files ready to upload"></ul>
+    <div class="row">
+      <button type="button" class="filled" id="upload" disabled>Upload</button>
+    </div>
+  </section>
+
+  <p id="result" class="note" aria-live="polite"></p>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var PICTURE = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic'];
+  var VIDEO = ['mp4', 'mov', 'webm', 'mkv'];
+  var AUDIO = ['mp3', 'ogg', 'wav', 'm4a', 'flac'];
+  var NAME_TYPES = { ogg: 'audio/ogg', mp3: 'audio/mpeg', wav: 'audio/wav', m4a: 'audio/mp4', flac: 'audio/flac', jpg: 'image/jpeg', png: 'image/png', mp4: 'video/mp4', mov: 'video/quicktime', webm: 'video/webm' };
+
+  var input = document.getElementById('files');
+  var list = document.getElementById('items');
+  var refused = document.getElementById('refused');
+  var upload = document.getElementById('upload');
+  var result = document.getElementById('result');
+  var items = [];
+  var seq = 0;
+
+  function extOf(name) {
+    var i = name.lastIndexOf('.');
+    return i < 0 ? '' : name.slice(i + 1).toLowerCase();
+  }
+
+  function kindOf(file) {
+    var ext = extOf(file.name);
+    var type = file.type || NAME_TYPES[ext] || '';
+    if (type.indexOf('image/') === 0 || PICTURE.indexOf(ext) >= 0) return 'picture';
+    if (type.indexOf('video/') === 0 || VIDEO.indexOf(ext) >= 0) return 'video';
+    if (type.indexOf('audio/') === 0 || AUDIO.indexOf(ext) >= 0) return 'audio';
+    return 'refused';
+  }
+
+  function render() {
+    list.innerHTML = '';
+    items.forEach(function (it) {
+      var li = document.createElement('li');
+      var text = document.createElement('span');
+      text.style.flex = '1';
+      var note = it.kind === 'picture' ? ' (will be converted)' : ' (sent unchanged)';
+      text.textContent = it.name + ' - ' + it.kind + (it.typeFromName ? ', type from name' : '') + note + (it.state === 'uploaded' ? ' - uploaded (pretend)' : '');
+      var rm = document.createElement('button');
+      rm.type = 'button';
+      rm.className = 'tonal';
+      rm.textContent = 'Remove';
+      rm.setAttribute('aria-label', 'Remove ' + it.name);
+      rm.addEventListener('click', function () {
+        items = items.filter(function (x) { return x.id !== it.id; });
+        result.textContent = 'Removed ' + it.name + '. ' + items.length + ' file(s) ready.';
+        render();
+      });
+      li.appendChild(text);
+      li.appendChild(rm);
+      list.appendChild(li);
+    });
+    upload.disabled = items.length === 0 || items.every(function (x) { return x.state === 'uploaded'; });
+  }
+
+  function takeFiles(chosen) {
+    var refusedNames = [];
+    var added = 0;
+    Array.prototype.forEach.call(chosen, function (f) {
+      var kind = kindOf(f);
+      if (kind === 'refused') {
+        refusedNames.push(f.name);
+        return;
+      }
+      items.push({ id: ++seq, name: f.name, kind: kind, typeFromName: !f.type, state: 'ready' });
+      added++;
+    });
+    if (refusedNames.length) {
+      refused.hidden = false;
+      refused.textContent = 'Refused, not a picture, video or audio file: ' + refusedNames.join(', ') + '.';
+    } else {
+      refused.hidden = true;
+      refused.textContent = '';
+    }
+    result.textContent = 'Added ' + added + ' file(s). ' + (refusedNames.length ? refusedNames.length + ' refused.' : 'None refused.');
+    render();
+  }
+
+  input.addEventListener('change', function () {
+    var chosen = Array.prototype.slice.call(input.files);
+    input.value = '';
+    takeFiles(chosen);
+  });
+
+  document.getElementById('pretend').addEventListener('click', function () {
+    takeFiles([
+      { name: 'front-door.jpg', type: 'image/jpeg' },
+      { name: 'garden-clip.mp4', type: 'video/mp4' },
+      { name: 'doorbell.ogg', type: '' },
+      { name: 'notes.txt', type: 'text/plain' }
+    ]);
+  });
+
+  upload.addEventListener('click', function () {
+    var n = 0;
+    items.forEach(function (it) { if (it.state !== 'uploaded') { it.state = 'uploaded'; n++; } });
+    result.textContent = 'Pretend upload of ' + n + ' file(s). Pictures are converted; video and audio go up as they are. Nothing was sent.';
+    render();
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    items = [];
+    seq = 0;
+    input.value = '';
+    refused.hidden = true;
+    refused.textContent = '';
+    result.textContent = '';
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

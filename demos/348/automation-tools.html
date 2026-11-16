@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Automation editor tools</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>[hidden] { display: none !important; }</style>
+</head>
+<body>
+<main class="demo" data-demo="automation-tools">
+  <h1>Automation editor Tools menu</h1>
+  <p class="muted">Search the tools and open one to read what it does. Then set the conditions in the simulator to see whether the pretend automation would run.</p>
+
+  <section class="card" aria-labelledby="tools-title">
+    <div class="stack">
+      <h2 id="tools-title">Tools</h2>
+      <label class="field" for="tool-search">Search the tools
+        <input type="search" id="tool-search" placeholder="For example: simulator or health">
+      </label>
+      <ul class="list" id="tool-list">
+        <li data-name="flow view minimap" data-tool="Flow view with a minimap: see the steps of an automation as a flow."><button type="button" class="tonal">Open Flow view</button><span>Flow view</span></li>
+        <li data-name="trace list" data-tool="Trace list: review the recorded runs of an automation, one line each."><button type="button" class="tonal">Open Trace list</button><span>Trace list</span></li>
+        <li data-name="simulator dry run" data-tool="Simulator: runs on the existing dry run. It never calls a service, and it says which conditions it cannot judge."><button type="button" class="tonal">Open Simulator</button><span>Simulator</span></li>
+        <li data-name="conflict loop detector" data-tool="Conflict and loop detector: warns when automations may fight each other or repeat forever."><button type="button" class="tonal">Open Conflict and loop detector</button><span>Conflict and loop detector</span></li>
+        <li data-name="health score" data-tool="Health score: a score for an automation, with its formula shown."><button type="button" class="tonal">Open Health score</button><span>Health score</span></li>
+        <li data-name="week ahead" data-tool="Week ahead: a view of the automations due in the coming week."><button type="button" class="tonal">Open Week ahead</button><span>Week ahead</span></li>
+        <li data-name="entity swap" data-tool="Entity swap: change one entity across automations, with a review step before anything changes."><button type="button" class="tonal">Open Entity swap</button><span>Entity swap</span></li>
+      </ul>
+      <p class="note" id="tool-note" aria-live="polite">Press Open on a tool to read what it does.</p>
+      <p class="note" id="none" hidden>No tool matches. Try another word.</p>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="sim-title">
+    <div class="stack">
+      <h2 id="sim-title">Simulator for a pretend automation</h2>
+      <p>When the hallway motion sensor turns on, turn on the porch light, if the conditions below are met.</p>
+      <label class="row"><input class="switch" type="checkbox" id="hall-light"> <span>Hallway light is on</span></label>
+      <label class="field" for="time-band">Time of day
+        <select id="time-band">
+          <option value="before">Before 18:00</option>
+          <option value="after">After 18:00</option>
+        </select>
+      </label>
+      <p class="badge" id="unknown">Someone is home: cannot judge here</p>
+      <div class="row">
+        <button type="button" class="filled" id="run-sim">Run simulator</button>
+        <button type="button" data-demo-reset>Start again</button>
+      </div>
+      <p class="note" id="sim-result" aria-live="polite">Set the conditions, then press Run simulator.</p>
+    </div>
+  </section>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var search = document.getElementById('tool-search');
+  var items = Array.prototype.slice.call(document.querySelectorAll('#tool-list li'));
+  var note = document.getElementById('tool-note');
+  var none = document.getElementById('none');
+  var hallLight = document.getElementById('hall-light');
+  var timeBand = document.getElementById('time-band');
+  var runSim = document.getElementById('run-sim');
+  var simResult = document.getElementById('sim-result');
+  var reset = document.querySelector('[data-demo-reset]');
+  var runs = 0;
+
+  function filterTools() {
+    var words = search.value.trim().toLowerCase();
+    var shown = 0;
+    items.forEach(function (li) {
+      var show = words === '' || li.getAttribute('data-name').indexOf(words) !== -1
+        || li.textContent.toLowerCase().indexOf(words) !== -1;
+      li.hidden = !show;
+      if (show) shown += 1;
+    });
+    none.hidden = shown !== 0;
+  }
+
+  items.forEach(function (li) {
+    li.querySelector('button').addEventListener('click', function () {
+      note.textContent = li.getAttribute('data-tool');
+    });
+  });
+
+  search.addEventListener('input', filterTools);
+
+  function simulate() {
+    var blocked = [];
+    if (!hallLight.checked) blocked.push('the hallway light is off');
+    if (timeBand.value !== 'after') blocked.push('it is before 18:00');
+    var text;
+    if (blocked.length === 0) {
+      text = 'Would run: turn on the porch light (pretend). No service is called. The condition "Someone is home" cannot be judged here, so check it on the real system.';
+    } else {
+      text = 'Would not run, because ' + blocked.join(' and ') + '. No service is called.';
+    }
+    simResult.textContent = text;
+  }
+
+  runSim.addEventListener('click', function () {
+    runs += 1;
+    simulate();
+    simResult.textContent = 'Simulation run ' + runs + '. ' + simResult.textContent;
+  });
+
+  hallLight.addEventListener('change', simulate);
+  timeBand.addEventListener('change', simulate);
+
+  reset.addEventListener('click', function () {
+    runs = 0;
+    hallLight.checked = false;
+    timeBand.value = 'before';
+    search.value = '';
+    filterTools();
+    note.textContent = 'Press Open on a tool to read what it does.';
+    simResult.textContent = 'Set the conditions, then press Run simulator.';
+  });
+
+  filterTools();
+})();
+</script>
+</body>
+</html>

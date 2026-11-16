@@ -1,0 +1,43 @@
+{
+  "build": 431,
+  "headline": "Visual editors for actions and dashboard elements, and a calendar offset that works when switched on",
+  "summary": "The action editor offers choices based on what each device or integration can do, and text pieces can be placed exactly where the cursor is. Dashboard elements can be added, moved and removed with structured controls. The optional calendar offset field also gets a valid value when it is turned on.",
+  "summary_yue": "動作編輯器而家按住個裝置或者整合真係做得到嘅嘢，列出選項俾你揀。文字片段可以插入游標所在嘅確實位置。儀表板元素可以用結構化控制項加、移同刪除。可選嘅日曆偏移欄位打開嗰陣，都會有一個有效嘅值。",
+  "highlights": [
+    {
+      "id": "visual-action-editor",
+      "title": "Visual editors for actions and dashboard elements",
+      "areas": ["interface", "core"],
+      "what": "Choosing an action now offers the options that the device or integration supports, so you pick from a list instead of typing a name. Text pieces can be inserted at the exact point of the cursor, and new actions follow the all-actions setting. Dashboard elements can be added and arranged with structured controls, including where no dedicated editor was supplied.",
+      "what_yue": "揀動作嗰陣，而家會列出個裝置或者整合支援嘅選項，揀就得，唔使打字。文字片段可以插入游標所在嘅確實位置，新動作會跟住「所有動作」嘅設定。儀表板元素可以用結構化控制項加同排列，就算冇專用編輯器都得。",
+      "why": "Editing actions and dashboards by typing asked more of a person than it should.",
+      "why_yue": "以前用打字編輯動作同儀表板，要打嘅字太多。",
+      "try": [
+        "Choose a device in the action editor and see which actions it supports.",
+        "Pick a different device and see the action list change to match it.",
+        "Place the cursor in the text box, choose a piece to insert, and see it appear at the cursor. Then add, move or remove a dashboard element."
+      ],
+      "sha": ["19c542b8f"],
+      "demo": "demos/431/visual-action-editor.html"
+    },
+    {
+      "id": "calendar-offset-field",
+      "title": "Calendar offset field gets a valid value when switched on",
+      "areas": ["interface"],
+      "what": "Turning on the optional calendar offset field gives it a valid offset, so its control is active and can be changed straight away. A blank value is refused with a message when you save.",
+      "what_yue": "打開可選嘅日曆偏移欄位，會即時有一個有效嘅偏移值，個控制項可以即刻改。如果存檔嗰陣留空，就會俾一句提示，唔會收低。",
+      "why": "Turning on the optional field could leave its controls inactive.",
+      "why_yue": "打開可選欄位之後，相關控制項可能會唔得用。",
+      "try": [
+        "Switch on the optional calendar offset field and see a valid offset already chosen.",
+        "Change the offset to the blank choice and press Save to see the message.",
+        "Choose a valid offset again and press Save to see it accepted."
+      ],
+      "sha": ["79d87a41c"],
+      "demo": "demos/431/calendar-offset.html"
+    }
+  ],
+  "other": [
+    { "title": "Recorded the local build and the deployment handoff. The production install stays on its current version until the published Core image passes its isolated browser check.", "sha": ["b784ddef5"] }
+  ]
+}

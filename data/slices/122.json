@@ -1,0 +1,35 @@
+{
+ "build": 122,
+ "core": "2026.11.1.122",
+ "supervisor": "2026.11.0.122",
+ "os": "18.5.122",
+ "tag": "v2026.11.1.122",
+ "source": "f5b82618f",
+ "date": "2026-11-11T18:54:23-05:00",
+ "previous_build": 121,
+ "changes": [
+  {
+   "sha": "f5b82618f",
+   "date": "2026-11-11T18:54:23-05:00",
+   "title": "Full hosting mode with the app store; dashboard add control; fixes from the browser pass on build 121",
+   "areas": [
+    "build",
+    "docs",
+    "interface",
+    "supervisor"
+   ],
+   "detail": "Hosting - \"Full\" mode: an outer container with its own Docker engine runs the Supervisor, the core and every app as containers inside it (hosting/full, compose.full.yaml, host.bat --full, host.sh --full, a workflow job that publishes the outer image and is part of the publish-only-when-green rule). The Supervisor skips its systemd firewall step when the outer container has already protected the gateway. Proven on a throwaway copy: store, installs, ingress, backup and restore with apps, a core update, stop and start; the workflow job has not run.\n\nInterface - A dashboard page that holds a single card says so in edit mode and offers the sections layout; a generated page offers an editable copy; the page uses the visible screen height. - From the browser pass on build 121: the statistics strip is used by six list pages; selection bar buttons, row checkboxes, notification buttons and dashboard add buttons are 44 px on touch; the bar clears the sub-tab row; long press on a tile opens the menu without taking over a configured hold action; readable bar and toast buttons; the toast stack clears the bottom bar; the type scale survives a reload and starts from the theme's sizes; support tick",
+   "detail_yue": "今次大件事：多咗個「完整模式」，一個外殼入面自己開引擎，管理員、核心同每個 應用程式各自一格，應用商店、完整備份、真更新全部得，部電腦望落只係得一個 容器。儀表板單卡頁編輯嗰陣終於有嘢可以加。仲有瀏覽器逐版睇完之後嘅一輪 執漏：粒掣夠大、字睇得清、砌好咗冇人用嘅零件終於駁返上版面。"
+  },
+  {
+   "sha": "4342caf56",
+   "date": "2026-11-11T16:59:44-05:00",
+   "title": "Tests: define build-time values and form stubs so no unhandled errors are printed",
+   "areas": [
+    "interface"
+   ],
+   "detail": "One layout test file printed 135 unhandled errors on every run: a build-time value the bundler defines was missing from the test setup, and the test browser's form internals lack the validity methods that form-associated components call. Both are provided in test/setup.ts. The suite is unchanged (6,232 pass, 3 fail as before) and prints no unhandled errors, so a real one will stand out.",
+   "detail_yue": "測試執手尾：每次跑都彈 135 行「冇人理嘅錯誤」，其實係測試環境少咗個建置 時先有嘅數值，同埋假瀏覽器唔識表單驗證。補返之後靜晒，真係有事先至會嘈。"
+  }
+ ]
+}

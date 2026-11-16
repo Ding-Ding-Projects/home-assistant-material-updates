@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Type scale demo</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+  input[type="range"] { width: 100%; min-height: 48px; accent-color: var(--p); }
+  .sample { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 8px 12px; border-radius: 12px; background: var(--sl2); }
+  .sample p { overflow-wrap: anywhere; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="type-scale">
+  <h1>Type scale</h1>
+  <p class="muted">Turn the scale on, then change the base size and the ratio. Each step grows by the ratio.</p>
+
+  <section class="card stack" aria-labelledby="h-set">
+    <h2 id="h-set" style="font-size:18px">Fonts</h2>
+    <div class="row">
+      <button type="button" id="toggle" aria-pressed="false" class="tonal">Type scale: off</button>
+    </div>
+    <label class="field" for="base">Base size: <output id="base-out" for="base">16</output> px
+      <input type="range" id="base" min="12" max="24" step="1" value="16">
+    </label>
+    <label class="field" for="ratio">Ratio
+      <select id="ratio">
+        <option value="1.125">1.125</option>
+        <option value="1.2" selected>1.2</option>
+        <option value="1.25">1.25</option>
+        <option value="1.333">1.333</option>
+        <option value="1.5">1.5</option>
+      </select>
+    </label>
+  </section>
+
+  <section class="card stack" aria-labelledby="h-prev">
+    <h2 id="h-prev" style="font-size:18px">Preview</h2>
+    <div class="sample"><span class="small muted">Step -1</span><p id="s-1">The quick brown fox</p></div>
+    <div class="sample"><span class="small muted">Step 0 (base)</span><p id="s0">The quick brown fox</p></div>
+    <div class="sample"><span class="small muted">Step 1</span><p id="s1">The quick brown fox</p></div>
+    <div class="sample"><span class="small muted">Step 2</span><p id="s2">The quick brown fox</p></div>
+    <div class="sample"><span class="small muted">Step 3</span><p id="s3">The quick brown fox</p></div>
+    <p class="note" id="status" aria-live="polite"></p>
+  </section>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var toggle = document.getElementById('toggle');
+  var base = document.getElementById('base');
+  var baseOut = document.getElementById('base-out');
+  var ratio = document.getElementById('ratio');
+  var status = document.getElementById('status');
+  var steps = { '-1': 'm1', '0': 's0', '1': 's1', '2': 's2', '3': 's3' };
+
+  function render() {
+    var on = toggle.getAttribute('aria-pressed') === 'true';
+    toggle.textContent = on ? 'Type scale: on' : 'Type scale: off';
+    toggle.className = on ? 'filled' : 'tonal';
+    baseOut.textContent = base.value;
+    var b = Number(base.value);
+    var r = Number(ratio.value);
+    var sizes = {};
+    Object.keys(steps).forEach(function (n) {
+      var size = on ? b * Math.pow(r, Number(n)) : 16;
+      sizes[n] = size;
+      var id = n === '-1' ? 's-1' : steps[n];
+      document.getElementById(id).style.fontSize = size.toFixed(1) + 'px';
+    });
+    if (!on) {
+      status.textContent = 'Type scale is off. Every step uses the default 16 px size.';
+    } else {
+      status.textContent = 'Step sizes in pixels: -1 is ' + sizes['-1'].toFixed(1) +
+        ', base is ' + sizes['0'].toFixed(1) + ', 1 is ' + sizes['1'].toFixed(1) +
+        ', 2 is ' + sizes['2'].toFixed(1) + ', 3 is ' + sizes['3'].toFixed(1) + '.';
+    }
+  }
+
+  toggle.addEventListener('click', function () {
+    toggle.setAttribute('aria-pressed', toggle.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+    render();
+  });
+  base.addEventListener('input', render);
+  ratio.addEventListener('change', render);
+
+  function reset() {
+    toggle.setAttribute('aria-pressed', 'false');
+    base.value = '16';
+    ratio.value = '1.2';
+    render();
+  }
+  document.querySelectorAll('[data-demo-reset]').forEach(function (b) { b.addEventListener('click', reset); });
+  reset();
+})();
+</script>
+</body>
+</html>

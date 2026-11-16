@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guides as linked articles</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="guide-articles">
+  <h1>Guides as linked articles</h1>
+  <p class="muted">Filter the guides by category, open one, then follow its related link to the next article.</p>
+
+  <section class="card stack" aria-labelledby="filter-title">
+    <h2 id="filter-title" class="small">Categories</h2>
+    <div class="row" id="groupsEl" role="group" aria-label="Category filter"></div>
+    <p id="count" class="muted small" aria-live="polite"></p>
+    <ul class="list" id="list" aria-label="Articles"></ul>
+  </section>
+
+  <article class="card stack" id="article" aria-labelledby="art-title" hidden>
+    <h2 id="art-title"></h2>
+    <p id="art-body"></p>
+    <div class="row">
+      <button type="button" class="tonal" id="related"></button>
+    </div>
+  </article>
+
+  <p id="status" aria-live="polite" class="note">Choose a category or open an article.</p>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var ARTICLES = [
+    { id: 'lights', group: 'Devices', title: 'Pretend guide: lights', body: 'This guide shows how a light is added and turned on.', related: 'automations' },
+    { id: 'automations', group: 'Automations', title: 'Pretend guide: automations', body: 'An automation runs its actions when its trigger happens.', related: 'actions' },
+    { id: 'actions', group: 'Automations', title: 'Pretend guide: actions', body: 'Actions are the steps an automation takes, in the order they are listed.', related: 'updates' },
+    { id: 'updates', group: 'Updates', title: 'Pretend guide: updates', body: 'Updates can be checked by hand or installed automatically, one app at a time.', related: 'lights' }
+  ];
+  var GROUPS = ['All', 'Devices', 'Automations', 'Updates'];
+
+  var groupsEl = document.getElementById('groupsEl');
+  var list = document.getElementById('list');
+  var count = document.getElementById('count');
+  var article = document.getElementById('article');
+  var artTitle = document.getElementById('art-title');
+  var artBody = document.getElementById('art-body');
+  var related = document.getElementById('related');
+  var status = document.getElementById('status');
+  var currentGroup = 'All';
+  var currentId = null;
+
+  function say(msg) { status.textContent = msg; }
+
+  function renderCats() {
+    groupsEl.innerHTML = '';
+    GROUPS.forEach(function (c) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'chip';
+      b.textContent = c;
+      b.setAttribute('aria-pressed', c === currentGroup ? 'true' : 'false');
+      b.addEventListener('click', function () {
+        currentGroup = c;
+        renderCats();
+        renderList();
+        say('Showing ' + c.toLowerCase() + ' guides.');
+      });
+      groupsEl.appendChild(b);
+    });
+  }
+
+  function renderList() {
+    list.innerHTML = '';
+    var shown = ARTICLES.filter(function (a) { return currentGroup === 'All' || a.group === currentGroup; });
+    count.textContent = shown.length + ' guide' + (shown.length === 1 ? '' : 's') + ' in this view.';
+    shown.forEach(function (a) {
+      var li = document.createElement('li');
+      var span = document.createElement('span');
+      span.style.flex = '1';
+      span.textContent = a.title + ' (' + a.group + ')';
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'tonal';
+      b.textContent = 'Open';
+      b.setAttribute('aria-label', 'Open ' + a.title);
+      b.addEventListener('click', function () { openArticle(a.id); });
+      li.appendChild(span);
+      li.appendChild(b);
+      list.appendChild(li);
+    });
+  }
+
+  function find(id) {
+    return ARTICLES.filter(function (a) { return a.id === id; })[0];
+  }
+
+  function openArticle(id) {
+    var a = find(id);
+    currentId = id;
+    artTitle.textContent = a.title;
+    artBody.textContent = a.body;
+    var rel = find(a.related);
+    related.textContent = 'Related: ' + rel.title;
+    article.hidden = false;
+    say('Opened ' + a.title + '.');
+  }
+
+  related.addEventListener('click', function () {
+    var a = find(currentId);
+    openArticle(a.related);
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    currentGroup = 'All';
+    currentId = null;
+    article.hidden = true;
+    renderCats();
+    renderList();
+    say('Choose a category or open an article.');
+  });
+
+  renderCats();
+  renderList();
+})();
+</script>
+</body>
+</html>

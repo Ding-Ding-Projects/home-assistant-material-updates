@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Navigation pane page order</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="navigation-order">
+  <h1>Navigation pane page order</h1>
+  <p class="muted">The default order is fixed: the default page, dashboards by title, the built-in pages, then the rest by title. Reload from server to see that the default list does not change.</p>
+
+  <section class="card stack" aria-labelledby="nav-title">
+    <h2 id="nav-title" class="small">Pages in the navigation pane</h2>
+    <label class="row">
+      <input type="checkbox" class="switch" id="useSaved">
+      <span>Use saved order</span>
+    </label>
+    <ol class="list" id="pages" aria-label="Navigation pages"></ol>
+    <div class="row">
+      <button type="button" class="tonal" id="reload">Reload from server</button>
+      <button type="button" class="tonal" id="reset">Reset to default</button>
+    </div>
+    <p class="small muted" id="serverOrder"></p>
+  </section>
+
+  <p id="status" aria-live="polite" class="note">Showing the default order.</p>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var PAGES = {
+    overview: { title: 'Overview', kind: 'default' },
+    energy: { title: 'Energy dashboard', kind: 'dashboard' },
+    garden: { title: 'Garden dashboard', kind: 'dashboard' },
+    map: { title: 'Map', kind: 'builtin' },
+    logbook: { title: 'Logbook', kind: 'builtin' },
+    history: { title: 'History', kind: 'builtin' },
+    media: { title: 'Media', kind: 'builtin' },
+    zeta: { title: 'Zeta tools', kind: 'other' },
+    alpha: { title: 'Alpha tools', kind: 'other' }
+  };
+  var BUILTIN_ORDER = ['map', 'logbook', 'history', 'media'];
+  var SERVER_START = ['zeta', 'history', 'energy', 'map', 'alpha', 'overview', 'logbook', 'garden', 'media'];
+
+  var serverOrder = SERVER_START.slice();
+  var saved = null;
+  var useSaved = document.getElementById('useSaved');
+  var pagesEl = document.getElementById('pages');
+  var status = document.getElementById('status');
+  var serverEl = document.getElementById('serverOrder');
+
+  function say(msg) { status.textContent = msg; }
+
+  function titleOf(id) { return PAGES[id].title; }
+
+  // Fixed default order: default page, dashboards by title, built-ins in their usual order, the rest by title.
+  function defaultOrder() {
+    var ids = Object.keys(PAGES);
+    var def = ids.filter(function (i) { return PAGES[i].kind === 'default'; });
+    var dash = ids.filter(function (i) { return PAGES[i].kind === 'dashboard'; })
+      .sort(function (a, b) { return titleOf(a).localeCompare(titleOf(b)); });
+    var builtin = BUILTIN_ORDER.slice();
+    var rest = ids.filter(function (i) { return PAGES[i].kind === 'other'; })
+      .sort(function (a, b) { return titleOf(a).localeCompare(titleOf(b)); });
+    return def.concat(dash, builtin, rest);
+  }
+
+  function shown() {
+    if (useSaved.checked && saved) { return saved.slice(); }
+    return defaultOrder();
+  }
+
+  function render() {
+    var list = shown();
+    pagesEl.innerHTML = '';
+    list.forEach(function (id, i) {
+      var li = document.createElement('li');
+      li.className = 'list';
+      var label = document.createElement('span');
+      label.style.flex = '1';
+      label.textContent = (i + 1) + '. ' + titleOf(id);
+      li.appendChild(label);
+      li.appendChild(makeMove('Up', id, -1, i));
+      li.appendChild(makeMove('Down', id, 1, i));
+      pagesEl.appendChild(li);
+    });
+    serverEl.textContent = 'Order the server supplied this time: ' + serverOrder.map(titleOf).join(', ') + '.';
+  }
+
+  function makeMove(label, id, dir, index) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'tonal';
+    b.textContent = label;
+    b.setAttribute('aria-label', label + ' for ' + titleOf(id));
+    b.addEventListener('click', function () {
+      var list = shown();
+      var j = index + dir;
+      if (j < 0 || j >= list.length) { return; }
+      var t = list[index];
+      list[index] = list[j];
+      list[j] = t;
+      saved = list;
+      useSaved.checked = true;
+      render();
+      say('Moved ' + titleOf(id) + ' ' + label.toLowerCase() + '. Your order is saved in this demo.');
+    });
+    return b;
+  }
+
+  function rotate(arr, n) {
+    return arr.slice(n).concat(arr.slice(0, n));
+  }
+
+  document.getElementById('reload').addEventListener('click', function () {
+    serverOrder = rotate(serverOrder, 2);
+    render();
+    say('Reloaded. The server order changed, and the default list is still the same.');
+  });
+
+  document.getElementById('reset').addEventListener('click', function () {
+    saved = null;
+    useSaved.checked = false;
+    render();
+    say('Back to the fixed default order.');
+  });
+
+  useSaved.addEventListener('change', function () {
+    if (useSaved.checked && !saved) {
+      say('No saved order yet. Move a page to make one. The default order is shown.');
+    } else {
+      say(useSaved.checked ? 'Your saved order is shown.' : 'The fixed default order is shown.');
+    }
+    render();
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    serverOrder = SERVER_START.slice();
+    saved = null;
+    useSaved.checked = false;
+    render();
+    say('Showing the default order.');
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

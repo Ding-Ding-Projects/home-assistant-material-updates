@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Backup restore demo</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="backup-restore">
+  <h1>Backup restore</h1>
+  <p class="muted">Choose a pretend backup, then check it or restore it.</p>
+
+  <section class="card stack" aria-labelledby="h-pick">
+    <h2 id="h-pick" style="font-size:18px">Pretend backups</h2>
+    <label class="field" for="file">Backup file
+      <select id="file">
+        <option value="current">backup-current.tar (version 2026.11.1)</option>
+        <option value="dotslash">./backup-older.tar (leading ./, version 2026.10.1)</option>
+        <option value="slash">backups/archive.tar (a slash in the name, version 2026.11.1)</option>
+        <option value="newer">backup-newer.tar (version 2026.12.1)</option>
+        <option value="nocore">backup-no-core.tar (no core backup inside)</option>
+      </select>
+    </label>
+    <div class="row">
+      <button type="button" class="tonal" id="check">Check only</button>
+      <button type="button" class="filled" id="restore">Restore</button>
+    </div>
+    <div class="note" id="result" aria-live="polite">Choose a backup and press a button.</div>
+  </section>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var BACKUPS = {
+    current: { name: 'backup-current.tar', version: '2026.11.1', ok: true, note: 'Valid. It can be restored.' },
+    dotslash: { name: './backup-older.tar', version: '2026.10.1', ok: true, note: 'Valid. The leading ./ is ignored, so it is not treated as a wrong password.' },
+    slash: { name: 'backups/archive.tar', version: '2026.11.1', ok: true, note: 'Valid. The slash in the name is tidied to backups-archive.tar when it is read.' },
+    newer: { name: 'backup-newer.tar', version: '2026.12.1', ok: false, note: 'Refused before anything is scheduled: this backup is from a newer release, 2026.12.1. Nothing was restored.' },
+    nocore: { name: 'backup-no-core.tar', version: '2026.11.1', ok: false, note: 'Refused: this archive has no core backup inside it. Nothing was restored.' }
+  };
+  var file = document.getElementById('file');
+  var result = document.getElementById('result');
+
+  function show(mode) {
+    var b = BACKUPS[file.value];
+    if (!b.ok) {
+      result.className = 'note error';
+      result.textContent = b.name + ': ' + b.note;
+      return;
+    }
+    result.className = 'note good';
+    if (mode === 'check') {
+      result.textContent = b.name + ' checks out. ' + b.note + ' No restore was started.';
+    } else {
+      result.textContent = 'Restore scheduled for the pretend archive ' + b.name + ' (version ' + b.version + '). Nothing is really restored in this demo.';
+    }
+  }
+
+  document.getElementById('check').addEventListener('click', function () { show('check'); });
+  document.getElementById('restore').addEventListener('click', function () { show('restore'); });
+
+  function reset() {
+    file.value = 'current';
+    result.className = 'note';
+    result.textContent = 'Choose a backup and press a button.';
+  }
+  document.querySelectorAll('[data-demo-reset]').forEach(function (b) { b.addEventListener('click', reset); });
+  reset();
+})();
+</script>
+</body>
+</html>

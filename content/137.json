@@ -1,0 +1,60 @@
+{
+  "build": 137,
+  "headline": "Fixes from the viewing pass, a Repairs page that no longer contradicts itself, and any file can be uploaded",
+  "summary": "The link confirmation page now asks before it leaves, and error reports come only from this site's own address. The Repairs page no longer shows a repair next to a card saying the installation is supported. Media upload accepts any file, and refuses only those that are not pictures, video or audio.",
+  "summary_yue": "連結確認頁而家會先問你，唔會未問人就自己去外面攞嘢，錯誤紀錄亦只接受本站嘅地址。「修復」頁唔會再出現一個修復提示，旁邊又寫住呢個安裝受支援。媒體上載而家乜檔都揀得，淨係唔係圖、影或聲嘅檔先會被請走。",
+  "highlights": [
+    {
+      "id": "link-confirmation-page",
+      "title": "Link confirmation page, locks and table fixes from the viewing pass",
+      "areas": ["interface"],
+      "what": "A round of defects found by viewing the previous build was fixed. The link confirmation page used to fail with an error and then fetch a file from an outside host to explain it. It now shows a confirmation step, and the error log accepts only this site's own address. Lock lists stack properly on a narrow panel, the remove prompt stays inside its window, and the School mode switch waits for its PIN before it appears. A table fill is no longer hidden under the table, the automation editor shows one set of Run now and Check buttons, and the colour tool labels its two names.",
+      "what_yue": "用緊上一個版本睇出嚟嘅一批問題都修好咗。連結確認頁以前會報錯，仲會去外面攞原始檔嚟解釋；而家會先出確認步驟，錯誤紀錄淨係接受本站嘅地址。鎖嘅清單喺窄面板會正確疊起，移除提示留喺視窗入面，學校模式嘅開關要等 PIN 先會出現。表格上色唔會再畀白底冚住，自動化編輯器只剩一組「立即執行」同「檢查」，顏色工具兩個名都有標籤。",
+      "why": "A page that asks before anything leaves should not reach outside first, and each of the other defects would have been noticed by someone using the product.",
+      "try": [
+        "Type an address and press Continue to reach the confirmation step.",
+        "Press Go back and check that the form comes back with the address still in it.",
+        "Add an error with an outside link and see it refused.",
+        "Add an error from this site and see it accepted into the log."
+      ],
+      "sha": ["55d9604cf"],
+      "demo": "demos/137/link-confirmation-page.html"
+    },
+    {
+      "id": "repairs-no-contradiction",
+      "title": "Repairs no longer say unsupported when the Supervisor says supported",
+      "areas": ["core"],
+      "what": "In full hosting mode, the Repairs page could show two cards that disagreed. One said Unsupported installation method, and below it another said the installation is supported. The start-up check raised its repair for every installation that was not the appliance operating system. Now it raises the repair only when the Supervisor does not report the host as supported. An installation that the Supervisor calls unsupported, or one that reports nothing, still gets the repair.",
+      "what_yue": "完整託管模式下，「修復」頁可以同時出現兩張互相唔同意嘅卡。上面話「不支援嘅安裝方式」，下面又話呢個安裝受支援。開機檢查以前只要唔係官方系統，就會照出提醒。而家佢會先聽 Supervisor 點講：佢話支援就唔出聲；佢話唔支援，或者乜都冇講，就照舊提醒。",
+      "why": "A repair that contradicts the host's own check misleads whoever reads the Repairs page.",
+      "try": [
+        "Choose Supervisor says supported and read the cards on the Repairs page.",
+        "Choose Supervisor says unsupported and see the repair come back.",
+        "Tick Show the build before this fix to see the old contradiction.",
+        "Press Start again to return the demo to its first state."
+      ],
+      "sha": ["22c552fa7"],
+      "demo": "demos/137/repairs-no-contradiction.html"
+    },
+    {
+      "id": "media-upload-any-file",
+      "title": "Media upload accepts every file, and refuses only unrelated ones",
+      "areas": ["interface"],
+      "what": "The upload picker no longer limits the file types it offers, so an Ogg audio file on an iPhone is no longer greyed out. A chosen file with no type gets one from its name. Files that are neither pictures, video nor audio are refused in the app before anything is sent, with one message that names them, and the related files in the same choice still upload. Chosen pictures are converted in the same way as dropped pictures; audio and video are sent unchanged.",
+      "what_yue": "上載嘅揀檔視窗而家唔再限制檔案類型，所以 iPhone 上面嘅 Ogg 聲檔唔會再灰晒。冇類型嘅檔會睇檔名補返類型。圖、影、聲以外嘅檔會喺介面度即刻請走，一則訊息會點名晒，同一批入面啱嘅檔照樣上載。圖片會跟拖放嘅圖一樣自動轉格式，聲同影片則原封不動。",
+      "why": "A phone greyed out files it could not play itself, which blocked files that only needed to be uploaded.",
+      "try": [
+        "Choose several files, including one with an unusual extension.",
+        "Read the message about refused files, if there is one.",
+        "Remove one item from the list.",
+        "Press Start again to clear the list."
+      ],
+      "sha": ["b48bd9677"],
+      "demo": "demos/137/media-upload-any-file.html"
+    }
+  ],
+  "other": [
+    { "title": "Desktop app build stops early, with a clear message, when its runtime was not unpacked", "sha": ["95a83e69d"] },
+    { "title": "Supervisor unit tests brought in line with this project's changes", "sha": ["42de55f75"] }
+  ]
+}

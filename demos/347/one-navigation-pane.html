@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One navigation pane, off by default</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+  [hidden] { display: none !important; }
+  .np-shell { display: grid; gap: 16px; grid-template-columns: 1fr; }
+  .np-shell.single .np-rail { display: none; }
+  @media (min-width: 880px) { .np-shell { grid-template-columns: 220px 1fr; } }
+  .np-top { display: none; }
+  .np-shell.single .np-top { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .np-shell.single .np-top input[type="search"] { flex: 1 1 200px; }
+  .np-stage { position: relative; min-height: 180px; border: 1px dashed var(--outv); border-radius: 16px; padding: 12px; }
+  .np-panel { position: absolute; left: 12px; right: 12px; top: 12px; background: var(--sl2); border: 1px solid var(--out); border-radius: 16px; padding: 12px; z-index: 2; }
+  .np-prompt { position: absolute; left: 24px; right: 24px; top: 70px; background: var(--sl0); border: 2px solid var(--p); border-radius: 16px; padding: 12px; }
+  .np-prompt.under { z-index: 1; }
+  .np-prompt.over { z-index: 3; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="one-navigation-pane">
+  <h1>One navigation pane, off by default</h1>
+  <p class="muted">Turn on One navigation pane to see the rail step aside. Search the pages and clear the notifications.</p>
+
+  <section class="card stack" aria-labelledby="set-title">
+    <h2 id="set-title">Setting</h2>
+    <label class="row"><input type="checkbox" class="switch" id="one-pane"> <span>One navigation pane</span></label>
+    <label class="row"><input type="checkbox" class="switch" id="old-layer"> <span>Show the old layering for the lock prompt (for comparison)</span></label>
+  </section>
+
+  <div class="np-shell" id="shell">
+    <aside class="card stack np-rail" aria-label="Side rail">
+      <h2>Rail</h2>
+      <ul class="list" id="rail-list"></ul>
+    </aside>
+
+    <section class="card stack" aria-labelledby="pane-title">
+      <div class="np-top" id="top">
+        <label class="field" style="flex:1 1 200px">Search pages
+          <input type="search" id="search" placeholder="Search pages">
+        </label>
+        <span class="badge" id="who">Pretend person</span>
+        <button type="button" class="tonal" id="home">Home</button>
+        <button type="button" class="tonal" id="notif">Notifications: <span id="notif-count">3</span></button>
+      </div>
+      <h2 id="pane-title">Pages and System</h2>
+      <div class="row" id="notif-row">
+        <button type="button" class="tonal" id="clear">Clear notifications</button>
+      </div>
+      <ul class="list" id="pages" aria-label="Pages"></ul>
+      <p class="muted small" id="result" aria-live="polite"></p>
+    </section>
+  </div>
+
+  <section class="card stack" aria-labelledby="lock-title">
+    <h2 id="lock-title">Remove lock prompt over the tool panel</h2>
+    <div class="np-stage" id="stage">
+      <div class="np-prompt over" id="prompt" role="dialog" aria-label="Remove lock prompt">
+        <p><strong>Remove this lock?</strong></p>
+        <div class="row"><button type="button" class="tonal">Cancel</button><button type="button" class="filled">Remove</button></div>
+      </div>
+      <div class="np-panel" id="panel"><p>Page tool panel</p></div>
+    </div>
+    <p class="small muted" id="layer-note">The prompt sits above the panel.</p>
+  </section>
+
+  <div class="row">
+    <button type="button" data-demo-reset>Start again</button>
+  </div>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  'use strict';
+  function $(id) { return document.getElementById(id); }
+  var PAGES = ['Overview', 'Devices', 'Automations', 'Scripts', 'Energy', 'Backups', 'Logs', 'Repairs'];
+  var S;
+
+  function fresh() { return { one: false, query: '', notifications: 3, oldLayer: false }; }
+
+  function render() {
+    $('one-pane').checked = S.one;
+    $('shell').classList.toggle('single', S.one);
+    $('search').value = S.query;
+    $('notif-count').textContent = String(S.notifications);
+    $('notif').setAttribute('aria-label', 'Notifications: ' + S.notifications);
+    $('clear').disabled = S.notifications === 0;
+
+    var q = S.query.trim().toLowerCase();
+    var shown = PAGES.filter(function (p) { return p.toLowerCase().indexOf(q) !== -1; });
+    var html = shown.map(function (p) {
+      return '<li><button type="button" class="chip" data-page="' + p + '">' + p + '</button></li>';
+    }).join('');
+    $('pages').innerHTML = html || '<li class="muted">No page matches that search.</li>';
+    $('result').textContent = shown.length + ' of ' + PAGES.length + ' pages shown.';
+
+    $('old-layer').checked = S.oldLayer;
+    var prompt = $('prompt');
+    prompt.classList.toggle('under', S.oldLayer);
+    prompt.classList.toggle('over', !S.oldLayer);
+    $('layer-note').textContent = S.oldLayer
+      ? 'Old layering: the prompt sits under the panel.'
+      : 'The prompt sits above the panel.';
+  }
+
+  $('one-pane').addEventListener('change', function () {
+    S.one = $('one-pane').checked;
+    render();
+  });
+  $('old-layer').addEventListener('change', function () {
+    S.oldLayer = $('old-layer').checked;
+    render();
+  });
+  $('search').addEventListener('input', function () {
+    S.query = $('search').value;
+    render();
+  });
+  $('clear').addEventListener('click', function () {
+    S.notifications = 0;
+    $('result').textContent = 'Notifications cleared.';
+    render();
+  });
+  $('pages').addEventListener('click', function (e) {
+    var btn = e.target.closest('button[data-page]');
+    if (btn) {
+      $('result').textContent = 'Opened ' + btn.getAttribute('data-page') + '.';
+    }
+  });
+  $('home').addEventListener('click', function () {
+    $('result').textContent = 'Went to the home page.';
+  });
+
+  // Rail list mirrors the pages so the rail and the one pane show the same pages.
+  $('rail-list').innerHTML = PAGES.map(function (p) { return '<li>' + p + '</li>'; }).join('');
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    S = fresh();
+    $('result').textContent = 'Put back to the first state.';
+    render();
+  });
+
+  S = fresh();
+  render();
+})();
+</script>
+</body>
+</html>

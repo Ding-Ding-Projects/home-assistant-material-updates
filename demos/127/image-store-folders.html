@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Image store folders and Manage</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="image-store-folders">
+  <h1>Image store folders and Manage</h1>
+  <p class="muted">Create a folder, move pictures into it, rename one, convert one to a new copy, or download a selection as a zip.</p>
+
+  <section class="card stack" aria-labelledby="folder-h">
+    <h2 id="folder-h" style="font-size:18px;margin:0">Folders</h2>
+    <label class="field" for="folder-name">New folder name
+      <input type="text" id="folder-name" autocomplete="off" placeholder="Holiday photos">
+    </label>
+    <div class="row"><button type="button" class="tonal" id="create-folder">Create folder</button></div>
+    <ul class="list" id="folders" aria-label="Folders"></ul>
+  </section>
+
+  <section class="card stack" aria-labelledby="pics-h">
+    <h2 id="pics-h" style="font-size:18px;margin:0">Pictures in <span id="current-folder">All pictures</span></h2>
+    <ul class="list" id="pictures" aria-label="Pictures"></ul>
+    <label class="field" for="move-to">Move selected to
+      <select id="move-to"></select>
+    </label>
+    <div class="row"><button type="button" class="filled" id="move-go">Move selected</button></div>
+  </section>
+
+  <section class="card stack" aria-labelledby="manage-h">
+    <h2 id="manage-h" style="font-size:18px;margin:0">Manage</h2>
+    <p class="small muted" id="manage-note">Select one picture to rename or convert it. Select pictures to download them as a zip.</p>
+    <label class="field" for="new-name">New name for the selected picture
+      <input type="text" id="new-name" autocomplete="off">
+    </label>
+    <div class="row">
+      <button type="button" class="tonal" id="rename-go">Rename</button>
+      <button type="button" class="tonal" id="convert-go">Convert to a new copy</button>
+      <button type="button" class="tonal" id="zip-go">Download selection as zip</button>
+    </div>
+  </section>
+
+  <p id="result" class="note good" aria-live="polite"></p>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var START_PICS = [
+    { id: 1, name: 'kitchen.jpg', folder: null, mb: 4 },
+    { id: 2, name: 'garden.png', folder: null, mb: 9 },
+    { id: 3, name: 'hall.webp', folder: null, mb: 2 },
+    { id: 4, name: 'beach.jpg', folder: 'Holiday photos', mb: 12 }
+  ];
+  var MAX_ZIP_MB = 200;
+
+  var pics = [];
+  var folders = [];
+  var current = null;
+  var picsEl = document.getElementById('pictures');
+  var foldersEl = document.getElementById('folders');
+  var moveTo = document.getElementById('move-to');
+  var result = document.getElementById('result');
+  var currentEl = document.getElementById('current-folder');
+  var nextId = 100;
+  var selected = {};
+
+  function visible() {
+    return pics.filter(function (p) { return p.folder === current; });
+  }
+
+  function renderFolders() {
+    foldersEl.innerHTML = '';
+    var all = [null].concat(folders);
+    all.forEach(function (f) {
+      var li = document.createElement('li');
+      var label = f === null ? 'All pictures' : f;
+      var span = document.createElement('span');
+      span.style.flex = '1';
+      span.textContent = label + ' (' + pics.filter(function (p) { return p.folder === f; }).length + ')';
+      var open = document.createElement('button');
+      open.type = 'button';
+      open.className = f === current ? 'filled' : 'tonal';
+      open.textContent = 'Open';
+      open.setAttribute('aria-label', 'Open ' + label);
+      open.addEventListener('click', function () { current = f; selected = {}; render(); });
+      li.appendChild(span);
+      li.appendChild(open);
+      if (f !== null) {
+        var rm = document.createElement('button');
+        rm.type = 'button';
+        rm.className = 'tonal';
+        rm.textContent = 'Remove folder';
+        rm.setAttribute('aria-label', 'Remove folder ' + f);
+        rm.addEventListener('click', function () {
+          // Pictures move up one level; none is deleted.
+          pics.forEach(function (p) { if (p.folder === f) p.folder = null; });
+          folders = folders.filter(function (x) { return x !== f; });
+          if (current === f) current = null;
+          result.textContent = 'Removed folder ' + f + '. Its pictures moved up; none was deleted.';
+          render();
+        });
+        li.appendChild(rm);
+      }
+      foldersEl.appendChild(li);
+    });
+  }
+
+  function renderPics() {
+    picsEl.innerHTML = '';
+    var list = visible();
+    if (!list.length) {
+      var empty = document.createElement('li');
+      empty.textContent = 'No pictures here.';
+      picsEl.appendChild(empty);
+    }
+    list.forEach(function (p) {
+      var li = document.createElement('li');
+      var label = document.createElement('label');
+      label.className = 'row';
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = !!selected[p.id];
+      cb.addEventListener('change', function () { selected[p.id] = cb.checked; updateNote(); });
+      var span = document.createElement('span');
+      span.textContent = p.name + ' (' + p.mb + ' MB)';
+      label.appendChild(cb);
+      label.appendChild(span);
+      li.appendChild(label);
+      picsEl.appendChild(li);
+    });
+    moveTo.innerHTML = '';
+    [null].concat(folders).forEach(function (f) {
+      var o = document.createElement('option');
+      o.value = f === null ? '' : f;
+      o.textContent = f === null ? 'All pictures' : f;
+      moveTo.appendChild(o);
+    });
+    currentEl.textContent = current === null ? 'All pictures' : current;
+  }
+
+  function chosen() {
+    return pics.filter(function (p) { return selected[p.id] && visible().indexOf(p) >= 0; });
+  }
+
+  function updateNote() {
+    var n = chosen().length;
+    document.getElementById('manage-note').textContent = n + ' picture(s) selected. Select one picture to rename or convert it.';
+  }
+
+  function render() {
+    renderFolders();
+    renderPics();
+    updateNote();
+  }
+
+  document.getElementById('create-folder').addEventListener('click', function () {
+    var name = document.getElementById('folder-name').value.trim();
+    if (!name) { result.textContent = 'Type a folder name first.'; return; }
+    if (folders.indexOf(name) >= 0) { result.textContent = 'A folder called ' + name + ' already exists.'; return; }
+    folders.push(name);
+    document.getElementById('folder-name').value = '';
+    result.textContent = 'Created folder ' + name + '.';
+    render();
+  });
+
+  document.getElementById('move-go').addEventListener('click', function () {
+    var picks = chosen();
+    if (!picks.length) { result.textContent = 'Select at least one picture to move.'; return; }
+    var target = moveTo.value === '' ? null : moveTo.value;
+    picks.forEach(function (p) { p.folder = target; });
+    selected = {};
+    result.textContent = 'Moved ' + picks.length + ' picture(s) to ' + (target === null ? 'All pictures' : target) + '.';
+    render();
+  });
+
+  document.getElementById('rename-go').addEventListener('click', function () {
+    var picks = chosen();
+    var name = document.getElementById('new-name').value.trim();
+    if (picks.length !== 1) { result.textContent = 'Select exactly one picture to rename.'; return; }
+    if (!name) { result.textContent = 'Type the new name first.'; return; }
+    var old = picks[0].name;
+    picks[0].name = name;
+    result.textContent = 'Renamed ' + old + ' to ' + name + '.';
+    render();
+  });
+
+  document.getElementById('convert-go').addEventListener('click', function () {
+    var picks = chosen();
+    if (picks.length !== 1) { result.textContent = 'Select exactly one picture to convert.'; return; }
+    var src = picks[0];
+    var base = src.name.replace(/\.[^.]+$/, '');
+    var copy = { id: ++nextId, name: base + ' (converted).webp', folder: src.folder, mb: Math.max(1, Math.round(src.mb / 2)) };
+    pics.push(copy);
+    result.textContent = 'Converted ' + src.name + ' into a new item, ' + copy.name + ', beside the original. The original is kept.';
+    render();
+  });
+
+  document.getElementById('zip-go').addEventListener('click', function () {
+    var picks = chosen();
+    if (!picks.length) { result.textContent = 'Select at least one picture to download.'; return; }
+    var total = picks.reduce(function (sum, p) { return sum + p.mb; }, 0);
+    if (total > MAX_ZIP_MB) {
+      result.textContent = 'Too large for one zip: ' + total + ' MB is over the 200 MB limit.';
+      return;
+    }
+    result.textContent = 'Pretend zip of ' + picks.length + ' picture(s), ' + total + ' MB. Nothing was downloaded.';
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    pics = START_PICS.map(function (p) { return { id: p.id, name: p.name, folder: p.folder, mb: p.mb }; });
+    folders = ['Holiday photos'];
+    current = null;
+    selected = {};
+    nextId = 100;
+    document.getElementById('folder-name').value = '';
+    document.getElementById('new-name').value = '';
+    result.textContent = '';
+    render();
+  });
+
+  pics = START_PICS.map(function (p) { return { id: p.id, name: p.name, folder: p.folder, mb: p.mb }; });
+  folders = ['Holiday photos'];
+  render();
+})();
+</script>
+</body>
+</html>

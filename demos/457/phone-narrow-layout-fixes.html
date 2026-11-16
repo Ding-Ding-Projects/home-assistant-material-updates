@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phone and narrow-screen layouts stop cutting text</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+  label.row { min-height: 48px; cursor: pointer; flex-wrap: nowrap; }
+  .frame { max-width: 100%; border: 1px solid var(--outv); border-radius: 16px; padding: 12px; background: var(--sl1); }
+  .save-bar { display: flex; align-items: center; gap: 12px; min-height: 56px; background: var(--sl2); border-radius: 16px; padding: 8px 12px; }
+  .save-status { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1 1 auto; }
+  .save-hint { min-width: 0; flex: 1 1 auto; color: var(--onv); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .frame.before .save-status { flex: 0 0 96px; }
+  .frame.after.narrow .save-hint { display: none; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="phone-narrow-layout-fixes">
+  <h1>Phone and narrow-screen layouts stop cutting text</h1>
+  <p class="muted">Choose a width, then switch between Before and After to compare the save bar.</p>
+
+  <section class="card stack" aria-labelledby="width-heading">
+    <h2 id="width-heading">Width and layout</h2>
+    <label class="field" for="width">Screen width</label>
+    <select id="width">
+      <option value="320" selected>Phone (320 px)</option>
+      <option value="880">Wide (880 px)</option>
+    </select>
+    <label class="row">
+      <input type="checkbox" class="switch" id="fixed" role="switch" aria-describedby="fixed-help">
+      <span>Show the fixed layout (After)</span>
+    </label>
+    <p id="fixed-help" class="small muted">Off shows the Before layout, where the hint is kept and the status is cut short.</p>
+  </section>
+
+  <section class="card stack" aria-labelledby="preview-heading">
+    <h2 id="preview-heading">Save bar preview</h2>
+    <div id="frame" class="frame before">
+      <div class="save-bar">
+        <span id="status" class="save-status">No unsaved changes</span>
+        <span class="save-hint">Tip: review your changes before you leave this page.</span>
+      </div>
+    </div>
+    <p id="result" class="small" aria-live="polite"></p>
+  </section>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var width = document.getElementById('width');
+  var fixed = document.getElementById('fixed');
+  var frame = document.getElementById('frame');
+  var result = document.getElementById('result');
+
+  function render() {
+    var w = parseInt(width.value, 10);
+    frame.style.width = w + 'px';
+    // The frame can never be wider than the window, so judge narrowness by the width it really has.
+    var actual = Math.round(frame.getBoundingClientRect().width);
+    var narrow = actual < 400;
+    frame.classList.toggle('narrow', narrow);
+    frame.classList.toggle('before', !fixed.checked);
+    frame.classList.toggle('after', fixed.checked);
+    var hintShown = !(fixed.checked && narrow);
+    result.textContent = (fixed.checked ? 'After: ' : 'Before: ') +
+      (hintShown ? 'the hint is shown beside the status.' : 'the hint is hidden on this narrow width, so the status reads in full.') +
+      (fixed.checked || !narrow ? '' : ' The status is cut short at this width.') +
+      (actual < w ? ' This window is narrower than ' + w + ' px, so the preview is ' + actual + ' px wide.' : '');
+  }
+  window.addEventListener('resize', render);
+
+  width.addEventListener('change', render);
+  fixed.addEventListener('change', render);
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    width.value = '320';
+    fixed.checked = false;
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

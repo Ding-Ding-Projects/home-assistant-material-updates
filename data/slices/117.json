@@ -1,0 +1,32 @@
+{
+ "build": 117,
+ "core": "2026.11.1.117",
+ "supervisor": "2026.11.0.117",
+ "os": "18.5.117",
+ "tag": "v2026.11.1.117",
+ "source": "7ecc7c4a7",
+ "date": "2026-11-11T11:51:39-05:00",
+ "previous_build": 115,
+ "changes": [
+  {
+   "sha": "7ecc7c4a7",
+   "date": "2026-11-11T11:51:39-05:00",
+   "title": "Polish pass from the running app: tabs, phone tables, buttons",
+   "areas": [
+    "interface"
+   ],
+   "detail": "The Home Assistant pages were opened in a running copy of build 115 (the published container image) at 1440 and 390 pixels wide, and these defects fixed:\n\n- The page tab strip fades out at an edge that has tabs scrolled out of view, instead of cutting the last tab's name in half (\"Set\"). - On a phone, data table rows grow with their stacked columns. Before, a second line spilled into the next row (users, blueprints). - The Personal settings info buttons asked the translation for \"About {name}\" without a name, which logged a formatting error on every render (52 times on one visit). The placeholder is now passed through for the button to fill in. - The scenes empty state's \"Learn more\" icon was drawn at 80 pixels, because the large empty-state icon style reached into the button. - The to-do list's Add item button sat behind the page footer on wide layouts."
+  },
+  {
+   "sha": "e4425a069",
+   "date": "2026-11-11T11:24:16-05:00",
+   "title": "Deploy Assistant polish pass over every board",
+   "areas": [
+    "deploy",
+    "design",
+    "docs"
+   ],
+   "detail": "Every board was drawn again from the app, reviewed, and these fixed:\n\n- The Deploy tab has the same header as every other tab: icon, title, one line on what it does, version and demo tags on the right. - Instances, Downloads and Extensions put their main buttons in the header instead of on a row of their own under it. - Instance cards say \"1 backup\", not \"1 backups\". - The new Minecraft server dialog no longer cuts its step names: the current step is named, the others show their number. - The demo has game rules, so the Game rules tab is not empty. - AI models: memory and graphics memory join the header facts instead of a second row repeating them; the folded system prompt shows a chevron and whether it is set; the number steppers have real buttons. The steppers' class no longer clashes with the wizard steps. - Activity spaces its Notifications and History headings apart. - The update self-test demo names the current version, not 1.1.4. - The Design tab includes every Deploy Assistant canvas, 16 to 20. - Search fields show one focus ring, on the rounded edge. - The virtual disk file and parent fields span the dialog. - The empty convert result says \"Results show here.\""
+  }
+ ]
+}

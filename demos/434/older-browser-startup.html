@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Older browsers and the startup screen</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="older-browser-startup">
+  <h1>Older browsers and the startup screen</h1>
+  <p class="muted">Choose the kind of browser, decide whether the legacy bundle is supplied, then start the demo and see whether the startup screen closes.</p>
+
+  <section class="card stack" aria-labelledby="setup-title">
+    <h2 id="setup-title" class="small">Set up the visit</h2>
+    <label class="field">
+      Browser type
+      <select id="browser">
+        <option value="modern">Modern browser</option>
+        <option value="older">Older browser, outside the modern range</option>
+      </select>
+    </label>
+    <label class="row">
+      <input type="checkbox" class="switch" id="legacy" checked>
+      <span>Legacy bundle supplied</span>
+    </label>
+    <div class="row">
+      <button type="button" class="filled" id="start">Start the demo</button>
+    </div>
+  </section>
+
+  <section class="card stack" aria-label="Demo screen">
+    <div id="screen" class="note">Startup screen. Press Start the demo.</div>
+    <p id="result" aria-live="polite" class="note">No visit started yet.</p>
+  </section>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var browser = document.getElementById('browser');
+  var legacy = document.getElementById('legacy');
+  var screen = document.getElementById('screen');
+  var result = document.getElementById('result');
+
+  function setText(el, text) { el.textContent = text; }
+
+  document.getElementById('start').addEventListener('click', function () {
+    var older = browser.value === 'older';
+    if (older && !legacy.checked) {
+      setText(screen, 'Startup screen. Loading is waiting for a bundle this browser cannot run.');
+      setText(result, 'The startup screen stays up. This browser is outside the modern range and no legacy bundle was supplied.');
+      return;
+    }
+    if (older) {
+      setText(screen, 'Home view. The legacy bundle loaded and the startup screen closed.');
+      setText(result, 'Older browser with the legacy bundle: the startup screen closed and the home view is shown.');
+      return;
+    }
+    setText(screen, 'Home view. The modern build loaded and the startup screen closed.');
+    setText(result, 'Modern browser: the modern build loads and the startup screen closes.');
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    browser.value = 'modern';
+    legacy.checked = true;
+    setText(screen, 'Startup screen. Press Start the demo.');
+    setText(result, 'No visit started yet.');
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+{
+  "build": 439,
+  "headline": "Six faults found by using build 437 are corrected",
+  "summary": "Build 439 fixes six problems seen while using build 437. On a phone, the automation tools sheet reaches the bottom of the screen and the flow view no longer cuts off nodes. The session clock has its own row above the bottom bar, the storage page shows unknown counts as words instead of NaN rows, the lights page shows its name once, and clicking the label of the continue-on-error switch now turns it. The notes say these fixes have not yet been seen in a browser. The README now shows pictures of build 437.",
+  "summary_yue": "439 版修正用 437 版時見到嘅六個問題：手機上自動化工具面板唔再切到底，流程圖唔再切走節點，時鐘有自己一行，唔會壓住底欄。儲存頁未知數目顯示做字，唔再出 NaN 行；燈光頁標題只出一次；「所有動作出錯都繼續」個標籤撳得返，會切換開關。開發記錄話呢啲修正未喺瀏覽器睇過。",
+  "highlights": [
+    {
+      "id": "phone-and-storage-fixes",
+      "title": "Phone layout, session clock, storage counts and switch label are fixed",
+      "areas": ["interface"],
+      "what": "On a phone, the automation tools sheet is no longer cut off about 168 px above the bottom, and the flow view lays its nodes out top to bottom when left to right would make them too small, so no node is cut off when the view opens. The session clock sits in its own row directly above the bottom bar on every page. The storage page shows an unknown count as words instead of NaN rows. The lights page shows its name once. Clicking the label of the continue-on-error switch now turns the switch.",
+      "what_yue": "手機上，自動化工具面板唔會再切走底部約 168 px 嘅內容。流程圖當由左至右會太細時，改由上至下排列，打開時節點唔會被切走。時鐘而家喺每一頁底欄上面自己一行。儲存頁未知嘅數目會以文字顯示，唔再出 NaN 行。燈光頁標題只出一次。撳「所有動作出錯都繼續」嘅標籤，開關會跟住切換。",
+      "why": "Each of these made a page hard to use on a phone, or showed a wrong number, and a switch that ignored its label was easy to miss.",
+      "try": ["Open the demo and choose Before (build 437) or After (build 439).", "Look at the tools sheet and the clock on the phone-width frame, then switch to After.", "Type a storage count, leave it empty for unknown, and click the label of the switch."],
+      "sha": ["47a063cfd"],
+      "demo": "demos/439/phone-and-storage-fixes.html"
+    }
+  ],
+  "other": [
+    { "title": "The README now shows pictures of build 437, a new picture of the Updates page, and notes on what was used and seen working and what is still wrong.", "sha": ["5f885179a"] },
+    { "title": "The project README links to the reviewed synthetic screenshot gallery, and records the unfinished Raspberry Pi recovery branch and the backup progress work.", "sha": ["85660ebd5"] }
+  ]
+}

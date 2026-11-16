@@ -1,0 +1,44 @@
+{
+  "build": 436,
+  "headline": "Typed number, date and receiver controls, and to-do item pickers",
+  "summary": "Build 436 makes action editing more precise. Number actions use the range that the selected Number entities share, dates use the native picker when their format fits, and Yamaha receiver cursor commands can be picked from a list of checked commands. The action and dashboard editors can choose to-do items, camera presets and climate modes, and the closed to-do picker shows the item's name. The browser demo now runs the sample Shopping List to-do automation. Existing templates and older values can still be edited.",
+  "summary_yue": "436 版令動作編輯更準確。數值動作用所選 Number 實體共同嘅範圍，日期格式相容時用原生日期選擇器，Yamaha 接收器嘅游標指令可以由已核實嘅清單揀。動作同儀表板編輯器可以揀待辦事項、鏡頭預設位置同冷氣模式，關閉待辦事項選擇器後會顯示項目名稱。瀏覽器示範而家會執行購物清單待辦範例。原有範本同舊格式仍然可以編輯。",
+  "highlights": [
+    {
+      "id": "typed-action-controls",
+      "title": "Number, date and receiver cursor controls in the action editor",
+      "areas": ["interface"],
+      "what": "In the action editor, a number value uses the range that the selected Number entities have in common. A date field uses the native date picker when the date format fits. Yamaha receiver actions can pick a cursor command from the list of commands that were validated. Older templates and legacy values keep their own editing route.",
+      "what_yue": "喺動作編輯器，數值會用所選 Number 實體共同嘅範圍。日期格式相容時用原生日期選擇器。Yamaha 接收器嘅游標動作可以由已核實嘅指令清單揀。舊範本同舊格式都仍然可以照原有方法編輯。",
+      "why": "Picking from a range or a list is quicker than typing, and it stops a value or a command name being typed wrongly.",
+      "try": ["Select two Number entities and see the shared range.", "Enter a number outside that range and read the message.", "Open a date field and pick a date, then open the receiver cursor list and choose a command."],
+      "sha": ["69f0bbfc3"],
+      "demo": "demos/436/typed-action-controls.html"
+    },
+    {
+      "id": "todo-item-and-selector-pickers",
+      "title": "Pick to-do items, camera presets and climate modes from lists",
+      "areas": ["interface"],
+      "what": "The action editor and the dashboard editor now offer lists for choosing an existing to-do item, a camera preset or a common climate mode, instead of a typed name. The dashboard editor has its own fields for the icon, the navigation entry and the order of entities. When the to-do picker is closed, it shows the current item's name, while the action still stores the item's exact ID.",
+      "what_yue": "動作編輯器同儀表板編輯器而家會提供清單，揀現有嘅待辦事項、鏡頭預設位置或常用冷氣模式，唔使再打名。儀表板亦有自己嘅欄位，調圖示、導覽項目同實體次序。待辦事項選擇器關閉後會顯示目前項目名稱，但動作仍然儲存原有嘅 ID。",
+      "why": "A grocery list keeps changing its item names, so a typed name goes out of date, while a picker always shows the items that exist.",
+      "try": ["Open the to-do item picker in the action editor and choose an item.", "Close the picker and read the item name shown.", "Change the order of entities in the dashboard editor."],
+      "sha": ["aa645e962", "dc71e1cf9"],
+      "demo": "demos/436/todo-item-and-selector-pickers.html"
+    },
+    {
+      "id": "todo-browser-demo",
+      "title": "The sample to-do automation runs in the browser demo",
+      "areas": ["interface"],
+      "what": "The browser demo runs the two supported to-do actions through its sample services, and the Shopping List example is linked from the project page and from the visual editor guide. Running the automation checks off the groceries it was asked to complete. The sample services now check their target against the current demo state and update the entity count, so the shopping list no longer disappears partway through the example.",
+      "what_yue": "瀏覽器示範而家會透過範例服務執行兩個支援嘅待辦事項動作。專案頁同視覺化編輯指南都連到購物清單範例。執行自動化時，會剔走佢要求完成嘅雜貨。範例服務而家會按目前示範狀態核對目標，並更新實體數目，購物清單唔會喺示範途中突然唔見。",
+      "why": "A worked example is only useful if the automation really runs and the list stays put while the example is followed.",
+      "try": ["Open the Shopping List automation in the demo.", "Run it and watch the groceries get checked off.", "Add a new item, remove it, and run the automation again."],
+      "sha": ["6ef6f51a6", "b288cdb27"],
+      "demo": "demos/436/todo-browser-demo.html"
+    }
+  ],
+  "other": [
+    { "title": "Each to-do update checks read permission again when it is sent, including role changes on an existing subscription.", "sha": ["7dfc307e4"] }
+  ]
+}

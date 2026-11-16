@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Problem detector outlines the exact card or step</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+  [hidden] { display: none !important; }
+  .pd-item { border: 2px solid transparent; border-radius: 16px; padding: 12px 16px; background: var(--sl1); }
+  .pd-item.problem { border-color: var(--amber); background: var(--amberc); }
+  .pd-item.off { opacity: .7; }
+  .pd-item h3 { font-size: 16px; line-height: 24px; font-weight: 600; }
+  .pd-layout { display: grid; gap: 16px; grid-template-columns: 1fr; }
+  @media (min-width: 880px) { .pd-layout { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="problem-detector">
+  <h1>Problem detector outlines the exact card or step</h1>
+  <p class="muted">Press a Problem found badge to read the details. Fix, follow the steps or press Ignore.</p>
+
+  <div class="pd-layout">
+    <section class="card stack" aria-labelledby="dash-title">
+      <h2 id="dash-title">Dashboard</h2>
+      <div id="cards" class="stack"></div>
+    </section>
+
+    <section class="card stack" aria-labelledby="auto-title">
+      <h2 id="auto-title">Automation steps</h2>
+      <div id="steps" class="stack"></div>
+    </section>
+  </div>
+
+  <section class="card stack" aria-labelledby="det-title">
+    <h2 id="det-title">Details</h2>
+    <div id="details" class="stack">
+      <p class="muted">Press a Problem found badge to see its details here.</p>
+    </div>
+  </section>
+
+  <section class="card stack" aria-labelledby="rep-title">
+    <h2 id="rep-title">Repairs</h2>
+    <p id="count" class="muted"></p>
+    <ul id="repairs" class="list"></ul>
+  </section>
+
+  <p class="note" id="msg" aria-live="polite"></p>
+  <div class="row">
+    <button type="button" data-demo-reset>Start again</button>
+  </div>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  'use strict';
+  function $(id) { return document.getElementById(id); }
+  var KNOWN = { 'light.kitchen': true, 'sensor.hall_temperature': true, 'switch.fan': true };
+
+  function fresh() {
+    return {
+      selected: null,
+      items: [
+        { id: 'c1', kind: 'card', title: 'Kitchen lights', entity: 'light.kitchen', state: 'open' },
+        { id: 'c2', kind: 'card', title: 'Hall temperature', entity: 'sensor.hall_temp_old', state: 'open' },
+        { id: 's1', kind: 'step', title: 'Turn on the fan', entity: 'switch.fan', state: 'open', enabled: true },
+        { id: 's2', kind: 'step', title: 'Turn on the porch lamp', entity: 'light.porch_lamp', state: 'open', enabled: true }
+      ]
+    };
+  }
+  var S;
+
+  function isProblem(it) {
+    return it.state === 'open' && !KNOWN[it.entity];
+  }
+
+  function itemHtml(it) {
+    var problem = isProblem(it);
+    var cls = 'pd-item' + (problem ? ' problem' : '') + (it.kind === 'step' && it.enabled === false ? ' off' : '');
+    var badge = '';
+    if (problem) {
+      badge = '<button type="button" class="chip" data-action="details" data-id="' + it.id + '" aria-expanded="' + (S.selected === it.id) + '">Problem found</button>';
+    }
+    var status = '';
+    if (it.state === 'ignored') { status = '<span class="badge">Ignored</span>'; }
+    if (it.state === 'fixed') { status = '<span class="badge good">Turned off</span>'; }
+    var name = it.kind === 'card' ? 'Card' : 'Step';
+    return '<div class="' + cls + '">' +
+      '<h3>' + it.title + '</h3>' +
+      '<p class="small muted">' + name + ' names ' + it.entity + '</p>' +
+      '<div class="row" style="margin-top:8px">' + badge + status + '</div>' +
+      '</div>';
+  }
+
+  function render() {
+    $('cards').innerHTML = S.items.filter(function (i) { return i.kind === 'card'; }).map(itemHtml).join('');
+    $('steps').innerHTML = S.items.filter(function (i) { return i.kind === 'step'; }).map(itemHtml).join('');
+
+    var found = S.items.filter(isProblem);
+    $('count').textContent = 'Problems open: ' + found.length + '.';
+
+    var sel = S.items.filter(function (i) { return i.id === S.selected; })[0];
+    if (!sel || !isProblem(sel)) {
+      $('details').innerHTML = '<p class="muted">Press a Problem found badge to see its details here.</p>';
+    } else {
+      var fixable = sel.kind === 'step';
+      var fixBtn = fixable
+        ? '<button type="button" class="filled" data-action="fix" data-id="' + sel.id + '">Fix: turn this step off</button>'
+        : '';
+      var steps = fixable
+        ? ''
+        : '<p>Fix it by hand:</p><ol><li>Open the card editor.</li><li>Choose a known entity for this card.</li><li>Save the dashboard.</li></ol>';
+      $('details').innerHTML =
+        '<h3>' + sel.title + '</h3>' +
+        '<p>What is wrong: ' + sel.entity + ' is not an entity that Home Assistant knows.</p>' +
+        '<p>Why it matters: this ' + (fixable ? 'step' : 'card') + ' cannot use that entity until it names a known one.</p>' +
+        (fixable ? '' : steps) +
+        '<div class="row">' + fixBtn +
+        '<button type="button" class="tonal" data-action="ignore" data-id="' + sel.id + '">Ignore</button></div>';
+    }
+
+    var repairs = found.map(function (i) {
+      return '<li><span>' + i.title + ' (' + i.entity + ')</span>' +
+        '<button type="button" class="tonal" data-action="details" data-id="' + i.id + '">Details</button></li>';
+    });
+    $('repairs').innerHTML = repairs.length ? repairs.join('') : '<li class="muted">No problems are open.</li>';
+  }
+
+  function find(id) {
+    return S.items.filter(function (i) { return i.id === id; })[0];
+  }
+
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('button[data-action]');
+    if (!btn) { return; }
+    var it = find(btn.getAttribute('data-id'));
+    var action = btn.getAttribute('data-action');
+    if (!it) { return; }
+    if (action === 'details') {
+      S.selected = it.id;
+      $('msg').textContent = 'Showing details for ' + it.title + '.';
+    } else if (action === 'fix') {
+      it.state = 'fixed';
+      it.enabled = false;
+      S.selected = null;
+      $('msg').textContent = it.title + ' is turned off, so the problem is gone.';
+    } else if (action === 'ignore') {
+      it.state = 'ignored';
+      S.selected = null;
+      $('msg').textContent = it.title + ' is ignored. Its outline is gone.';
+    }
+    render();
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    S = fresh();
+    $('msg').textContent = 'Put back to the first state.';
+    render();
+  });
+
+  S = fresh();
+  render();
+})();
+</script>
+</body>
+</html>

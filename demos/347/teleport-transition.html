@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jumps to an exact element play one short transition</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+  [hidden] { display: none !important; }
+  .tp-page { position: relative; display: flex; flex-direction: column; gap: 12px; }
+  .tp-target { border: 1px solid var(--outv); border-radius: 16px; padding: 14px 16px; background: var(--sl1); position: relative; }
+  .tp-target.spot { outline: 3px solid var(--p); outline-offset: 3px; }
+  .tp-target.materialise { animation: tp-materialise 900ms ease-out both; }
+  .tp-target.glow { animation: tp-glow 900ms ease-out both; }
+  .tp-ring { position: absolute; left: 50%; top: 50%; width: 24px; height: 24px; margin: -12px 0 0 -12px; border-radius: 50%; border: 3px solid var(--p); pointer-events: none; opacity: 0; }
+  .tp-ring.play { animation: tp-ring 600ms ease-out both; }
+  .tp-beam { position: absolute; left: 0; height: 4px; width: 100%; top: 50%; background: var(--p); transform-origin: left center; transform: scaleX(0); opacity: 0; pointer-events: none; }
+  .tp-beam.play { animation: tp-beam 700ms ease-in-out both; }
+  @keyframes tp-ring { 0% { opacity: 1; transform: scale(.4); } 100% { opacity: 0; transform: scale(3); } }
+  @keyframes tp-beam { 0% { transform: scaleX(0); opacity: 1; } 60% { transform: scaleX(1); opacity: 1; } 100% { transform: scaleX(1); opacity: 0; } }
+  @keyframes tp-materialise { 0% { filter: blur(14px); opacity: 0; } 100% { filter: blur(0); opacity: 1; } }
+  @keyframes tp-glow { 0% { box-shadow: 0 0 0 0 var(--p); } 100% { box-shadow: 0 0 0 14px transparent; } }
+  .tp-noanim .tp-ring, .tp-noanim .tp-beam { display: none; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="teleport-transition">
+  <h1>Jumps to an exact element play one short transition</h1>
+  <p class="muted">Press Teleport on a problem. Turn on Reduce motion to skip the transition.</p>
+
+  <div class="grid">
+    <section class="card stack" aria-labelledby="rep-title">
+      <h2 id="rep-title">Repairs</h2>
+      <ul class="list" id="repairs">
+        <li><span>Kitchen lights names a missing entity</span><button type="button" class="tonal" data-tp="kitchen">Teleport</button></li>
+        <li><span>Hall temperature names a missing entity</span><button type="button" class="tonal" data-tp="hall">Teleport</button></li>
+        <li><span>Porch lamp step names a missing entity</span><button type="button" class="tonal" data-tp="porch">Teleport</button></li>
+      </ul>
+      <label class="row"><input type="checkbox" class="switch" id="reduce"> <span>Reduce motion (skip the transition)</span></label>
+    </section>
+
+    <section class="card stack" aria-labelledby="page-title">
+      <h2 id="page-title">Settings page</h2>
+      <div class="tp-page" id="page">
+        <div class="tp-target" id="t-kitchen"><strong>Kitchen lights</strong><p class="small muted">light.kitchen</p><span class="tp-ring"></span><span class="tp-beam"></span></div>
+        <div class="tp-target" id="t-hall"><strong>Hall temperature</strong><p class="small muted">sensor.hall_temp_old</p><span class="tp-ring"></span><span class="tp-beam"></span></div>
+        <div class="tp-target" id="t-porch"><strong>Porch lamp</strong><p class="small muted">light.porch_lamp</p><span class="tp-ring"></span><span class="tp-beam"></span></div>
+      </div>
+    </section>
+  </div>
+
+  <section class="card stack" aria-labelledby="det-title" id="details" hidden>
+    <h2 id="det-title">Details beside the element</h2>
+    <p id="det-text"></p>
+  </section>
+
+  <p class="note" id="msg" aria-live="polite">Nothing has been teleported yet.</p>
+  <div class="row">
+    <button type="button" data-demo-reset>Start again</button>
+  </div>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  'use strict';
+  function $(id) { return document.getElementById(id); }
+  var timers = [];
+  var busy = false;
+  var names = { kitchen: 'Kitchen lights', hall: 'Hall temperature', porch: 'Porch lamp' };
+
+  function clearAll() {
+    timers.forEach(function (t) { clearTimeout(t); });
+    timers = [];
+    busy = false;
+    document.querySelectorAll('.tp-target').forEach(function (el) {
+      el.classList.remove('spot', 'materialise', 'glow');
+    });
+    document.querySelectorAll('.tp-ring, .tp-beam').forEach(function (el) {
+      el.classList.remove('play');
+    });
+    $('details').hidden = true;
+    document.querySelectorAll('[data-tp]').forEach(function (b) { b.disabled = false; });
+  }
+
+  function land(key) {
+    var target = $('t-' + key);
+    target.classList.add('spot');
+    $('det-text').textContent = names[key] + ': this is the element the problem names. The details sit beside it.';
+    $('details').hidden = false;
+    $('msg').textContent = 'Teleported to ' + names[key] + '. The element is spotlighted and its details are open.';
+    busy = false;
+    document.querySelectorAll('[data-tp]').forEach(function (b) { b.disabled = false; });
+  }
+
+  document.querySelectorAll('[data-tp]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (busy) { return; }
+      var key = btn.getAttribute('data-tp');
+      var target = $('t-' + key);
+      clearAll();
+      document.querySelectorAll('[data-tp]').forEach(function (b) { b.disabled = true; });
+      if ($('reduce').checked) {
+        $('msg').textContent = 'Reduce motion is on, so the transition is skipped.';
+        land(key);
+        return;
+      }
+      busy = true;
+      $('msg').textContent = 'Teleporting to ' + names[key] + '.';
+      var ring = target.querySelector('.tp-ring');
+      var beam = target.querySelector('.tp-beam');
+      ring.classList.add('play');
+      beam.classList.add('play');
+      timers.push(setTimeout(function () {
+        target.classList.add('materialise');
+      }, 500));
+      timers.push(setTimeout(function () {
+        target.classList.remove('materialise');
+        target.classList.add('glow');
+      }, 1100));
+      timers.push(setTimeout(function () {
+        target.classList.remove('glow');
+        land(key);
+      }, 2000));
+    });
+  });
+
+  $('reduce').addEventListener('change', function () {
+    $('page').classList.toggle('tp-noanim', $('reduce').checked);
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    clearAll();
+    $('reduce').checked = false;
+    $('page').classList.remove('tp-noanim');
+    $('msg').textContent = 'Put back to the first state. Nothing has been teleported yet.';
+  });
+})();
+</script>
+</body>
+</html>

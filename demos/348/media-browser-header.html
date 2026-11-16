@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Media browser header</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>[hidden] { display: none !important; }</style>
+</head>
+<body>
+<main class="demo" data-demo="media-browser-header">
+  <h1>Media browser header and embedded page cards</h1>
+  <p class="muted">Open a folder to see the title step aside. Hide the notice to see the card change.</p>
+
+  <section class="card" aria-labelledby="browser-title">
+    <div class="stack">
+      <header id="head" class="stack">
+        <h2 id="title" class="top-title" style="font-size: 32px; line-height: 40px;">Media</h2>
+        <p class="muted" id="summary">2 folders, 5 pretend files at the top level</p>
+      </header>
+
+      <div class="row" role="group" aria-label="Folders">
+        <button type="button" class="chip" data-folder="Camera clips">Camera clips</button>
+        <button type="button" class="chip" data-folder="Doorbell">Doorbell</button>
+        <button type="button" class="chip" data-folder="All media" aria-pressed="true">All media</button>
+      </div>
+
+      <ul class="list" id="files" hidden>
+        <li>Front door, 10:14 (pretend)</li>
+        <li>Garden, 11:02 (pretend)</li>
+        <li>Driveway, 12:40 (pretend)</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="card small-r" aria-labelledby="embed-title">
+    <div class="stack">
+      <h2 id="embed-title" style="font-size: 18px;">Embedded page (pretend)</h2>
+      <div class="card small-r tonal" id="address-card">
+        <span class="mono">pretend-page address</span>
+      </div>
+      <div class="card small-r tonal" id="notice-card">
+        <p>Pretend notice: this page is shown inside the frame.</p>
+      </div>
+      <label class="row"><input class="switch" type="checkbox" id="notice-on" checked> <span>Show the notice</span></label>
+    </div>
+  </section>
+
+  <div class="row">
+    <button type="button" data-demo-reset>Start again</button>
+  </div>
+  <p class="note" id="result" aria-live="polite">Top level: the big Media title leads.</p>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var head = document.getElementById('head');
+  var title = document.getElementById('title');
+  var summary = document.getElementById('summary');
+  var files = document.getElementById('files');
+  var chips = Array.prototype.slice.call(document.querySelectorAll('button[data-folder]'));
+  var noticeOn = document.getElementById('notice-on');
+  var noticeCard = document.getElementById('notice-card');
+  var result = document.getElementById('result');
+  var reset = document.querySelector('[data-demo-reset]');
+
+  function showFolder(name) {
+    chips.forEach(function (chip) {
+      chip.setAttribute('aria-pressed', String(chip.getAttribute('data-folder') === name));
+    });
+    if (name === 'All media') {
+      title.textContent = 'Media';
+      title.style.fontSize = '32px';
+      summary.textContent = '2 folders, 5 pretend files at the top level';
+      summary.hidden = false;
+      files.hidden = true;
+      result.textContent = 'Top level: the big Media title leads.';
+    } else {
+      title.textContent = name;
+      title.style.fontSize = '20px';
+      summary.textContent = 'Inside a folder, the folder name leads.';
+      summary.hidden = false;
+      files.hidden = false;
+      result.textContent = 'Inside ' + name + ': the folder name leads, and the Media title steps aside.';
+    }
+  }
+
+  function describeNotice() {
+    var on = noticeOn.checked;
+    noticeCard.hidden = !on;
+    if (result.textContent.indexOf('notice') !== -1) result.textContent = result.textContent.split(' Notice')[0];
+    result.textContent += ' Notice ' + (on ? 'shown' : 'hidden') + '.';
+  }
+
+  chips.forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      showFolder(chip.getAttribute('data-folder'));
+    });
+  });
+
+  noticeOn.addEventListener('change', describeNotice);
+
+  reset.addEventListener('click', function () {
+    noticeOn.checked = true;
+    noticeCard.hidden = false;
+    showFolder('All media');
+  });
+
+  showFolder('All media');
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+{
+  "build": 425,
+  "headline": "Apps can update themselves, and phone layouts are tidier",
+  "summary": "The Updates page now has automatic updates for apps. You can switch them on one by one or all together, and a backup is made first where an update supports one. Home Assistant Core, the Supervisor and the operating system are never updated automatically. Several layout faults on phones and empty pages were fixed, but these fixes had not all been checked in a browser when this was written.",
+  "summary_yue": "更新頁而家可以自動更新應用程式。可以逐個開，亦可以一掣全部開，支援備份嘅更新會先做備份。核心、Supervisor 同作業系統永遠唔會自動更新。手機同空白頁面嘅多個版面問題都執好咗，但寫呢段嘢嗰陣，未全部喺瀏覽器睇過。",
+  "highlights": [
+    {
+      "id": "automatic-app-updates",
+      "title": "Automatic updates, continue on error for all, and a visual dictionary editor",
+      "areas": ["core", "interface"],
+      "what": "The Updates page has an Automatic updates card with two switches: one to update everything automatically, and an Automatic switch on each row to choose items one by one. Updates install one at a time when they become available, a version you skip is left alone, and a failed update is recorded and not retried. Home Assistant Core, the Supervisor and the operating system are never updated automatically. The automation editor also has a switch to continue on error for all actions, and dictionary fields have a visual editor so you no longer need YAML.",
+      "what_yue": "更新頁有一張「自動更新」卡，兩粒掣：一粒係全部自動更新，每一行亦有自己嘅「自動」掣。更新有新版本就一次一個裝。跳過咗嘅版本唔會郁，失敗嘅更新會記低，唔會再試。核心、Supervisor 同作業系統永遠唔會自動更新。自動化編輯器多咗「所有動作出錯都繼續」總掣，字典欄位有圖形編輯器，唔使再對住 YAML。",
+      "why": "People wanted updates to happen without keeping the browser open, and dictionary fields were hard to edit as YAML.",
+      "why_yue": "屋企人想更新可以自己跑，唔使開住瀏覽器守住；字典欄位用 YAML 編輯唔方便。",
+      "try": [
+        "Open the Updates page and find the Automatic updates card.",
+        "Switch on the Automatic switch for one app and see only that app set to install automatically.",
+        "Switch on Update everything automatically and see the other apps follow, one at a time.",
+        "Check that Core, the Supervisor and the operating system have no automatic switch."
+      ],
+      "sha": ["f7f282a80"],
+      "demo": "demos/425/automatic-updates.html"
+    },
+    {
+      "id": "phone-and-empty-page-fixes",
+      "title": "Phone and empty-page layout fixes",
+      "areas": ["interface"],
+      "what": "On a phone, the storage cards fit the screen and long values wrap. Empty battery cells are left out of the devices list, so row text is no longer cut. The Lights, Climate and Security pages explain what belongs there and how to add some, instead of appearing blank. Several pages now show one title only.",
+      "what_yue": "手機上，儲存卡會收埋喺屏幕入面，長嘅字會自動換行。裝置清單入面空白嘅電池格會唔見，行字唔會再俾切走。燈光、氣候同保安頁會講明應該有咩、點樣加，唔會白晒。幾個頁面而家只會有一個標題。",
+      "why": "On a phone some pages were cut off, and some pages with nothing to show looked blank.",
+      "why_yue": "手機上有啲頁面俾切咗，有啲冇嘢顯示嗰陣又會白晒。",
+      "try": [
+        "Set the preview to phone width and see that empty battery cells are left out of the devices list.",
+        "Use the switch to compare the earlier layout with the fixed one.",
+        "On the empty Lights page, press Add a light to see the list fill in."
+      ],
+      "sha": ["0de76e7bd"],
+      "demo": "demos/425/layout-fixes.html"
+    }
+  ],
+  "other": [
+    { "title": "Recorded the release 420 read-back and the live browser pass of build 422, with no page errors", "sha": ["a731b5b9a"] }
+  ]
+}

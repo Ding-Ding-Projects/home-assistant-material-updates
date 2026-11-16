@@ -1,0 +1,79 @@
+{
+ "build": 436,
+ "core": "2026.11.1.436",
+ "supervisor": "2026.11.0.436",
+ "os": "18.5.436",
+ "tag": "v2026.11.1.436",
+ "source": "69f0bbfc3",
+ "date": "2026-11-13T19:03:18-05:00",
+ "previous_build": 434,
+ "changes": [
+  {
+   "sha": "69f0bbfc3",
+   "date": "2026-11-13T19:03:18-05:00",
+   "title": "Add typed number, date, and receiver action controls",
+   "areas": [
+    "docs",
+    "core",
+    "interface"
+   ],
+   "detail": "Use the selected Number entities for compatible bounds, keep dates in the native picker when their representation fits, and list the validated Yamaha cursor commands. Existing templates and legacy values keep their editing routes.",
+   "detail_yue": "數值動作用所選實體嘅共同範圍；格式相容嘅日期用日期選擇器，Yamaha 方向指令就可以直接揀。原有範本同舊格式仍然可以編輯。"
+  },
+  {
+   "sha": "dc71e1cf9",
+   "date": "2026-11-13T18:29:31-05:00",
+   "title": "Show selected to-do item names and record editor evidence",
+   "areas": [
+    "docs",
+    "interface"
+   ],
+   "detail": "The closed picker displays the current item summary while the action stores the exact item ID. Record the verified release, stable feed, and narrow dashboard run with its original capture.",
+   "detail_yue": "關閉選擇器後會顯示目前嘅待辦事項名稱，動作仍然儲存原有 ID。記錄已核實嘅發佈、更新頻道同窄畫面儀表板測試。"
+  },
+  {
+   "sha": "b288cdb27",
+   "date": "2026-11-13T18:15:44-05:00",
+   "title": "Use current demo entities when running to-do actions",
+   "areas": [
+    "interface"
+   ],
+   "detail": "The synthetic services now validate their target against the current demo state and update the current entity count. The shopping list no longer disappears between setup and the checkout line.",
+   "detail_yue": "待辦事項範例用目前嘅實體資料驗證目標同更新數目。購物清單唔會喺設定完成之後突然唔見咗。"
+  },
+  {
+   "sha": "6ef6f51a6",
+   "date": "2026-11-13T18:01:41-05:00",
+   "title": "Run the sample to-do automation in the browser demo",
+   "areas": [
+    "docs",
+    "interface"
+   ],
+   "detail": "Route the two supported to-do actions through the sample services. Link the new Shopping List automation from the project page and the visual editor guide. The run now checks off the groceries it was asked to complete.",
+   "detail_yue": "瀏覽器示範會執行兩個支援嘅待辦事項動作。專案頁同視覺化編輯指南都連到購物清單範例。叫佢剔購物清單，終於真係會剔。"
+  },
+  {
+   "sha": "7dfc307e4",
+   "date": "2026-11-13T17:57:55-05:00",
+   "title": "Recheck to-do subscription permissions on delivery",
+   "areas": [
+    "core",
+    "interface"
+   ],
+   "detail": "Resolve current read permission for each to-do update and cover role changes on an existing subscription. Give the selector test a correctly typed connection context.",
+   "detail_yue": "每次傳送待辦事項更新之前都重新檢查讀取權限，亦測試連線期間嘅權限變更。選擇器測試使用正確嘅連線型別。"
+  },
+  {
+   "sha": "aa645e962",
+   "date": "2026-11-13T17:42:37-05:00",
+   "title": "Add capability-backed action and dashboard selectors",
+   "areas": [
+    "docs",
+    "core",
+    "interface"
+   ],
+   "detail": "Choose existing to-do items, camera presets, and common climate modes in the action editor. Dashboard icon, navigation, and entity-order controls give existing configurations their own fields. The to-do picker can finally keep up with a grocery list.",
+   "detail_yue": "動作編輯器可以揀待辦事項、鏡頭預設位置同冷氣運作模式。儀表板亦可以直接揀圖示、頁面同調整實體次序。改個購物清單名，選單終於跟得切。"
+  }
+ ]
+}

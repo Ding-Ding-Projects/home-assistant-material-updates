@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phone layout demo</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+  .frame { width: 100%; max-width: 880px; margin: 0 auto; border: 2px solid var(--outv); border-radius: 24px; background: var(--sl1); overflow: hidden; display: flex; flex-direction: column; }
+  .frame.phone { max-width: 360px; }
+  .top-strip { padding: 6px 12px; background: var(--sl3); font-size: 13px; }
+  .frame.phone .top-strip { display: none; }
+  .frame-head { padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .frame-head h2 { font-size: 18px; }
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 12px 16px; }
+  .frame.phone .fields { grid-template-columns: 1fr; }
+  .fields span { padding: 8px 10px; border-radius: 10px; background: var(--sl2); overflow-wrap: anywhere; }
+  .menu { display: none; padding: 12px 16px; background: var(--sl0); gap: 8px; flex-direction: column; }
+  .menu.open { display: flex; }
+  .menu.phone-menu { padding: 8px 12px; }
+  .bottom-bar { display: none; border-top: 1px solid var(--outv); padding: 8px; }
+  .frame.phone .bottom-bar { display: flex; justify-content: center; }
+  .bottom-bar button { min-height: 48px; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="phone-layout">
+  <h1>Phone layout</h1>
+  <p class="muted">Switch to Phone view to see the top strip go, the Pages button move to the bottom, and the YAML fields stack in one column.</p>
+
+  <div class="row">
+    <button type="button" class="tonal" id="phone" aria-pressed="false">Phone view</button>
+    <button type="button" class="tonal" id="menu-toggle" aria-expanded="false" aria-controls="menu">Open menu</button>
+  </div>
+
+  <div class="frame" id="frame" aria-label="Pretend page preview">
+    <div class="top-strip" id="strip">Currently on: Pretend page</div>
+    <div class="frame-head">
+      <h2>YAML tools (pretend)</h2>
+      <span class="badge" id="mode">Wide view</span>
+    </div>
+    <div class="fields">
+      <span>pretend_key_one: value one</span>
+      <span>pretend_key_two: value two, a longer name</span>
+      <span>pretend_key_three: value three</span>
+      <span>pretend_key_four: value four</span>
+    </div>
+    <div class="menu" id="menu">
+      <span class="badge">Pretend group</span>
+      <button type="button" class="tonal">Pretend menu item</button>
+      <button type="button" class="tonal">Another pretend item</button>
+    </div>
+    <div class="bottom-bar"><button type="button" class="tonal">Pages</button></div>
+  </div>
+
+  <p class="note" id="status" aria-live="polite"></p>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var frame = document.getElementById('frame');
+  var phoneBtn = document.getElementById('phone');
+  var menuBtn = document.getElementById('menu-toggle');
+  var menu = document.getElementById('menu');
+  var mode = document.getElementById('mode');
+  var status = document.getElementById('status');
+
+  function setPhone(on) {
+    frame.classList.toggle('phone', on);
+    phoneBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    phoneBtn.className = on ? 'filled' : 'tonal';
+    mode.textContent = on ? 'Phone view' : 'Wide view';
+    menu.classList.toggle('phone-menu', on);
+    status.textContent = on
+      ? 'Phone view: the top strip is hidden, the Pages button is at the bottom, and the fields are in one column.'
+      : 'Wide view: the top strip shows the page name and the fields are in two columns.';
+  }
+
+  phoneBtn.addEventListener('click', function () { setPhone(phoneBtn.getAttribute('aria-pressed') !== 'true'); });
+  menuBtn.addEventListener('click', function () {
+    var open = !menu.classList.contains('open');
+    menu.classList.toggle('open', open);
+    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    status.textContent = open ? 'Menu open.' : 'Menu closed.';
+  });
+
+  function reset() {
+    setPhone(false);
+    menu.classList.remove('open');
+    menuBtn.setAttribute('aria-expanded', 'false');
+  }
+  document.querySelectorAll('[data-demo-reset]').forEach(function (b) { b.addEventListener('click', reset); });
+  reset();
+})();
+</script>
+</body>
+</html>

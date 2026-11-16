@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Faults found on build 413</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>[hidden] { display: none !important; }</style>
+</head>
+<body>
+<main class="demo" data-demo="feature-pass-fixes">
+  <h1>Faults found on build 413 and their fixes</h1>
+  <p class="muted">Type in the search box or press an area to show only that area. The list is pretend data taken from the faults above.</p>
+
+  <section class="card" aria-labelledby="list-title">
+    <div class="stack">
+      <h2 id="list-title">Fault list</h2>
+      <label class="field" for="search">Search the faults
+        <input type="search" id="search" placeholder="For example: theme or dashboards">
+      </label>
+
+      <div class="row" role="group" aria-label="Area">
+        <button type="button" class="chip" data-area="all" aria-pressed="true">All</button>
+        <button type="button" class="chip" data-area="Automation" aria-pressed="false">Automation</button>
+        <button type="button" class="chip" data-area="Dashboards" aria-pressed="false">Dashboards</button>
+        <button type="button" class="chip" data-area="Navigation" aria-pressed="false">Navigation</button>
+        <button type="button" class="chip" data-area="Pages" aria-pressed="false">Pages</button>
+        <button type="button" class="chip" data-area="Themes" aria-pressed="false">Themes</button>
+      </div>
+
+      <p id="count" aria-live="polite">Showing 6 of 6 faults.</p>
+
+      <ul class="list" id="list">
+        <li data-area="Automation" data-text="week ahead time trigger weekday list blank panel">
+          <div class="stack">
+            <strong>Week ahead went blank for a time trigger with no weekday list</strong>
+            <span class="badge">Automation</span>
+            <span class="muted">Fix: a missing weekday list is now read as every day.</span>
+          </div>
+        </li>
+        <li data-area="Themes" data-text="theme zip spaces quotes name not recognised">
+          <div class="stack">
+            <strong>A theme with spaces in its name was not recognised from a ZIP</strong>
+            <span class="badge">Themes</span>
+            <span class="muted">Fix: a plain top-level key may now hold spaces.</span>
+          </div>
+        </li>
+        <li data-area="Navigation" data-text="notifications off centre navigation pane start edge">
+          <div class="stack">
+            <strong>Notifications sat off-centre in the navigation pane</strong>
+            <span class="badge">Navigation</span>
+            <span class="muted">Fix: every entry now starts at the start edge.</span>
+          </div>
+        </li>
+        <li data-area="Pages" data-text="people roles tags title shown twice header">
+          <div class="stack">
+            <strong>People, Roles and Tags showed their title twice</strong>
+            <span class="badge">Pages</span>
+            <span class="muted">Fix: the page header carries the title, and the summary line is shown under it.</span>
+          </div>
+        </li>
+        <li data-area="Dashboards" data-text="dashboards list type column empty reload">
+          <div class="stack">
+            <strong>The type column of the dashboards list was empty until a reload</strong>
+            <span class="badge">Dashboards</span>
+            <span class="muted">Fix: the cached list now depends on the translations.</span>
+          </div>
+        </li>
+        <li data-area="Pages" data-text="help icon tool pill two wide windows duplicate">
+          <div class="stack">
+            <strong>Two help icons showed in the tool pill on wide windows</strong>
+            <span class="badge">Pages</span>
+            <span class="muted">Fix: the shared help icon stays, and the page's own copy is no longer shown.</span>
+          </div>
+        </li>
+      </ul>
+
+      <p class="note" id="none" hidden>No fault matches. Try another word, or press All.</p>
+
+      <div class="row">
+        <button type="button" data-demo-reset>Start again</button>
+      </div>
+    </div>
+  </section>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var search = document.getElementById('search');
+  var list = document.getElementById('list');
+  var items = Array.prototype.slice.call(list.querySelectorAll('li'));
+  var chips = Array.prototype.slice.call(document.querySelectorAll('button[data-area]'));
+  var count = document.getElementById('count');
+  var none = document.getElementById('none');
+  var reset = document.querySelector('[data-demo-reset]');
+  var area = 'all';
+
+  function apply() {
+    var words = search.value.trim().toLowerCase();
+    var shown = 0;
+    items.forEach(function (li) {
+      var areaOk = area === 'all' || li.getAttribute('data-area') === area;
+      var textOk = words === '' || li.getAttribute('data-text').indexOf(words) !== -1
+        || li.textContent.toLowerCase().indexOf(words) !== -1;
+      var show = areaOk && textOk;
+      li.hidden = !show;
+      if (show) shown += 1;
+    });
+    count.textContent = 'Showing ' + shown + ' of ' + items.length + ' faults.';
+    none.hidden = shown !== 0;
+  }
+
+  chips.forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      area = chip.getAttribute('data-area') === 'all' ? 'all' : chip.getAttribute('data-area');
+      chips.forEach(function (other) {
+        other.setAttribute('aria-pressed', String(other === chip));
+      });
+      apply();
+    });
+  });
+
+  search.addEventListener('input', apply);
+
+  reset.addEventListener('click', function () {
+    search.value = '';
+    area = 'all';
+    chips.forEach(function (other) {
+      other.setAttribute('aria-pressed', String(other.getAttribute('data-area') === 'all'));
+    });
+    apply();
+  });
+
+  apply();
+})();
+</script>
+</body>
+</html>

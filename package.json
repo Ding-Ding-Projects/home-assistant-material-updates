@@ -1,0 +1,15 @@
+{
+  "name": "home-assistant-material-updates",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Release notes site for Home Assistant Material: one page per version, with a working demo of each new feature.",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "fetch": "node fetch-data.mjs",
+    "build": "node build.mjs",
+    "check": "node check.mjs",
+    "test": "node test-demos.mjs",
+    "serve": "node serve.mjs"
+  }
+}

@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phone Pages sheet and section tabs</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="section-tab-menus-and-phone-fixes">
+  <h1>Phone Pages sheet</h1>
+  <p class="muted">Open settings and tool pages from the sheet, group them with the picker, and close the tab you are using to see where focus goes.</p>
+
+  <section class="card stack" aria-labelledby="sheet-h" style="max-width:420px">
+    <h2 id="sheet-h" style="font-size:18px;margin:0">Pages</h2>
+    <ul class="list" id="pages" aria-label="Pages"></ul>
+  </section>
+
+  <section class="card stack" aria-labelledby="open-h" style="max-width:420px">
+    <h2 id="open-h" style="font-size:18px;margin:0">Open tabs</h2>
+    <div class="row" id="tabs" role="group" aria-label="Open tabs"></div>
+    <label class="field" for="group">Group of the selected tab
+      <select id="group">
+        <option value="">No group</option>
+        <option value="Settings section">Settings section</option>
+        <option value="Tools">Tools</option>
+      </select>
+    </label>
+    <div class="row"><button type="button" class="filled" id="close-current">Close the tab in use</button></div>
+  </section>
+
+  <p id="result" class="note good" aria-live="polite"></p>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var PAGES = [
+    { id: 'overview', label: 'Overview', kind: 'Main' },
+    { id: 'profile', label: 'Profile', kind: 'Settings' },
+    { id: 'appearance', label: 'Appearance', kind: 'Settings' },
+    { id: 'energy', label: 'Energy report', kind: 'Tool' },
+    { id: 'images', label: 'Image store', kind: 'Tool' }
+  ];
+
+  var open = [];
+  var selected = null;
+  var pagesEl = document.getElementById('pages');
+  var tabsEl = document.getElementById('tabs');
+  var groupSel = document.getElementById('group');
+  var result = document.getElementById('result');
+
+  function find(id) {
+    for (var i = 0; i < PAGES.length; i++) if (PAGES[i].id === id) return PAGES[i];
+    return null;
+  }
+
+  function openPage(id) {
+    if (open.some(function (t) { return t.id === id; })) {
+      selected = id;
+      result.textContent = find(id).label + ' is already open. Its tab is selected.';
+    } else {
+      open.push({ id: id, group: '' });
+      selected = id;
+      result.textContent = 'Opened ' + find(id).label + '.';
+    }
+    render();
+  }
+
+  function closeCurrent() {
+    if (!selected) { result.textContent = 'No tab is in use.'; return; }
+    var idx = open.map(function (t) { return t.id; }).indexOf(selected);
+    var name = find(selected).label;
+    open.splice(idx, 1);
+    // Go to the neighbouring tab: the next one, or the previous one at the end.
+    if (open.length) {
+      var next = open[idx] || open[idx - 1];
+      selected = next.id;
+      result.textContent = 'Closed ' + name + '. ' + find(selected).label + ' is now in use.';
+    } else {
+      selected = null;
+      result.textContent = 'Closed ' + name + '. No tabs are open.';
+    }
+    render();
+  }
+
+  function render() {
+    pagesEl.innerHTML = '';
+    PAGES.forEach(function (p) {
+      var li = document.createElement('li');
+      var span = document.createElement('span');
+      span.style.flex = '1';
+      span.textContent = p.label + ' (' + p.kind + ')';
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tonal';
+      btn.textContent = 'Open';
+      btn.setAttribute('aria-label', 'Open ' + p.label);
+      btn.addEventListener('click', function () { openPage(p.id); });
+      li.appendChild(span);
+      li.appendChild(btn);
+      pagesEl.appendChild(li);
+    });
+
+    tabsEl.innerHTML = '';
+    if (!open.length) {
+      var none = document.createElement('p');
+      none.className = 'muted';
+      none.textContent = 'No tabs open.';
+      tabsEl.appendChild(none);
+    }
+    open.forEach(function (t) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = t.id === selected ? 'filled' : 'tonal';
+      b.textContent = find(t.id).label + (t.group ? ' (' + t.group + ')' : '');
+      b.setAttribute('aria-current', t.id === selected ? 'true' : 'false');
+      b.addEventListener('click', function () { selected = t.id; render(); });
+      tabsEl.appendChild(b);
+    });
+
+    var cur = open.filter(function (t) { return t.id === selected; })[0];
+    groupSel.value = cur ? cur.group : '';
+    groupSel.disabled = !cur;
+  }
+
+  groupSel.addEventListener('change', function () {
+    var cur = open.filter(function (t) { return t.id === selected; })[0];
+    if (!cur) return;
+    cur.group = groupSel.value;
+    result.textContent = groupSel.value ? find(cur.id).label + ' is in ' + groupSel.value + '.' : find(cur.id).label + ' has no group.';
+    render();
+  });
+
+  document.getElementById('close-current').addEventListener('click', closeCurrent);
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    open = [];
+    selected = null;
+    result.textContent = '';
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

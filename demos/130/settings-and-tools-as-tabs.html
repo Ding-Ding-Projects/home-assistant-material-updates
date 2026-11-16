@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings and tools as tabs</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="settings-and-tools-as-tabs">
+  <h1>Settings and tools as tabs</h1>
+  <p class="muted">Open settings pages and tools from the catalog as tabs. Choosing one that is already open brings its tab back instead of opening a second one.</p>
+
+  <section class="card stack" aria-labelledby="cat-h">
+    <h2 id="cat-h" style="font-size:18px;margin:0">New tab catalog</h2>
+    <ul class="list" id="catalog" aria-label="Catalog"></ul>
+  </section>
+
+  <section class="card stack" aria-labelledby="tabs-h">
+    <h2 id="tabs-h" style="font-size:18px;margin:0">Open tabs</h2>
+    <div class="row" id="tab-row" role="tablist" aria-label="Open tabs"></div>
+    <div class="row" id="selected-actions"></div>
+    <p class="small muted" id="hidden-note" hidden></p>
+  </section>
+
+  <p id="result" class="note good" aria-live="polite"></p>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var CATALOG = [
+    { id: 'profile', title: 'Profile', kind: 'Settings page', icon: 'P' },
+    { id: 'appearance', title: 'Appearance', kind: 'Settings page', icon: 'A' },
+    { id: 'energy', title: 'Energy report', kind: 'Tool', icon: 'E' },
+    { id: 'images', title: 'Image store', kind: 'Tool', icon: 'I' }
+  ];
+
+  var allowed = {};
+  var tabs = [];
+  var selectedId = null;
+  var catalogEl = document.getElementById('catalog');
+  var tabRow = document.getElementById('tab-row');
+  var actions = document.getElementById('selected-actions');
+  var hiddenNote = document.getElementById('hidden-note');
+  var result = document.getElementById('result');
+
+  function byId(id) {
+    for (var i = 0; i < CATALOG.length; i++) if (CATALOG[i].id === id) return CATALOG[i];
+    return null;
+  }
+
+  function openTab(id) {
+    var existing = tabs.filter(function (t) { return t.id === id; })[0];
+    if (existing) {
+      selectedId = id;
+      result.textContent = byId(id).title + ' was already open, so its tab is selected again.';
+    } else {
+      var item = byId(id);
+      tabs.push({ id: id, title: item.title, icon: item.icon, pinned: false });
+      selectedId = id;
+      result.textContent = 'Opened ' + item.title + ' as a tab of its own.';
+    }
+    render();
+  }
+
+  function render() {
+    catalogEl.innerHTML = '';
+    CATALOG.forEach(function (item) {
+      var li = document.createElement('li');
+      var span = document.createElement('span');
+      span.style.flex = '1';
+      span.textContent = item.icon + '  ' + item.title + ' (' + item.kind + ')';
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tonal';
+      btn.textContent = 'Open as tab';
+      btn.setAttribute('aria-label', 'Open ' + item.title + ' as a tab');
+      btn.addEventListener('click', function () { openTab(item.id); });
+      var sw = document.createElement('label');
+      sw.className = 'row';
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.className = 'switch';
+      cb.checked = allowed[item.id] !== false;
+      cb.setAttribute('aria-label', 'Visible to this account: ' + item.title);
+      cb.addEventListener('change', function () {
+        allowed[item.id] = cb.checked;
+        result.textContent = item.title + (cb.checked ? ' is visible to this account.' : ' is hidden for this account. Its tab is kept but not shown.');
+        render();
+      });
+      var st = document.createElement('span');
+      st.className = 'small';
+      st.textContent = 'Visible';
+      sw.appendChild(cb);
+      sw.appendChild(st);
+      li.appendChild(span);
+      li.appendChild(btn);
+      li.appendChild(sw);
+      catalogEl.appendChild(li);
+    });
+
+    var shown = tabs.filter(function (t) { return allowed[t.id] !== false; });
+    var hiddenCount = tabs.length - shown.length;
+    tabRow.innerHTML = '';
+    shown.forEach(function (t) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = t.id === selectedId ? 'filled' : 'tonal';
+      b.textContent = t.icon + ' ' + t.title + (t.pinned ? ' (pinned)' : '');
+      b.setAttribute('aria-current', t.id === selectedId ? 'true' : 'false');
+      b.addEventListener('click', function () { selectedId = t.id; render(); });
+      tabRow.appendChild(b);
+    });
+    if (!shown.length) {
+      var none = document.createElement('p');
+      none.className = 'muted';
+      none.textContent = 'No tabs open.';
+      tabRow.appendChild(none);
+    }
+
+    actions.innerHTML = '';
+    var sel = tabs.filter(function (t) { return t.id === selectedId; })[0];
+    if (sel && allowed[sel.id] !== false) {
+      var pin = document.createElement('button');
+      pin.type = 'button';
+      pin.className = 'tonal';
+      pin.textContent = sel.pinned ? 'Unpin ' + sel.title : 'Pin ' + sel.title;
+      pin.addEventListener('click', function () {
+        sel.pinned = !sel.pinned;
+        result.textContent = (sel.pinned ? 'Pinned ' : 'Unpinned ') + sel.title + '.';
+        render();
+      });
+      var close = document.createElement('button');
+      close.type = 'button';
+      close.className = 'tonal';
+      close.textContent = 'Close ' + sel.title;
+      close.addEventListener('click', function () {
+        tabs = tabs.filter(function (t) { return t.id !== sel.id; });
+        selectedId = tabs.length ? tabs[tabs.length - 1].id : null;
+        result.textContent = 'Closed ' + sel.title + '.';
+        render();
+      });
+      actions.appendChild(pin);
+      actions.appendChild(close);
+    }
+
+    if (hiddenCount > 0) {
+      hiddenNote.hidden = false;
+      hiddenNote.textContent = hiddenCount + ' tab(s) are hidden for this account. They are kept, not deleted.';
+    } else {
+      hiddenNote.hidden = true;
+      hiddenNote.textContent = '';
+    }
+  }
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    allowed = {};
+    tabs = [];
+    selectedId = null;
+    result.textContent = '';
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

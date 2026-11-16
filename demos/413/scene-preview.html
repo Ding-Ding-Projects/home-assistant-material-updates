@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Preview a scene</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.demo table { font-size: 15px; }
+.demo td, .demo th { padding: 10px 8px; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="scene-preview">
+  <h1>Preview a scene</h1>
+  <p class="muted">Preview the &quot;Movie night&quot; scene. It asks first, runs for 30 seconds, then puts everything back unless you keep it.</p>
+
+  <section class="card stack" aria-labelledby="dev-h">
+    <h2 id="dev-h">Devices</h2>
+    <table>
+      <thead>
+        <tr><th scope="col">Device</th><th scope="col">Now</th><th scope="col">Scene</th></tr>
+      </thead>
+      <tbody id="devices"></tbody>
+    </table>
+  </section>
+
+  <section id="ask" class="card tonal stack" aria-labelledby="ask-h" hidden>
+    <h2 id="ask-h">Start the preview?</h2>
+    <p>It changes 3 devices to the scene for 30 seconds, then puts them back.</p>
+    <div class="row">
+      <button type="button" id="start" class="filled">Start preview</button>
+      <button type="button" id="cancel" class="text">Cancel</button>
+    </div>
+  </section>
+
+  <section class="card stack" aria-labelledby="ctl-h">
+    <h2 id="ctl-h">Controls</h2>
+    <div class="row">
+      <button type="button" id="preview" class="filled">Preview scene</button>
+    </div>
+    <p id="status" class="note" aria-live="polite">Nothing is previewed.</p>
+  </section>
+
+  <div class="row">
+    <button type="button" data-demo-reset class="tonal">Start again</button>
+  </div>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var devices = [
+    { name: 'Hall light', start: '100%', target: '20%' },
+    { name: 'Lounge lamp', start: '60%', target: '10%' },
+    { name: 'Living room blinds', start: 'open', target: 'closed' }
+  ];
+  var current = [];
+  var snapshot = null;
+  var left = 0;
+  var timer = null;
+  var body = document.getElementById('devices');
+  var ask = document.getElementById('ask');
+  var status = document.getElementById('status');
+  var previewBtn = document.getElementById('preview');
+
+  function stopTimer() {
+    if (timer !== null) { clearInterval(timer); timer = null; }
+  }
+
+  function draw() {
+    body.textContent = '';
+    devices.forEach(function (d, i) {
+      var tr = document.createElement('tr');
+      var a = document.createElement('td'); a.textContent = d.name;
+      var b = document.createElement('td'); b.textContent = current[i];
+      var c = document.createElement('td'); c.textContent = d.target;
+      tr.appendChild(a); tr.appendChild(b); tr.appendChild(c);
+      body.appendChild(tr);
+    });
+    previewBtn.disabled = timer !== null;
+  }
+
+  function restore(message) {
+    stopTimer();
+    if (snapshot) current = snapshot.slice();
+    snapshot = null;
+    status.textContent = message;
+    draw();
+  }
+
+  function startPreview() {
+    ask.hidden = true;
+    snapshot = current.slice();
+    current = devices.map(function (d) { return d.target; });
+    left = 30;
+    stopTimer();
+    timer = setInterval(function () {
+      left -= 1;
+      if (left <= 0) {
+        restore('Preview ended. The devices are back where they were.');
+      } else {
+        status.textContent = 'Preview running: ' + left + ' seconds left.';
+      }
+    }, 1000);
+    status.textContent = 'Preview running: 30 seconds left.';
+    draw();
+  }
+
+  previewBtn.addEventListener('click', function () {
+    ask.hidden = false;
+    status.textContent = 'Confirm before the preview starts.';
+    document.getElementById('start').focus();
+  });
+  document.getElementById('start').addEventListener('click', startPreview);
+  document.getElementById('cancel').addEventListener('click', function () {
+    ask.hidden = true;
+    status.textContent = 'Preview cancelled. Nothing changed.';
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    stopTimer();
+    ask.hidden = true;
+    snapshot = null;
+    current = devices.map(function (d) { return d.start; });
+    status.textContent = 'Nothing is previewed.';
+    draw();
+  });
+
+  current = devices.map(function (d) { return d.start; });
+  status.textContent = 'Nothing is previewed.';
+  draw();
+})();
+</script>
+</body>
+</html>

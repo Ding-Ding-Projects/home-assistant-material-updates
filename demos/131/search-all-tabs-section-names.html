@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Search all tabs: section names</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+  label.row { min-height: 48px; cursor: pointer; flex-wrap: nowrap; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="search-all-tabs-section-names">
+  <h1>Search all tabs: section names</h1>
+  <p class="muted">Type a word such as Profile or Energy. Each settings section is named by its first two tabs.</p>
+
+  <section class="card stack" aria-labelledby="s-h">
+    <h2 id="s-h" style="font-size:18px;margin:0">Search</h2>
+    <label class="field" for="q">
+      <span>Search all tabs</span>
+      <input type="search" id="q" placeholder="Search all tabs" autocomplete="off">
+    </label>
+    <label class="row" for="old">
+      <input type="checkbox" class="switch" id="old">
+      <span>Show the old address style for comparison</span>
+    </label>
+  </section>
+
+  <section class="card stack" aria-labelledby="r-h">
+    <h2 id="r-h" style="font-size:18px;margin:0">Sections</h2>
+    <ul class="list" id="results" aria-label="Matching sections"></ul>
+  </section>
+
+  <p id="result" class="note" aria-live="polite"></p>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var SECTIONS = [
+    { path: '/settings/profile', tabs: ['Profile', 'Appearance', 'Locks'] },
+    { path: '/settings/automations', tabs: ['Automations', 'Scripts', 'History'] },
+    { path: '/settings/energy', tabs: ['Energy', 'Climate', 'Alerts'] }
+  ];
+
+  var q = document.getElementById('q');
+  var old = document.getElementById('old');
+  var results = document.getElementById('results');
+  var result = document.getElementById('result');
+
+  function nameOf(sec) {
+    return old.checked ? sec.path : sec.tabs[0] + ', ' + sec.tabs[1];
+  }
+
+  function render() {
+    var word = q.value.trim().toLowerCase();
+    results.innerHTML = '';
+    var count = 0;
+    SECTIONS.forEach(function (sec) {
+      var hit = !word || nameOf(sec).toLowerCase().indexOf(word) >= 0 ||
+        sec.tabs.some(function (t) { return t.toLowerCase().indexOf(word) >= 0; });
+      if (!hit) return;
+      count++;
+      var li = document.createElement('li');
+      li.style.flexDirection = 'column';
+      li.style.alignItems = 'flex-start';
+      var title = document.createElement('strong');
+      title.textContent = nameOf(sec);
+      var tabs = document.createElement('span');
+      tabs.className = 'small muted';
+      tabs.textContent = 'Tabs: ' + sec.tabs.join(', ');
+      li.appendChild(title);
+      li.appendChild(tabs);
+      results.appendChild(li);
+    });
+    if (!count) {
+      var none = document.createElement('li');
+      none.textContent = 'No section matches that word.';
+      results.appendChild(none);
+    }
+    result.textContent = count + ' section(s) listed. ' + (old.checked ? 'Old address style shown.' : 'Named by the first tabs.');
+  }
+
+  q.addEventListener('input', render);
+  old.addEventListener('change', render);
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    q.value = '';
+    old.checked = false;
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

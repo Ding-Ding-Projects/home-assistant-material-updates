@@ -1,0 +1,139 @@
+{
+  "build": 121,
+  "headline": "Backups restore more reliably, and six lists gain bulk actions and dry runs",
+  "summary": "Build 121 brings many changes together. Backups from older archives restore, and a backup from a newer release is refused before anything is scheduled, with its version named. Six tables get row selection and bulk actions with a preview before anything is removed, notices stack up to three at a time, and an automation can be dry-run against fake states. Several of these changes have passed their tests but have not yet been seen in a running copy, and the notes for each say so.",
+  "summary_yue": "第 121 版集合咗好多改動。舊式備份而家還原得；比新版本更新嘅備份會喺開始之前拒絕，並且寫明版本。六個列表有行選同批量操作，刪除前會先睇預覽；通知最多疊三個；自動化可以用假狀態乾跑一次。部分改動淨係過咗測試，未喺真正運行緊嘅版本睇過，每項紀錄都有寫明。",
+  "highlights": [
+    {
+      "id": "backup-restore",
+      "title": "Backups from older archives restore, and newer ones are refused clearly",
+      "areas": ["core"],
+      "what": "A backup made by an older archive now restores, because a leading ./ in the file name no longer makes it look like the wrong password. A backup from a newer release is refused before anything is scheduled, and the message names its version. A backup name that contains a slash is tidied when it is read, so the upload is not refused for that reason.",
+      "what_yue": "舊式備份入面，檔案名開頭有「./」嘅，而家唔會再俾你當成密碼錯。比新版本更新嘅備份會喺開始之前拒絕，訊息會寫明版本。備份名有斜線嘅，讀取嗰陣會自動整好，唔會因為呢個原因俾拒絕上載。",
+      "why": "Some valid backups were refused for the wrong reason, and a backup from a newer release needed a clear refusal before it could touch anything.",
+      "try": [
+        "Choose a pretend backup from the list, such as the one with a leading ./ or the one from a newer version.",
+        "Press Check only to see the result without restoring anything.",
+        "Press Restore on a valid backup and read the message that says what was scheduled.",
+        "A newer backup is refused and its version is named. Nothing is restored in that case."
+      ],
+      "sha": ["4d8ac10ed"],
+      "demo": "demos/121/backup-restore.html"
+    },
+    {
+      "id": "command-search",
+      "title": "Command search works fully from the keyboard",
+      "areas": ["interface"],
+      "what": "Command search lists actions and pages in one place and can be used without a mouse. Arrow keys move through the matching list and wrap from the last item back to the first, Space toggles the highlighted item, and Escape closes the search. A status line says how many items match the words you typed.",
+      "what_yue": "指令搜尋將動作同頁面集中喺一個地方，唔使用滑鼠都得。用方向鍵上落，去到最尾會繞返頭；撳空格可以切換反白嗰項；撳 Escape 就閂咗搜尋。狀態行會話你知有幾多項符合你打嘅字。",
+      "why": "People who use the keyboard need to reach any action quickly, and a long list is hard to scan without a clear way to move through it.",
+      "try": [
+        "Type part of a name in the search box, such as the word backup.",
+        "Use the down arrow past the last match and see it wrap to the first.",
+        "Press Space on a highlighted command and see its state change to On.",
+        "Press Escape to close the search. The status line says how many commands matched."
+      ],
+      "sha": ["b7843603e"],
+      "demo": "demos/121/command-search.html"
+    },
+    {
+      "id": "type-scale",
+      "title": "A type scale sets every text size from one base size and ratio",
+      "areas": ["interface"],
+      "what": "The fonts dialog can now set every text size from a base size and a ratio. Each step grows or shrinks by the ratio, and the scale multiplies the Text size setting. It is off by default. The same build also adds a named colour palette and a practise control, which saves and sends nothing, to the setting information panels.",
+      "what_yue": "字體對話框可以用一個基礎大小同一個比例，設定每一級字嘅大小。每一級都會按比例放大或者縮細，同「文字大小」設定相乘。預設係關閉。同一版仲加咗命名調色盤，同埋設定說明嘅練習掣，撳咗唔會儲存，亦唔會送出任何嘢。",
+      "why": "Sizes chosen one at a time can look uneven, while sizes that step up by one ratio read more evenly across a page.",
+      "try": [
+        "Press the switch to turn the type scale on.",
+        "Move the base size slider and choose a different ratio.",
+        "Read the list of step sizes and check that each one is the ratio times the step before it.",
+        "Press Start again to turn the scale off and return to the default sizes."
+      ],
+      "sha": ["c0f26a697"],
+      "demo": "demos/121/type-scale.html"
+    },
+    {
+      "id": "automation-dry-run",
+      "title": "Dry run tests an automation against fake states",
+      "areas": ["interface"],
+      "what": "A dry run checks a whole automation against fake states and calls no service, so nothing in the home changes. Named test cases can be kept in the history manager, and a simulated run decides each condition against those fake states. The automation editor also has a bottom bar with Run now, Check, Dry run and Save.",
+      "what_yue": "乾跑會用假嘅狀態，逐個條件去試一次整個自動化，唔會叫任何服務，所以屋企嘅嘢唔會郁。歷史管理可以儲住有名字嘅測試個案，模擬運行會對住呢啲假狀態去判斷每個條件。自動化編輯器底部有「即刻運行」、「檢查」、「乾跑」同「儲存」四個掣。",
+      "why": "Testing an automation on the real devices could switch lights or doors by accident, so a check that touches nothing is useful before a change goes live.",
+      "try": [
+        "Change the pretend hallway light and the pretend time of day, then press Dry run.",
+        "Read which condition passed and which failed.",
+        "Press Dry run again with other fake states and compare the result.",
+        "The counter shows that the number of service calls is still zero."
+      ],
+      "sha": ["c84a2eef8"],
+      "demo": "demos/121/automation-dry-run.html"
+    },
+    {
+      "id": "stacked-toasts",
+      "title": "Messages stack up to three at a time, with a queue and a pausing timer",
+      "areas": ["interface"],
+      "what": "Short messages called toasts now stack, with up to three visible at once. Any extra message waits behind a chip that says more are waiting. Each message's timer pauses while you point at it or move keyboard focus onto it. Notification rows also show their severity with a colour, an icon and a word, and can be sorted by severity and then by newest.",
+      "what_yue": "短訊息（toast）而家會疊埋，最多同時見到三個。多出嚟嘅會排隊，有個「仲有更多」嘅小標籤話你知。你將滑鼠指住一個訊息，或者用鍵盤揀住佢，佢嘅計時就會停低。通知列亦都用顏色、圖示同字顯示嚴重程度，可以按嚴重程度再按最新排序。",
+      "why": "Messages used to cover one another, and a pile of them could hide the buttons people needed to press.",
+      "try": [
+        "Press Send a message four times with different severities.",
+        "Count the visible messages and check that the waiting chip shows the extra one.",
+        "Point at a message and see its countdown stay still while you hover over it.",
+        "Press Dismiss on a message to bring the next queued message forward."
+      ],
+      "sha": ["a00117602"],
+      "demo": "demos/121/stacked-toasts.html"
+    },
+    {
+      "id": "bulk-actions",
+      "title": "Six tables gain row selection and bulk actions with previews",
+      "areas": ["interface"],
+      "what": "Tags, dashboards, resources, scenes, blueprints and backups can now be selected row by row, and one action can be applied to every selected row. Deleting opens a preview of the rows first, and it needs a second press to confirm. Anything that cannot be removed, such as a tag an automation still uses, is skipped and the reason is shown.",
+      "what_yue": "標籤、儀表板、資源、場景、藍圖同備份六個表，而家可以逐行揀，再一齊做同一個動作。刪除之前會先開預覽，要撳兩次先會確認。唔可以刪嘅嘢，例如仲有自動化用緊嘅標籤，會跳過，並且寫明原因。",
+      "why": "Removing many items one at a time was slow, and a bulk delete with no preview could remove the wrong things.",
+      "try": [
+        "Tick two pretend tag rows, or press Select all.",
+        "Press Delete selected to open the preview list.",
+        "Press Confirm delete once, then press it again to finish.",
+        "Read the result message and check that the tag still in use was skipped with its reason."
+      ],
+      "sha": ["c8600219c"],
+      "demo": "demos/121/bulk-actions.html"
+    },
+    {
+      "id": "touch-targets",
+      "title": "Sliders, text fields and filter chips are 44 px tall on touch screens",
+      "areas": ["interface"],
+      "what": "On a touch screen, sliders, compact text fields and the filter chips beside a table's search box are now 44 pixels tall. A slider used to react only in its middle 32 pixels. The colour picker's marker no longer covers the Hue label when the colour is black.",
+      "what_yue": "用手指撳嘅嘢而家夠大。滑桿之前淨係中間 32 像素有反應，細格文字欄同表格隔籬嘅篩選掣都係 32 像素高，而家全部係 44 像素。揀色嗰粒圓點，顏色係黑色嗰陣，亦唔再遮住「色相」兩個字。",
+      "why": "Small targets are hard to hit with a finger, and people kept missing them.",
+      "try": [
+        "Press Before to see the old 32-pixel sizes, then move the slider.",
+        "Press After and read the measured heights, which should show 44 pixels.",
+        "Tap a filter chip and check that it changes its pressed state.",
+        "Press Start again to return to the Before view."
+      ],
+      "sha": ["336234d2d"],
+      "demo": "demos/121/touch-targets.html"
+    },
+    {
+      "id": "schedule-entity-rules",
+      "title": "Schedule rules can check an entity's state",
+      "areas": ["interface"],
+      "what": "A schedule rule can now look at an entity, such as a sensor or a door, and compare it with is, is not, above or below. The rule runs only when the comparison passes. The same build also saves personal settings on the instance, so they follow your account to every device.",
+      "what_yue": "時間表規則而家可以睇實體嘅狀態，例如感應器或者門，再用「係」、「唔係」、「高過」或者「低過」去比較。比較通過先會執行。同一版仲將個人設定儲喺伺服器上，跟住你嘅戶口去晒每部機。",
+      "why": "A schedule used to look only at the clock, so it could not respond to what a device was actually doing.",
+      "try": [
+        "Choose the pretend temperature sensor and pick above, then type a number.",
+        "Change the pretend sensor reading and see whether the rule would run now.",
+        "Choose the pretend door and pick is, then type open.",
+        "Choose above or below with the door and read the error message."
+      ],
+      "sha": ["c44440bf6"],
+      "demo": "demos/121/schedule-entity-rules.html"
+    }
+  ],
+  "other": [
+    { "title": "On a phone, the Personal settings page no longer scrolls sideways, because its row of group chips now scrolls inside itself.", "sha": ["7f8909f3b"] }
+  ]
+}

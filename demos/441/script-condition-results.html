@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: script condition results</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.mode-row { position: sticky; top: 0; z-index: 2; background: var(--surf); padding: 8px 0; }
+[hidden] { display: none !important; }
+.step { display: flex; flex-direction: column; gap: 8px; padding: 12px 0; border-top: 1px solid var(--outv); }
+.step:first-child { border-top: none; }
+.step .summary { font-weight: 500; }
+.result { background: var(--sl2); border-radius: 12px; padding: 10px 14px; font-size: 14px; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="script-condition-results">
+  <h1>Script conditions read clearly beside their summary</h1>
+  <p class="muted">Change the mode, search the steps, and show a condition result under its summary. Scroll the list: the mode row stays in view.</p>
+
+  <section class="card stack" aria-labelledby="steps-h">
+    <h2 id="steps-h" class="small">Steps in this script</h2>
+
+    <div class="mode-row row" role="group" aria-label="Script mode">
+      <button type="button" class="chip" data-mode="once" aria-pressed="true">Run once</button>
+      <button type="button" class="chip" data-mode="repeat" aria-pressed="false">Repeat</button>
+      <p id="mode-text" class="small muted" style="flex-basis:100%">Mode: run once. The script stops after its first pass.</p>
+    </div>
+
+    <label class="field" for="search">Search steps
+      <input type="search" id="search" placeholder="Type to filter">
+    </label>
+    <p id="count" class="small muted" aria-live="polite">5 steps shown.</p>
+
+    <ul class="list" id="steps">
+      <li class="step" data-text="front door sensor close">
+        <span class="summary">Wait for the front door sensor to close</span>
+        <div><button type="button" class="tonal" aria-expanded="false" data-result="0">Show result</button></div>
+        <div class="result" hidden>Result: door closed for 2 minutes (pretend data).</div>
+      </li>
+      <li class="step" data-text="hall light sunset">
+        <span class="summary">Turn on the hall light at sunset</span>
+        <div><button type="button" class="tonal" aria-expanded="false" data-result="1">Show result</button></div>
+        <div class="result" hidden>Result: condition met at 17:42 (pretend data).</div>
+      </li>
+      <li class="step" data-text="kitchen temperature">
+        <span class="summary">Check the kitchen temperature</span>
+        <div><button type="button" class="tonal" aria-expanded="false" data-result="2">Show result</button></div>
+        <div class="result" hidden>Result: 21 degrees, condition not met (pretend data).</div>
+      </li>
+      <li class="step" data-text="washer message">
+        <span class="summary">Send a message when the washer ends</span>
+        <div><button type="button" class="tonal" aria-expanded="false" data-result="3">Show result</button></div>
+        <div class="result" hidden>Result: waiting for the washer (pretend data).</div>
+      </li>
+      <li class="step" data-text="blinds afternoon">
+        <span class="summary">Close the blinds in the afternoon</span>
+        <div><button type="button" class="tonal" aria-expanded="false" data-result="4">Show result</button></div>
+        <div class="result" hidden>Result: condition met at 15:05 (pretend data).</div>
+      </li>
+    </ul>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var MODES = {
+    once: 'Mode: run once. The script stops after its first pass.',
+    repeat: 'Mode: repeat. The script starts again each time its condition is met.'
+  };
+  var modeButtons = document.querySelectorAll('[data-mode]');
+  var modeText = document.getElementById('mode-text');
+  var search = document.getElementById('search');
+  var count = document.getElementById('count');
+  var steps = Array.prototype.slice.call(document.querySelectorAll('#steps .step'));
+  var resultButtons = document.querySelectorAll('[data-result]');
+
+  function setMode(mode) {
+    modeButtons.forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b.getAttribute('data-mode') === mode));
+    });
+    modeText.textContent = MODES[mode];
+  }
+
+  function applyFilter() {
+    var q = search.value.trim().toLowerCase();
+    var shown = 0;
+    steps.forEach(function (li) {
+      var match = q === '' || li.getAttribute('data-text').indexOf(q) !== -1 ||
+        li.querySelector('.summary').textContent.toLowerCase().indexOf(q) !== -1;
+      li.hidden = !match;
+      if (match) { shown++; }
+    });
+    count.textContent = shown + (shown === 1 ? ' step shown.' : ' steps shown.');
+  }
+
+  modeButtons.forEach(function (b) {
+    b.addEventListener('click', function () { setMode(b.getAttribute('data-mode')); });
+  });
+
+  search.addEventListener('input', applyFilter);
+
+  resultButtons.forEach(function (b) {
+    b.addEventListener('click', function () {
+      var li = b.closest('.step');
+      var box = li.querySelector('.result');
+      var open = box.hidden;          // currently hidden, so open it
+      box.hidden = !open;
+      b.setAttribute('aria-expanded', String(open));
+      b.textContent = open ? 'Hide result' : 'Show result';
+    });
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    setMode('once');
+    search.value = '';
+    applyFilter();
+    steps.forEach(function (li) {
+      li.querySelector('.result').hidden = true;
+      var b = li.querySelector('[data-result]');
+      b.setAttribute('aria-expanded', 'false');
+      b.textContent = 'Show result';
+    });
+  });
+
+  setMode('once');
+  applyFilter();
+})();
+</script>
+</body>
+</html>

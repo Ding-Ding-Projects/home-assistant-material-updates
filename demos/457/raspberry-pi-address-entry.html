@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Raspberry Pi backup addresses can be entered and retried</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="raspberry-pi-address-entry">
+  <h1>Raspberry Pi backup addresses can be entered and retried</h1>
+  <p class="muted">Type one private IPv4 address at a time, remove any you do not want, then retry the waiting device job.</p>
+
+  <section class="card stack" aria-labelledby="add-heading">
+    <h2 id="add-heading">Add an address</h2>
+    <form id="add-form" class="stack" novalidate>
+      <label class="field" for="addr">Private IPv4 address (one address, four numbers with dots between them)</label>
+      <input type="text" id="addr" inputmode="decimal" autocomplete="off">
+      <button type="button" class="tonal" data-pretend-address>Use a pretend address</button>
+      <div class="row">
+        <button type="submit" class="filled">Add address</button>
+      </div>
+    </form>
+    <div id="message" aria-live="polite" class="stack"></div>
+  </section>
+
+  <section class="card stack" aria-labelledby="list-heading">
+    <h2 id="list-heading">Addresses to contact</h2>
+    <p id="count" class="small muted" aria-live="polite"></p>
+    <ul id="addresses" class="list"></ul>
+  </section>
+
+  <section class="card stack" aria-labelledby="job-heading">
+    <h2 id="job-heading">Waiting device job (pretend)</h2>
+    <p id="job" class="note">Waiting for a Raspberry Pi to answer.</p>
+    <div class="row">
+      <button type="button" id="retry" class="tonal" disabled>Retry with the same request</button>
+    </div>
+  </section>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var LIMIT = 16;
+  var addresses = [];
+  var form = document.getElementById('add-form');
+  var input = document.getElementById('addr');
+  var message = document.getElementById('message');
+  var list = document.getElementById('addresses');
+  var count = document.getElementById('count');
+  var retry = document.getElementById('retry');
+  var job = document.getElementById('job');
+
+  function isPrivateIPv4(text) {
+    var m = /^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/.exec(text);
+    if (!m) return { ok: false, reason: 'Enter a plain IPv4 address with four numbers and dots, like the one your router gives a device.' };
+    var o = [parseInt(m[1], 10), parseInt(m[2], 10), parseInt(m[3], 10), parseInt(m[4], 10)];
+    for (var i = 0; i < 4; i++) {
+      if (o[i] > 255) return { ok: false, reason: 'Each number in an address must be 255 or lower.' };
+    }
+    var priv = o[0] === 10 || (o[0] === 172 && o[1] >= 16 && o[1] <= 31) || (o[0] === 192 && o[1] === 168);
+    if (!priv) return { ok: false, reason: 'Only private addresses are accepted. This one is public or not private.' };
+    return { ok: true };
+  }
+
+  function say(text, cls) {
+    message.textContent = '';
+    var n = document.createElement('div');
+    n.className = 'note' + (cls ? ' ' + cls : '');
+    n.textContent = text;
+    message.appendChild(n);
+  }
+
+  function render() {
+    list.textContent = '';
+    addresses.forEach(function (addr, index) {
+      var li = document.createElement('li');
+      var span = document.createElement('span');
+      span.style.flex = '1';
+      span.textContent = addr;
+      var remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'tonal';
+      remove.textContent = 'Remove ' + addr;
+      remove.addEventListener('click', function () {
+        addresses.splice(index, 1);
+        say('Removed ' + addr + '.', 'good');
+        render();
+      });
+      li.appendChild(span);
+      li.appendChild(remove);
+      list.appendChild(li);
+    });
+    count.textContent = addresses.length + ' of ' + LIMIT + ' addresses added.';
+    retry.disabled = addresses.length === 0;
+  }
+
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+    var text = input.value.trim();
+    if (text.indexOf('/') !== -1 || text.indexOf('-') !== -1) {
+      say('Ranges are not accepted. Enter one address at a time.', 'error');
+      return;
+    }
+    if (addresses.length >= LIMIT) {
+      say('The limit of ' + LIMIT + ' addresses is reached. Remove one to add another.', 'error');
+      return;
+    }
+    var check = isPrivateIPv4(text);
+    if (!check.ok) {
+      say(check.reason, 'error');
+      return;
+    }
+    if (addresses.indexOf(text) !== -1) {
+      say('That address is already listed.', 'warn');
+      return;
+    }
+    addresses.push(text);
+    input.value = '';
+    say('Added ' + text + '. Form values stay in this window only.', 'good');
+    render();
+  });
+
+  retry.addEventListener('click', function () {
+    job.textContent = 'Retry sent to ' + addresses.length + ' address(es) with the same request and handle (pretend). Nothing was started again.';
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    addresses = [];
+    input.value = '';
+    message.textContent = '';
+    job.textContent = 'Waiting for a Raspberry Pi to answer.';
+    render();
+  });
+
+  render();
+})();
+document.querySelector('[data-pretend-address]').addEventListener('click',function(){var f=document.getElementById('addr');f.value=[10,0,0,20+Math.floor(document.querySelectorAll('li').length%200)].join('.');f.dispatchEvent(new Event('input',{bubbles:true}));f.focus();});
+</script>
+</body>
+</html>

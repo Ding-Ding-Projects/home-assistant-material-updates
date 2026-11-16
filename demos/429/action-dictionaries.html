@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Action dictionaries and uploads</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+  input[type="file"] { font: inherit; min-height: 56px; width: 100%; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--out); background: var(--sl0); color: var(--on); }
+  input[type="file"]::file-selector-button { font: inherit; min-height: 40px; margin-right: 12px; padding: 0 16px; border-radius: 20px; border: 0; background: var(--sc); color: var(--on-sc); cursor: pointer; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="action-dictionaries">
+  <h1>Action dictionaries and uploads</h1>
+  <p class="muted">Pick an action to see its dictionary, search the entries, choose a speech engine, and add dashboard resource files.</p>
+
+  <section class="card stack" aria-labelledby="dict-title">
+    <h2 id="dict-title" class="small">Action dictionary</h2>
+    <label class="field">
+      Action
+      <select id="action">
+        <option value="light">Pretend light action</option>
+        <option value="climate">Pretend climate action</option>
+        <option value="media">Pretend media action</option>
+      </select>
+    </label>
+    <label class="field">
+      Search the dictionary
+      <input type="search" id="search" placeholder="Type part of a key">
+    </label>
+    <ul class="list" id="entries" aria-label="Dictionary entries"></ul>
+  </section>
+
+  <section class="card stack" aria-labelledby="speech-title">
+    <h2 id="speech-title" class="small">Speech engine options</h2>
+    <label class="field">
+      Speech engine
+      <select id="engine">
+        <option value="alpha">Pretend engine A</option>
+        <option value="beta">Pretend engine B</option>
+      </select>
+    </label>
+    <ul class="list" id="options" aria-label="Options offered"></ul>
+  </section>
+
+  <section class="card stack" aria-labelledby="res-title">
+    <h2 id="res-title" class="small">Dashboard resources</h2>
+    <label class="field">
+      Add a resource file
+      <input type="file" id="file">
+    </label>
+    <div class="row">
+      <button type="button" class="tonal" id="pretend-file">Use a pretend file</button>
+    </div>
+    <ul class="list" id="resources" aria-label="Resources"></ul>
+  </section>
+
+  <p id="status" aria-live="polite" class="note">Ready.</p>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var DICT = {
+    light: [['entity', 'The light to act on'], ['level', 'How bright, from 0 to 100'], ['speed', 'How quickly it changes'], ['colour', 'The colour to show']],
+    climate: [['entity', 'The thermostat to act on'], ['target', 'The temperature to aim for'], ['mode', 'Heat, cool or auto'], ['hold', 'Keep the target until changed']],
+    media: [['entity', 'The speaker to act on'], ['volume', 'How loud, from 0 to 100'], ['source', 'Which music source to use']]
+  };
+  var OPTIONS = {
+    alpha: ['Common voice', 'Faster reply', 'Default pitch'],
+    beta: ['Common voice', 'Slower reply', 'Default pitch', 'Whisper']
+  };
+
+  var action = document.getElementById('action');
+  var search = document.getElementById('search');
+  var entries = document.getElementById('entries');
+  var engine = document.getElementById('engine');
+  var options = document.getElementById('options');
+  var file = document.getElementById('file');
+  var resources = document.getElementById('resources');
+  var status = document.getElementById('status');
+  var files = [];
+
+  function say(msg) { status.textContent = msg; }
+
+  function renderEntries() {
+    var q = search.value.trim().toLowerCase();
+    var rows = DICT[action.value].filter(function (e) {
+      return q === '' || e[0].indexOf(q) !== -1 || e[1].toLowerCase().indexOf(q) !== -1;
+    });
+    entries.innerHTML = '';
+    rows.forEach(function (e) {
+      var li = document.createElement('li');
+      li.innerHTML = '';
+      var k = document.createElement('span');
+      k.className = 'mono';
+      k.textContent = e[0];
+      var d = document.createElement('span');
+      d.className = 'muted small';
+      d.textContent = e[1];
+      li.appendChild(k);
+      li.appendChild(d);
+      entries.appendChild(li);
+    });
+    if (rows.length === 0) {
+      var none = document.createElement('li');
+      none.textContent = 'No entries match.';
+      entries.appendChild(none);
+    }
+    return rows.length;
+  }
+
+  function renderOptions() {
+    options.innerHTML = '';
+    OPTIONS[engine.value].forEach(function (o) {
+      var li = document.createElement('li');
+      li.textContent = o;
+      options.appendChild(li);
+    });
+  }
+
+  function renderResources() {
+    resources.innerHTML = '';
+    if (files.length === 0) {
+      var li = document.createElement('li');
+      li.textContent = 'No resource files yet.';
+      resources.appendChild(li);
+      return;
+    }
+    files.forEach(function (name, i) {
+      var li = document.createElement('li');
+      var s = document.createElement('span');
+      s.style.flex = '1';
+      s.textContent = name;
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'tonal';
+      b.textContent = 'Remove';
+      b.setAttribute('aria-label', 'Remove ' + name);
+      b.addEventListener('click', function () {
+        files.splice(i, 1);
+        renderResources();
+        say('Removed ' + name + '.');
+      });
+      li.appendChild(s);
+      li.appendChild(b);
+      resources.appendChild(li);
+    });
+  }
+
+  action.addEventListener('change', function () {
+    var n = renderEntries();
+    say(n + ' entries for this action.');
+  });
+  search.addEventListener('input', function () {
+    var n = renderEntries();
+    say(n + ' of ' + DICT[action.value].length + ' entries match.');
+  });
+  engine.addEventListener('change', function () {
+    renderOptions();
+    say('Options for ' + engine.options[engine.selectedIndex].text + ' are listed.');
+  });
+  function addResource(name) {
+    files.push(name);
+    renderResources();
+    say('Added ' + name + ' to the dashboard resources.');
+  }
+  file.addEventListener('change', function () {
+    if (file.files && file.files.length) {
+      var name = file.files[0].name;
+      file.value = '';
+      addResource(name);
+    }
+  });
+  var PRETEND = ['pretend-card.js', 'pretend-theme.css', 'pretend-chart.js'];
+  var pretendCount = 0;
+  document.getElementById('pretend-file').addEventListener('click', function () {
+    addResource(PRETEND[pretendCount % PRETEND.length]);
+    pretendCount += 1;
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    action.value = 'light';
+    search.value = '';
+    engine.value = 'alpha';
+    files = [];
+    pretendCount = 0;
+    file.value = '';
+    renderEntries();
+    renderOptions();
+    renderResources();
+    say('Ready.');
+  });
+
+  renderEntries();
+  renderOptions();
+  renderResources();
+})();
+</script>
+</body>
+</html>

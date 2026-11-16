@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: to-do item pickers</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+[hidden] { display: none !important; }
+.picker-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.picker-list button { justify-content: flex-start; width: 100%; }
+.picker-list button[aria-pressed="true"] { background: var(--pc); color: var(--on-pc); border-color: transparent; }
+.order li { justify-content: space-between; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="todo-item-and-selector-pickers">
+  <h1>Pick to-do items and see their names</h1>
+  <p class="muted">Open the to-do picker and choose a list, then close it and read the name shown. Rename the list: the name changes, the stored ID does not. Move entities up or down in the dashboard order.</p>
+
+  <section class="card stack" aria-labelledby="pick-h">
+    <h2 id="pick-h" class="small">Action: add to a to-do list</h2>
+    <div>
+      <button type="button" class="tonal" id="open-picker" aria-haspopup="listbox" aria-expanded="false" aria-controls="picker-list">Choose to-do item</button>
+      <div id="picker-list" class="picker-list" role="listbox" aria-label="To-do items" hidden></div>
+    </div>
+    <p id="picker-closed" class="note" aria-live="polite">No to-do item chosen yet.</p>
+    <p class="small muted">Stored ID: <span class="mono" id="stored-id">none</span></p>
+
+    <label class="field" for="rename">New name for the chosen list
+      <input type="text" id="rename" placeholder="for example Weekend groceries">
+    </label>
+    <div class="row"><button type="button" class="tonal" id="rename-btn">Rename the list</button></div>
+  </section>
+
+  <section class="card stack" aria-labelledby="order-h">
+    <h2 id="order-h" class="small">Dashboard entity order</h2>
+    <ol class="list order" id="order"></ol>
+    <p class="small muted" id="status" aria-live="polite">Use Move up and Move down to change the order.</p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var INITIAL_ITEMS = [
+    { id: 'todo.groceries', name: 'Groceries' },
+    { id: 'todo.hardware', name: 'Hardware store' },
+    { id: 'todo.packing', name: 'Packing list' }
+  ];
+  var INITIAL_ORDER = ['Kitchen lights', 'Hall lights', 'Front door'];
+
+  var items, order, chosen;
+  var open = document.getElementById('open-picker');
+  var list = document.getElementById('picker-list');
+  var closed = document.getElementById('picker-closed');
+  var storedId = document.getElementById('stored-id');
+  var rename = document.getElementById('rename');
+  var orderEl = document.getElementById('order');
+  var status = document.getElementById('status');
+
+  function copy(o) { return JSON.parse(JSON.stringify(o)); }
+
+  function setOpen(v) {
+    list.hidden = !v;
+    open.setAttribute('aria-expanded', String(v));
+    if (v) {
+      var first = list.querySelector('button');
+      if (first) { first.focus(); }
+    }
+  }
+
+  function renderPicker() {
+    list.innerHTML = '';
+    items.forEach(function (it) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.setAttribute('role', 'option');
+      b.setAttribute('aria-selected', String(chosen === it.id));
+      b.textContent = it.name;
+      b.addEventListener('click', function () {
+        chosen = it.id;
+        setOpen(false);
+        open.focus();
+        renderClosed();
+      });
+      list.appendChild(b);
+    });
+  }
+
+  function renderClosed() {
+    var it = items.filter(function (i) { return i.id === chosen; })[0];
+    if (!it) {
+      closed.textContent = 'No to-do item chosen yet.';
+      storedId.textContent = 'none';
+      return;
+    }
+    closed.textContent = 'Selected: ' + it.name + '.';
+    storedId.textContent = it.id;
+  }
+
+  function renderOrder() {
+    orderEl.innerHTML = '';
+    order.forEach(function (name, i) {
+      var li = document.createElement('li');
+      var span = document.createElement('span');
+      span.textContent = name;
+      var up = document.createElement('button');
+      up.type = 'button';
+      up.className = 'tonal';
+      up.textContent = 'Move up';
+      up.setAttribute('aria-label', 'Move ' + name + ' up');
+      up.disabled = i === 0;
+      up.addEventListener('click', function () { swap(i, i - 1); });
+      var down = document.createElement('button');
+      down.type = 'button';
+      down.className = 'tonal';
+      down.textContent = 'Move down';
+      down.setAttribute('aria-label', 'Move ' + name + ' down');
+      down.disabled = i === order.length - 1;
+      down.addEventListener('click', function () { swap(i, i + 1); });
+      li.appendChild(span);
+      var row = document.createElement('span');
+      row.className = 'row';
+      row.appendChild(up);
+      row.appendChild(down);
+      li.appendChild(row);
+      orderEl.appendChild(li);
+    });
+  }
+
+  function swap(a, b) {
+    var t = order[a]; order[a] = order[b]; order[b] = t;
+    renderOrder();
+    // Keep keyboard focus on the moved entity's button, then announce the new order.
+    var btns = orderEl.querySelectorAll('li')[b].querySelectorAll('button');
+    var target = (b < a) ? btns[0] : btns[1];
+    if (target.disabled) { target = (target === btns[0]) ? btns[1] : btns[0]; }
+    target.focus();
+    orderEl.setAttribute('data-order', order.join(', '));
+    status.textContent = 'Order: ' + order.join(', ') + '.';
+  }
+
+  open.addEventListener('click', function () {
+    var willOpen = list.hidden;
+    if (willOpen) { renderPicker(); }
+    setOpen(willOpen);
+  });
+
+  list.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { setOpen(false); open.focus(); }
+  });
+
+  document.getElementById('rename-btn').addEventListener('click', function () {
+    var name = rename.value.trim();
+    if (!chosen) { closed.textContent = 'Choose a to-do item first.'; return; }
+    if (name === '') { closed.textContent = 'Type a new name first.'; return; }
+    items = items.map(function (i) { return i.id === chosen ? { id: i.id, name: name } : i; });
+    renderClosed();
+    rename.value = '';
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    items = copy(INITIAL_ITEMS);
+    order = copy(INITIAL_ORDER);
+    chosen = null;
+    rename.value = '';
+    setOpen(false);
+    renderClosed();
+    renderOrder();
+  });
+
+  items = copy(INITIAL_ITEMS);
+  order = copy(INITIAL_ORDER);
+  chosen = null;
+  renderClosed();
+  renderOrder();
+})();
+</script>
+</body>
+</html>

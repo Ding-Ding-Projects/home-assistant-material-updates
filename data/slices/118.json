@@ -1,0 +1,21 @@
+{
+ "build": 118,
+ "core": "2026.11.1.118",
+ "supervisor": "2026.11.0.118",
+ "os": "18.5.118",
+ "tag": "v2026.11.1.118",
+ "source": "b1e08fd1c",
+ "date": "2026-11-11T11:54:48-05:00",
+ "previous_build": 117,
+ "changes": [
+  {
+   "sha": "b1e08fd1c",
+   "date": "2026-11-11T11:54:48-05:00",
+   "title": "Draw the Home Assistant pages from a running copy",
+   "areas": [
+    "design"
+   ],
+   "detail": "A new canvas, 22-live-app, with fifteen boards drawn by design/source/pages/live_boards.py from the frontend in this repository served against a running core: each board shows one page at 1440 pixels and on a 390 pixel phone, light and one dark. The boards for the pages fixed in the polish pass say what changed."
+  }
+ ]
+}

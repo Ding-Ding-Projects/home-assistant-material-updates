@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Command search demo</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+  .cmd-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .cmd-list li { min-height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px; border-radius: 12px; background: var(--sl2); border: 2px solid transparent; }
+  .cmd-list li[aria-selected="true"] { border-color: var(--p); }
+  .cmd-list li[hidden] { display: none; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="command-search">
+  <h1>Command search</h1>
+  <p class="muted">Type to filter. Use the arrow keys to move, Space to toggle, and Escape to close.</p>
+
+  <section class="card stack" aria-labelledby="h-search">
+    <h2 id="h-search" style="font-size:18px">Commands</h2>
+    <label class="field" for="q">Search commands
+      <input type="search" id="q" autocomplete="off">
+    </label>
+    <ul class="cmd-list" id="cmds" role="listbox" aria-label="Pretend commands">
+      <li role="option" aria-selected="false" data-name="open the pretend dashboard">Open the pretend dashboard <span class="badge" data-state>Off</span></li>
+      <li role="option" aria-selected="false" data-name="make a pretend backup">Make a pretend backup <span class="badge" data-state>Off</span></li>
+      <li role="option" aria-selected="false" data-name="show pretend notifications">Show pretend notifications <span class="badge" data-state>Off</span></li>
+      <li role="option" aria-selected="false" data-name="turn on the pretend example">Turn on the pretend example <span class="badge" data-state>Off</span></li>
+      <li role="option" aria-selected="false" data-name="open pretend support">Open pretend support <span class="badge" data-state>Off</span></li>
+      <li role="option" aria-selected="false" data-name="check pretend updates">Check pretend updates <span class="badge" data-state>Off</span></li>
+    </ul>
+    <p id="status" class="note" aria-live="polite"></p>
+  </section>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var q = document.getElementById('q');
+  var list = document.getElementById('cmds');
+  var status = document.getElementById('status');
+  var items = Array.prototype.slice.call(list.querySelectorAll('li'));
+  var index = 0;
+  var closed = false;
+
+  function visible() {
+    return items.filter(function (li) { return !li.hidden; });
+  }
+
+  function highlight() {
+    var v = visible();
+    items.forEach(function (li) { li.setAttribute('aria-selected', 'false'); });
+    if (v.length === 0) { return; }
+    if (index >= v.length) { index = 0; }
+    if (index < 0) { index = v.length - 1; }
+    v[index].setAttribute('aria-selected', 'true');
+    v[index].scrollIntoView({ block: 'nearest' });
+  }
+
+  function applyFilter() {
+    var words = q.value.trim().toLowerCase();
+    items.forEach(function (li) {
+      li.hidden = words !== '' && li.getAttribute('data-name').indexOf(words) === -1;
+    });
+    index = 0;
+    highlight();
+    var count = visible().length;
+    status.textContent = count + ' of ' + items.length + ' commands match.';
+  }
+
+  q.addEventListener('input', function () { closed = false; applyFilter(); });
+
+  q.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowDown') { e.preventDefault(); index += 1; highlight(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); index -= 1; highlight(); }
+    else if (e.key === ' ' || e.key === 'Spacebar') {
+      var v = visible();
+      if (v.length) {
+        e.preventDefault();
+        var badge = v[index].querySelector('[data-state]');
+        var on = badge.textContent !== 'On';
+        badge.textContent = on ? 'On' : 'Off';
+        badge.className = on ? 'badge primary' : 'badge';
+        status.textContent = v[index].getAttribute('data-name') + ' is now ' + (on ? 'On' : 'Off') + '.';
+      }
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      q.value = '';
+      closed = true;
+      applyFilter();
+      status.textContent = 'Search closed. All 6 commands are listed again.';
+    }
+  });
+
+  function reset() {
+    q.value = '';
+    items.forEach(function (li) {
+      li.hidden = false;
+      var b = li.querySelector('[data-state]');
+      b.textContent = 'Off';
+      b.className = 'badge';
+    });
+    index = 0;
+    closed = false;
+    highlight();
+    status.textContent = '6 of 6 commands match.';
+  }
+  document.querySelectorAll('[data-demo-reset]').forEach(function (b) { b.addEventListener('click', reset); });
+  reset();
+})();
+</script>
+</body>
+</html>

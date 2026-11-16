@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keep history per entity</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.demo label.row { display: flex; align-items: center; gap: 12px; min-height: 48px; cursor: pointer; }
+.demo input[type="checkbox"] { width: 24px; height: 24px; flex: none; accent-color: var(--p); }
+.demo ul { margin: 0; padding: 0; list-style: none; }
+.demo .sensor { display: flex; flex-direction: column; gap: 12px; padding: 12px 0; border-top: 1px solid var(--outv); }
+.demo .sensor:first-child { border-top: none; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="recorder-keep-history">
+  <h1>Keep history per entity</h1>
+  <p class="muted">Turn history off for one sensor, or set how long to wait between repeated values. Send values and watch the rows.</p>
+
+  <section class="card stack" aria-labelledby="clock-h">
+    <h2 id="clock-h">Pretend clock</h2>
+    <p id="clock">Time: 0 seconds</p>
+    <div class="row">
+      <button type="button" id="wait30" class="tonal">Wait 30 seconds</button>
+      <button type="button" id="wait60" class="tonal">Wait 60 seconds</button>
+    </div>
+  </section>
+
+  <section class="card stack" aria-labelledby="sens-h">
+    <h2 id="sens-h">Sensors</h2>
+    <ul id="sensors"></ul>
+  </section>
+
+  <section class="card stack" aria-labelledby="log-h">
+    <h2 id="log-h">What the recorder did</h2>
+    <p id="log" class="note" aria-live="polite">Nothing sent yet.</p>
+  </section>
+
+  <div class="row">
+    <button type="button" data-demo-reset class="tonal">Start again</button>
+  </div>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var now = 0;
+  var sensors = [];
+  var clock = document.getElementById('clock');
+  var box = document.getElementById('sensors');
+  var log = document.getElementById('log');
+
+  function fresh() {
+    return [
+      { name: 'Hall motion', values: ['clear', 'detected'], value: 'clear', keep: true, interval: 0, last: null, rows: 0 },
+      { name: 'Front door', values: ['closed', 'open'], value: 'closed', keep: true, interval: 60, last: null, rows: 0 },
+      { name: 'Living room temperature', values: ['21.5', '21.6', '21.7'], value: '21.5', keep: true, interval: 300, last: null, rows: 0 }
+    ];
+  }
+
+  function record(s) { s.rows += 1; s.last = now; }
+
+  function send(s, next, index) {
+    var changed = next !== s.value;
+    s.value = next;
+    if (!s.keep) {
+      log.textContent = s.name + ': history is off, so "' + next + '" was not recorded.';
+      draw();
+      return;
+    }
+    if (changed) {
+      record(s);
+      log.textContent = s.name + ': a new value "' + next + '" was recorded at once. Changes are never held back.';
+      draw();
+      return;
+    }
+    if (s.last !== null && now - s.last < s.interval) {
+      log.textContent = s.name + ': same value again, only ' + (now - s.last) + ' seconds after the last row. The minimum is ' + s.interval + ' seconds, so nothing was added.';
+      draw();
+      return;
+    }
+    record(s);
+    log.textContent = s.name + ': same value again, and the minimum time has passed, so one repeat row was added.';
+    draw();
+  }
+
+  function nextValue(s) {
+    var i = s.values.indexOf(s.value);
+    return s.values[(i + 1) % s.values.length];
+  }
+
+  function draw() {
+    box.textContent = '';
+    clock.textContent = 'Time: ' + now + ' seconds';
+    sensors.forEach(function (s, i) {
+      var li = document.createElement('li');
+      li.className = 'sensor';
+
+      var title = document.createElement('p');
+      title.textContent = s.name + ': now "' + s.value + '", ' + s.rows + ' rows';
+      li.appendChild(title);
+
+      var l = document.createElement('label');
+      l.className = 'row';
+      var sw = document.createElement('input');
+      sw.type = 'checkbox';
+      sw.checked = s.keep;
+      sw.addEventListener('change', function () {
+        s.keep = sw.checked;
+        log.textContent = s.name + ': keep history is ' + (s.keep ? 'on' : 'off') + '. Existing rows are kept.';
+        draw();
+      });
+      var lt = document.createElement('span');
+      lt.textContent = 'Keep history';
+      l.appendChild(sw);
+      l.appendChild(lt);
+      li.appendChild(l);
+
+      var sel = document.createElement('select');
+      sel.setAttribute('aria-label', 'Minimum time between repeated rows for ' + s.name);
+      [[0, 'No minimum'], [60, '60 seconds'], [300, '5 minutes']].forEach(function (pair) {
+        var o = document.createElement('option');
+        o.value = String(pair[0]);
+        o.textContent = pair[1];
+        sel.appendChild(o);
+      });
+      sel.value = String(s.interval);
+      sel.addEventListener('change', function () {
+        s.interval = Number(sel.value);
+        log.textContent = s.name + ': minimum time between repeats is now ' + s.interval + ' seconds.';
+        draw();
+      });
+      var lab = document.createElement('label');
+      lab.className = 'field';
+      lab.textContent = 'Minimum time between repeated values';
+      lab.appendChild(sel);
+      li.appendChild(lab);
+
+      var same = document.createElement('button');
+      same.type = 'button';
+      same.className = 'tonal';
+      same.textContent = 'Send same value';
+      same.addEventListener('click', function () { send(s, s.value, i); });
+      var diff = document.createElement('button');
+      diff.type = 'button';
+      diff.className = 'filled';
+      diff.textContent = 'Send a different value';
+      diff.addEventListener('click', function () { send(s, nextValue(s), i); });
+      var row = document.createElement('div');
+      row.className = 'row';
+      row.appendChild(same);
+      row.appendChild(diff);
+      li.appendChild(row);
+
+      box.appendChild(li);
+    });
+  }
+
+  document.getElementById('wait30').addEventListener('click', function () { now += 30; draw(); });
+  document.getElementById('wait60').addEventListener('click', function () { now += 60; draw(); });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    now = 0;
+    sensors = fresh();
+    sensors.forEach(record);
+    log.textContent = 'Nothing sent yet.';
+    draw();
+  });
+
+  now = 0;
+  sensors = fresh();
+  sensors.forEach(record);
+  draw();
+})();
+</script>
+</body>
+</html>

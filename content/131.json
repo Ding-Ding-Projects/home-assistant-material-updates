@@ -1,0 +1,41 @@
+{
+  "build": 131,
+  "headline": "New tab catalog sections use the full panel, and Search all tabs names sections by their first tabs",
+  "summary": "The New tab catalog shows its page list across the full width of the panel again, instead of squeezing it into one half. Search all tabs now names each settings section by its first tabs, so you see a name a person can read rather than the section's web address.",
+  "summary_yue": "「新分頁」目錄嘅頁面清單而家再闊晒成個面板，唔會擠喺一半。「搜尋所有分頁」入面，每個設定分區用頭幾個分頁嘅名嚟叫，唔再用網址，人睇得明得多。",
+  "highlights": [
+    {
+      "id": "new-tab-catalog-sections",
+      "title": "New tab catalog sections use the full panel",
+      "areas": ["interface"],
+      "what": "In the New tab catalog, each section is now a normal block, so its page list uses the full width of the panel. Before this change, the tab group styling from the tab strip was applied to the catalog sections as well. That squeezed each list into the right half of the panel and left the other half empty.",
+      "what_yue": "「新分頁」目錄入面，每一段而家都係普通方塊，所以頁面清單會闊晒成個面板。以前分頁列嘅分組樣式錯誤咁套咗落目錄嘅段落度，每個清單都擠喺右半邊，左邊空晒。",
+      "why": "The catalog looked lopsided, and half of its panel was wasted.",
+      "try": [
+        "Open the New tab catalog from the tab strip.",
+        "Type part of a page name into the search box and see the list narrow.",
+        "Open a page and see it appear in the open tabs list.",
+        "Press Start again to clear the search and the open list."
+      ],
+      "sha": ["e163a99be"],
+      "demo": "demos/131/new-tab-catalog-sections.html"
+    },
+    {
+      "id": "search-all-tabs-section-names",
+      "title": "Search all tabs names settings sections by their first tabs",
+      "areas": ["interface"],
+      "what": "In Search all tabs, a settings section is now named by its first tabs, for example Profile and Appearance, instead of by its web address. An address suits a computer, and a list of names suits a person.",
+      "what_yue": "「搜尋所有分頁」入面，設定分區而家用頭幾個分頁嘅名嚟叫，例如「個人檔案、外觀」，唔再用網址。網址畀電腦睇就啱，畀人睇就差啲。",
+      "why": "A section named by its address was hard for a person to recognise at a glance.",
+      "try": [
+        "Type a word such as Profile into the search box.",
+        "See the section listed under the names of its first tabs.",
+        "Turn on the switch to show the old address style for comparison.",
+        "Press Start again to turn the comparison off."
+      ],
+      "sha": ["17efc3cb3"],
+      "demo": "demos/131/search-all-tabs-section-names.html"
+    }
+  ],
+  "other": []
+}

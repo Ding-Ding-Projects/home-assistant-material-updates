@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: dashboard draft recovery</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+[hidden] { display: none !important; }
+.card-edit { display: flex; flex-direction: column; gap: 8px; }
+.card-edit h2 { font-size: 16px; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="dashboard-draft-recovery">
+  <h1>Dashboard saves are guarded and card drafts can be recovered</h1>
+  <p class="muted">Edit a card title, save a draft, discard your edits and recover the draft. Then let another editor save and try to save your older copy.</p>
+
+  <section class="card stack" aria-labelledby="dash-h">
+    <h2 id="dash-h" class="small">Dashboard: Kitchen and hall</h2>
+    <p id="revision" class="small muted" aria-live="polite"></p>
+
+    <div class="card-edit card tonal small-r">
+      <h2>Card 1</h2>
+      <label class="field" for="c1">Card title
+        <input type="text" id="c1">
+      </label>
+    </div>
+
+    <div class="card-edit card tonal small-r">
+      <h2>Card 2</h2>
+      <label class="field" for="c2">Card title
+        <input type="text" id="c2">
+      </label>
+    </div>
+
+    <div class="row">
+      <button type="button" class="tonal" id="save-draft">Save draft</button>
+      <button type="button" class="tonal" id="discard">Discard changes</button>
+      <button type="button" class="tonal" id="recover">Recover draft</button>
+    </div>
+
+    <div class="row">
+      <button type="button" class="filled" id="save-dash">Save dashboard</button>
+      <button type="button" class="tonal" id="other">Another editor saves</button>
+      <button type="button" class="tonal" id="reload">Reload the newest copy</button>
+    </div>
+
+    <p id="status" class="note" aria-live="polite">Editing revision 4. Nothing has changed yet.</p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var INITIAL = { revision: 4, cards: ['Kitchen lights', 'Hall lights'] };
+
+  var server;      // the dashboard as saved
+  var opened;     // the revision this editor opened
+  var drafts;     // drafts kept per card index
+  var c1 = document.getElementById('c1');
+  var c2 = document.getElementById('c2');
+  var inputs = [c1, c2];
+  var revisionLine = document.getElementById('revision');
+  var status = document.getElementById('status');
+
+  function copy(o) { return JSON.parse(JSON.stringify(o)); }
+
+  function fillInputs(cards) {
+    c1.value = cards[0];
+    c2.value = cards[1];
+  }
+
+  function showRevision() {
+    revisionLine.textContent = 'Saved revision: ' + server.revision + '. This editor opened revision: ' + opened + '.';
+  }
+
+  function say(text) { status.textContent = text; }
+
+  document.getElementById('save-draft').addEventListener('click', function () {
+    drafts = inputs.map(function (el) { return el.value; });
+    say('Draft saved for both cards. The draft is kept even if you discard your edits.');
+  });
+
+  document.getElementById('discard').addEventListener('click', function () {
+    fillInputs(server.cards);
+    say('Edits discarded. The fields show the saved titles again.');
+  });
+
+  document.getElementById('recover').addEventListener('click', function () {
+    if (!drafts) { say('There is no draft to recover.'); return; }
+    inputs[0].value = drafts[0];
+    inputs[1].value = drafts[1];
+    say('Draft recovered into both fields.');
+  });
+
+  document.getElementById('save-dash').addEventListener('click', function () {
+    if (opened !== server.revision) {
+      say('Not saved. Another editor saved revision ' + server.revision + ' after you opened revision ' + opened + '. Press Reload to see the newest copy. Your draft is still kept.');
+      return;
+    }
+    server.cards = [c1.value.trim() || server.cards[0], c2.value.trim() || server.cards[1]];
+    server.revision += 1;
+    opened = server.revision;
+    drafts = undefined;
+    showRevision();
+    say('Saved as revision ' + server.revision + '.');
+  });
+
+  document.getElementById('other').addEventListener('click', function () {
+    server.cards = [server.cards[0] + ' (saved elsewhere)', server.cards[1]];
+    server.revision += 1;
+    showRevision();
+    say('Another editor saved revision ' + server.revision + '. Your editor still shows revision ' + opened + '.');
+  });
+
+  document.getElementById('reload').addEventListener('click', function () {
+    opened = server.revision;
+    fillInputs(server.cards);
+    showRevision();
+    say('Loaded the newest copy, revision ' + server.revision + '. Your draft can still be recovered.');
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    server = copy(INITIAL);
+    opened = server.revision;
+    drafts = undefined;
+    fillInputs(server.cards);
+    showRevision();
+    say('Editing revision 4. Nothing has changed yet.');
+  });
+
+  server = copy(INITIAL);
+  opened = server.revision;
+  fillInputs(server.cards);
+  showRevision();
+})();
+</script>
+</body>
+</html>

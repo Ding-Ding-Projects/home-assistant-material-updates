@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Full hosting mode demo</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+  .outer { border: 2px solid var(--p); border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; min-height: 56px; padding: 8px 12px; border-radius: 12px; background: var(--sl2); }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="full-hosting-mode">
+  <h1>Full hosting mode</h1>
+  <p class="muted">One outer container holds the Supervisor, the core and the apps. Stop it and every part inside stops too.</p>
+
+  <section class="outer card" aria-labelledby="h-outer">
+    <div class="row" style="justify-content: space-between">
+      <h2 id="h-outer" style="font-size:18px">Outer container (its own Docker engine)</h2>
+      <span class="badge" id="outer-badge">Running</span>
+    </div>
+    <div class="inner"><span>Supervisor</span><span class="badge" id="sup-badge">Running</span></div>
+    <div class="inner"><span id="core-name">Core, version 1</span><span class="badge" id="core-badge">Running</span></div>
+    <div class="inner"><span>Pretend app</span><span class="badge" id="app-badge">Running</span></div>
+  </section>
+
+  <div class="row">
+    <button type="button" class="filled" id="start">Start outer container</button>
+    <button type="button" class="tonal" id="stop">Stop outer container</button>
+    <button type="button" class="tonal" id="restart-app">Restart pretend app</button>
+    <button type="button" class="tonal" id="core-update">Core update</button>
+  </div>
+
+  <p id="result" class="note" aria-live="polite"></p>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var outer, appRunning, coreVersion;
+  var el = function (id) { return document.getElementById(id); };
+  var result = el('result');
+
+  function badge(node, on) {
+    node.textContent = on ? 'Running' : 'Stopped';
+    node.className = on ? 'badge good' : 'badge error';
+  }
+
+  function render() {
+    badge(el('outer-badge'), outer);
+    badge(el('sup-badge'), outer);
+    badge(el('core-badge'), outer);
+    badge(el('app-badge'), outer && appRunning);
+    el('core-name').textContent = 'Core, version ' + coreVersion;
+    el('start').disabled = outer;
+    el('stop').disabled = !outer;
+    el('restart-app').disabled = !outer;
+    el('core-update').disabled = !outer;
+  }
+
+  el('start').addEventListener('click', function () {
+    outer = true; appRunning = true; render();
+    result.textContent = 'Started. The Supervisor, the core and the pretend app are running inside the outer container.';
+  });
+  el('stop').addEventListener('click', function () {
+    outer = false; render();
+    result.textContent = 'Stopped the outer container. Every part inside it has stopped too.';
+  });
+  el('restart-app').addEventListener('click', function () {
+    appRunning = true; render();
+    result.textContent = 'The pretend app restarted inside the outer container. The core did not restart.';
+  });
+  el('core-update').addEventListener('click', function () {
+    coreVersion += 1; render();
+    result.textContent = 'Pretend core updated to version ' + coreVersion + ' inside the outer container.';
+  });
+
+  function reset() {
+    outer = true; appRunning = true; coreVersion = 1;
+    render();
+    result.textContent = 'Back to the first state: everything is running.';
+  }
+  document.querySelectorAll('[data-demo-reset]').forEach(function (b) { b.addEventListener('click', reset); });
+  reset();
+})();
+</script>
+</body>
+</html>

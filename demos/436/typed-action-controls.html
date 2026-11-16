@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: typed action controls</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+[hidden] { display: none !important; }
+.check { display: flex; align-items: center; gap: 12px; min-height: 48px; }
+.check input { width: 24px; height: 24px; flex: none; }
+.err { color: var(--err); font-size: 14px; }
+input[type="date"] { font: inherit; min-height: 56px; width: 100%; padding: 0 16px; border-radius: 12px; border: 1px solid var(--out); background: var(--sl0); color: var(--on); }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="typed-action-controls">
+  <h1>Number, date and receiver cursor controls in the action editor</h1>
+  <p class="muted">Tick Number entities to see their shared range, enter a value, then pick a date and a receiver cursor command.</p>
+
+  <section class="card stack" aria-labelledby="num-h">
+    <h2 id="num-h" class="small">Number entities (pretend)</h2>
+    <div class="stack" role="group" aria-labelledby="num-h">
+      <label class="check"><input type="checkbox" data-min="0" data-max="100" checked> Living room volume (0 to 100)</label>
+      <label class="check"><input type="checkbox" data-min="0" data-max="60" checked> Bedroom volume (0 to 60)</label>
+      <label class="check"><input type="checkbox" data-min="5" data-max="90"> Kitchen timer (5 to 90)</label>
+    </div>
+    <p id="range" class="note" aria-live="polite"></p>
+
+    <label class="field" for="value">Value for the action
+      <input type="number" id="value" value="40">
+    </label>
+    <p id="value-msg" class="small" aria-live="polite"></p>
+  </section>
+
+  <section class="card stack" aria-labelledby="date-h">
+    <h2 id="date-h" class="small">Date</h2>
+    <label class="field" for="date">Date for the action
+      <input type="date" id="date" value="2026-11-13">
+    </label>
+    <p id="date-out" class="small muted" aria-live="polite"></p>
+  </section>
+
+  <section class="card stack" aria-labelledby="cursor-h">
+    <h2 id="cursor-h" class="small">Receiver cursor command</h2>
+    <label class="field" for="cursor">Command (pretend list, validated)
+      <select id="cursor">
+        <option value="up">Up</option>
+        <option value="down">Down</option>
+        <option value="left">Left</option>
+        <option value="right">Right</option>
+        <option value="select">Select</option>
+      </select>
+    </label>
+    <p id="cursor-out" class="small muted" aria-live="polite"></p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('input[data-min]'));
+  var range = document.getElementById('range');
+  var value = document.getElementById('value');
+  var valueMsg = document.getElementById('value-msg');
+  var date = document.getElementById('date');
+  var dateOut = document.getElementById('date-out');
+  var cursor = document.getElementById('cursor');
+  var cursorOut = document.getElementById('cursor-out');
+
+  function shared() {
+    var picked = boxes.filter(function (b) { return b.checked; });
+    if (picked.length === 0) { return null; }
+    var lo = -Infinity, hi = Infinity;
+    picked.forEach(function (b) {
+      lo = Math.max(lo, Number(b.getAttribute('data-min')));
+      hi = Math.min(hi, Number(b.getAttribute('data-max')));
+    });
+    return { lo: lo, hi: hi, count: picked.length };
+  }
+
+  function checkValue() {
+    var r = shared();
+    if (!r) {
+      range.textContent = 'Select at least one Number entity to see the range.';
+      value.removeAttribute('aria-invalid');
+      valueMsg.textContent = '';
+      return;
+    }
+    if (r.lo > r.hi) {
+      range.textContent = 'The selected entities share no range. Untick one of them.';
+      value.removeAttribute('aria-invalid');
+      valueMsg.className = 'small';
+      valueMsg.textContent = '';
+      return;
+    }
+    range.textContent = 'Shared range for ' + r.count + (r.count === 1 ? ' entity' : ' entities') + ': ' + r.lo + ' to ' + r.hi + '.';
+    var v = Number(value.value);
+    if (value.value === '' || v < r.lo || v > r.hi) {
+      value.setAttribute('aria-invalid', 'true');
+      valueMsg.className = 'err';
+      valueMsg.textContent = 'Outside the shared range. Enter a value from ' + r.lo + ' to ' + r.hi + '.';
+    } else {
+      value.removeAttribute('aria-invalid');
+      valueMsg.className = 'small';
+      valueMsg.textContent = 'The action will store ' + v + '.';
+    }
+  }
+
+  function showDate() {
+    dateOut.textContent = date.value
+      ? 'The action will use the date ' + date.value + ', chosen in the native picker.'
+      : 'Choose a date.';
+  }
+
+  function showCursor() {
+    cursorOut.textContent = 'The action will send the ' + cursor.options[cursor.selectedIndex].text + ' command.';
+  }
+
+  boxes.forEach(function (b) { b.addEventListener('change', checkValue); });
+  value.addEventListener('input', checkValue);
+  date.addEventListener('input', showDate);
+  cursor.addEventListener('change', showCursor);
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    boxes.forEach(function (b, i) { b.checked = i < 2; });
+    value.value = '40';
+    date.value = '2026-11-13';
+    cursor.selectedIndex = 0;
+    checkValue();
+    showDate();
+    showCursor();
+  });
+
+  checkValue();
+  showDate();
+  showCursor();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: phone and storage fixes</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+[hidden] { display: none !important; }
+.phone { width: 100%; max-width: 320px; margin: 0 auto; border: 2px solid var(--out); border-radius: 24px; background: var(--sl1); overflow: hidden; display: flex; flex-direction: column; position: relative; }
+.phone .stage { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.phone .tool { background: var(--sl0); border-radius: 12px; padding: 12px; font-size: 14px; }
+.phone .bottom { height: 48px; background: var(--sc); color: var(--on-sc); display: flex; align-items: center; justify-content: space-between; padding: 0 12px; font-size: 13px; flex: none; }
+.phone .clock { font-size: 13px; font-weight: 500; }
+.phone[data-mode="before"] .stage { height: 220px; overflow: hidden; }
+.phone[data-mode="before"] .clock { position: absolute; right: 8px; bottom: 52px; background: var(--sl0); padding: 2px 6px; border-radius: 8px; }
+.phone[data-mode="after"] .clock-row { display: flex; justify-content: flex-end; padding: 4px 12px; background: var(--sl1); }
+.phone[data-mode="before"] .clock-row { display: none; }
+.phone[data-mode="after"] .clock { position: static; }
+.label-plain { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="phone-and-storage-fixes">
+  <h1>Phone layout, session clock, storage counts and switch label are fixed</h1>
+  <p class="muted">Choose Before (build 437) or After (build 439). Look at the phone frame, type a storage count, then click the words of the switch label.</p>
+
+  <section class="card stack">
+    <div class="row" role="group" aria-label="Show build">
+      <button type="button" class="chip" data-show="before" aria-pressed="true">Before (build 437)</button>
+      <button type="button" class="chip" data-show="after" aria-pressed="false">After (build 439)</button>
+    </div>
+
+    <div class="phone" id="phone" data-mode="before" aria-label="Phone preview of the automation tools sheet and the bottom bar">
+      <div class="stage" id="stage">
+        <div class="tool">Lights and scenes</div>
+        <div class="tool">Shopping list checkout</div>
+        <div class="tool">Blinds at sunset</div>
+        <div class="tool">Washer finished message</div>
+        <div class="tool">Door sensor follow-up</div>
+        <div class="tool">Weekly heating review</div>
+      </div>
+      <div class="clock-row"><span class="clock" id="clock">19:49</span></div>
+      <div class="bottom"><span>Tools</span><span>Settings</span></div>
+    </div>
+    <p class="small muted" id="phone-note" aria-live="polite">Before: the tools sheet is cut off above the bottom bar, and the clock sits over the bar.</p>
+  </section>
+
+  <section class="card stack" aria-labelledby="storage-h">
+    <h2 id="storage-h" class="small">Storage: count of rows</h2>
+    <label class="field" for="rows">Rows counted for this entity (leave empty if unknown)
+      <input type="text" id="rows" inputmode="numeric" placeholder="for example 128">
+    </label>
+    <p id="rows-out" class="note" aria-live="polite">Rows: unknown.</p>
+  </section>
+
+  <section class="card stack" aria-labelledby="switch-h">
+    <h2 id="switch-h" class="small">Switch label</h2>
+    <div class="label-plain">
+      <label for="coe" id="coe-label">Continue on error for all actions</label>
+      <input type="checkbox" class="switch" id="coe" aria-describedby="coe-out">
+    </div>
+    <p id="coe-out" class="small muted" aria-live="polite">Continue on error is off.</p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var phone = document.getElementById('phone');
+  var note = document.getElementById('phone-note');
+  var chips = document.querySelectorAll('[data-show]');
+  var rows = document.getElementById('rows');
+  var rowsOut = document.getElementById('rows-out');
+  var coe = document.getElementById('coe');
+  var coeLabel = document.getElementById('coe-label');
+  var coeOut = document.getElementById('coe-out');
+  var mode = 'before';
+
+  function setMode(m) {
+    mode = m;
+    phone.setAttribute('data-mode', m);
+    chips.forEach(function (c) {
+      c.setAttribute('aria-pressed', String(c.getAttribute('data-show') === m));
+    });
+    note.textContent = m === 'before'
+      ? 'Before: the tools sheet is cut off above the bottom bar, and the clock sits over the bar.'
+      : 'After: the tools sheet reaches the bottom, and the clock has its own row above the bar.';
+    renderRows();
+  }
+
+  function renderRows() {
+    var v = rows.value.trim();
+    if (v === '') {
+      rowsOut.textContent = mode === 'before' ? 'Rows: NaN rows (build 437 showed this).' : 'Rows: Unknown.';
+      return;
+    }
+    rowsOut.textContent = 'Rows: ' + v + '.';
+  }
+
+  // In build 437 the label did nothing when clicked. In build 439 it toggles the switch.
+  function labelClick(e) {
+    if (mode === 'before') { e.preventDefault(); coeOut.textContent = 'Before: the label did not respond. Use the switch itself.'; return; }
+    // After: the native label click toggles the switch; the change listener reports the state.
+  }
+
+  coeLabel.addEventListener('click', labelClick);
+
+  coe.addEventListener('change', function () {
+    coeOut.textContent = 'Continue on error is ' + (coe.checked ? 'on' : 'off') + '.';
+  });
+
+  chips.forEach(function (c) {
+    c.addEventListener('click', function () { setMode(c.getAttribute('data-show')); });
+  });
+
+  rows.addEventListener('input', renderRows);
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    rows.value = '';
+    coe.checked = false;
+    coeOut.textContent = 'Continue on error is off.';
+    setMode('before');
+  });
+
+  setMode('before');
+})();
+</script>
+</body>
+</html>

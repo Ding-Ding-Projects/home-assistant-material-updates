@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Touch target size demo</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+  .target { display: flex; align-items: center; width: 100%; height: var(--h, 44px); }
+  .target input[type="range"] { width: 100%; height: 100%; margin: 0; }
+  .target input[type="text"] { height: var(--h, 44px); min-height: var(--h, 44px); }
+  .touch-demo.before { --h: 32px; }
+  .touch-demo.before .chip { min-height: 32px; height: 32px; padding: 0 10px; }
+  .touch-demo.after { --h: 44px; }
+  .touch-demo.after .chip { min-height: 44px; height: 44px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chips .target { width: auto; height: auto; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="touch-targets">
+  <h1>Touch target size</h1>
+  <p class="muted">Compare the old 32 px sizes with the new 44 px sizes. The measured heights update when you switch.</p>
+
+  <div class="row">
+    <button type="button" id="before" aria-pressed="true" class="tonal">Before</button>
+    <button type="button" id="after" aria-pressed="false" class="tonal">After</button>
+  </div>
+
+  <section class="card stack touch-demo before" id="frame" aria-labelledby="h-controls">
+    <h2 id="h-controls" style="font-size:18px">Controls</h2>
+    <p class="note" id="mode-note"></p>
+
+    <div class="stack">
+      <label for="slider" class="field">Slider</label>
+      <div class="target" id="slider-box"><input type="range" id="slider" min="0" max="100" value="40"></div>
+      <p class="small">Slider value: <output id="slider-out" for="slider">40</output></p>
+    </div>
+
+    <div class="stack">
+      <label for="compact" class="field">Compact text field</label>
+      <div class="target" id="field-box"><input type="text" id="compact" value="Pretend text"></div>
+    </div>
+
+    <div class="stack">
+      <span class="field" id="chips-label">Filter chips beside a table search</span>
+      <div class="chips" role="group" aria-labelledby="chips-label">
+        <span class="target" id="chip-box"><button type="button" class="chip" aria-pressed="false">Pretend filter A</button></span>
+        <span class="target"><button type="button" class="chip" aria-pressed="false">Pretend filter B</button></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="card stack" aria-labelledby="h-measure">
+    <h2 id="h-measure" style="font-size:18px">Measured heights</h2>
+    <ul class="list" id="measure" aria-live="polite"></ul>
+  </section>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var frame = document.getElementById('frame');
+  var before = document.getElementById('before');
+  var after = document.getElementById('after');
+  var slider = document.getElementById('slider');
+  var sliderOut = document.getElementById('slider-out');
+  var measure = document.getElementById('measure');
+
+  function setMode(mode) {
+    frame.className = 'card stack touch-demo ' + mode;
+    before.setAttribute('aria-pressed', mode === 'before' ? 'true' : 'false');
+    after.setAttribute('aria-pressed', mode === 'after' ? 'true' : 'false');
+    before.className = mode === 'before' ? 'filled' : 'tonal';
+    after.className = mode === 'after' ? 'filled' : 'tonal';
+    document.getElementById('mode-note').textContent = mode === 'before'
+      ? 'Before view: the controls below are shown at the old 32 px size on purpose, so you can compare. They are the example, not the finished design.'
+      : 'After view: the controls below are at the new 44 px size.';
+    measureAll();
+  }
+
+  function heightOf(el) { return Math.round(el.getBoundingClientRect().height); }
+
+  function measureAll() {
+    var rows = [
+      ['Slider', document.getElementById('slider-box')],
+      ['Compact text field', document.getElementById('field-box')],
+      ['Filter chip', document.getElementById('chip-box')]
+    ];
+    measure.innerHTML = '';
+    rows.forEach(function (r) {
+      var li = document.createElement('li');
+      li.textContent = r[0] + ': ' + heightOf(r[1]) + ' px tall';
+      measure.appendChild(li);
+    });
+  }
+
+  before.addEventListener('click', function () { setMode('before'); });
+  after.addEventListener('click', function () { setMode('after'); });
+  slider.addEventListener('input', function () { sliderOut.textContent = slider.value; });
+  document.querySelectorAll('.chip').forEach(function (c) {
+    c.addEventListener('click', function () {
+      c.setAttribute('aria-pressed', c.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+      c.className = c.getAttribute('aria-pressed') === 'true' ? 'chip' : 'chip';
+      measure.setAttribute('data-last', c.textContent);
+    });
+  });
+  window.addEventListener('resize', measureAll);
+
+  function reset() {
+    slider.value = '40';
+    sliderOut.textContent = '40';
+    document.getElementById('compact').value = 'Pretend text';
+    document.querySelectorAll('.chip').forEach(function (c) { c.setAttribute('aria-pressed', 'false'); });
+    setMode('before');
+  }
+  document.querySelectorAll('[data-demo-reset]').forEach(function (b) { b.addEventListener('click', reset); });
+  reset();
+})();
+</script>
+</body>
+</html>

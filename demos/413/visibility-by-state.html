@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Show views by entity state</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.demo label.row { display: flex; align-items: center; gap: 12px; min-height: 48px; cursor: pointer; }
+.demo input[type="checkbox"] { width: 24px; height: 24px; flex: none; accent-color: var(--p); }
+.demo ul { margin: 0; padding: 0; list-style: none; }
+.demo fieldset { border: 1px solid var(--outv); border-radius: 16px; padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; margin: 0; }
+.demo legend { padding: 0 4px; font-weight: 500; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="visibility-by-state">
+  <h1>Show views by entity state</h1>
+  <p class="muted">Turn the pretend states on or off, and change each view&apos;s rule. The navigation list changes as you go.</p>
+
+  <section class="card stack" aria-labelledby="st-h">
+    <h2 id="st-h">Pretend states</h2>
+    <label class="row" for="door">
+      <input type="checkbox" id="door">
+      <span>Front door is open</span>
+    </label>
+    <label class="row" for="away">
+      <input type="checkbox" id="away">
+      <span>Home mode is away</span>
+    </label>
+  </section>
+
+  <section class="card stack" aria-labelledby="rules-h">
+    <h2 id="rules-h">Rules for each view</h2>
+    <div id="views" class="stack"></div>
+  </section>
+
+  <section class="card stack" aria-labelledby="nav-h">
+    <h2 id="nav-h">Navigation now</h2>
+    <ul id="nav" class="list" aria-live="polite"></ul>
+    <p id="hidden" class="small muted"></p>
+  </section>
+
+  <div class="row">
+    <button type="button" data-demo-reset class="tonal">Start again</button>
+  </div>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var states = { door: false, away: false };
+  var defaults = [
+    { name: 'Security', group: 'or', use: { door: true, away: true } },
+    { name: 'Energy', group: 'and', use: { door: false, away: true } },
+    { name: 'Cameras', group: 'not', use: { door: true, away: false } }
+  ];
+  var views = [];
+  var viewBox = document.getElementById('views');
+  var nav = document.getElementById('nav');
+  var hidden = document.getElementById('hidden');
+  var doorBox = document.getElementById('door');
+  var awayBox = document.getElementById('away');
+  var groupNames = { and: 'All of the chosen conditions', or: 'Any of the chosen conditions', not: 'None of the chosen conditions' };
+
+  function visible(v) {
+    var conds = [];
+    if (v.use.door) conds.push(states.door);
+    if (v.use.away) conds.push(states.away);
+    if (!conds.length) return true;
+    if (v.group === 'and') return conds.every(Boolean);
+    if (v.group === 'or') return conds.some(Boolean);
+    return !conds.some(Boolean);
+  }
+
+  function checkbox(label, checked, onChange) {
+    var l = document.createElement('label');
+    l.className = 'row';
+    var c = document.createElement('input');
+    c.type = 'checkbox';
+    c.checked = checked;
+    c.addEventListener('change', function () { onChange(c.checked); redraw(); });
+    var s = document.createElement('span');
+    s.textContent = label;
+    l.appendChild(c);
+    l.appendChild(s);
+    return l;
+  }
+
+  function drawViews() {
+    viewBox.textContent = '';
+    views.forEach(function (v) {
+      var fs = document.createElement('fieldset');
+      var lg = document.createElement('legend');
+      lg.textContent = v.name;
+      fs.appendChild(lg);
+
+      var lab = document.createElement('label');
+      lab.className = 'field';
+      lab.textContent = 'Show when';
+      var sel = document.createElement('select');
+      [['and', 'All conditions match'], ['or', 'Any condition matches'], ['not', 'No condition matches']].forEach(function (pair) {
+        var o = document.createElement('option');
+        o.value = pair[0];
+        o.textContent = pair[1];
+        sel.appendChild(o);
+      });
+      sel.value = v.group;
+      sel.addEventListener('change', function () { v.group = sel.value; redraw(); });
+      lab.appendChild(sel);
+      fs.appendChild(lab);
+
+      fs.appendChild(checkbox('Use: front door is open', v.use.door, function (x) { v.use.door = x; }));
+      fs.appendChild(checkbox('Use: home mode is away', v.use.away, function (x) { v.use.away = x; }));
+      viewBox.appendChild(fs);
+    });
+  }
+
+  function redraw() {
+    nav.textContent = '';
+    var shown = [];
+    var hiddenNames = [];
+    var home = document.createElement('li');
+    home.className = 'note';
+    home.textContent = 'Home (always shown)';
+    nav.appendChild(home);
+    views.forEach(function (v) {
+      if (visible(v)) {
+        shown.push(v.name);
+        var li = document.createElement('li');
+        li.className = 'note';
+        li.textContent = v.name;
+        nav.appendChild(li);
+      } else {
+        hiddenNames.push(v.name);
+      }
+    });
+    hidden.textContent = hiddenNames.length ? 'Hidden now: ' + hiddenNames.join(', ') + '.' : 'Every view is shown now.';
+  }
+
+  doorBox.addEventListener('change', function () { states.door = doorBox.checked; redraw(); });
+  awayBox.addEventListener('change', function () { states.away = awayBox.checked; redraw(); });
+
+  function reset() {
+    states.door = false;
+    states.away = false;
+    doorBox.checked = false;
+    awayBox.checked = false;
+    views = defaults.map(function (v) {
+      return { name: v.name, group: v.group, use: { door: v.use.door, away: v.use.away } };
+    });
+    drawViews();
+    redraw();
+  }
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', reset);
+  reset();
+})();
+</script>
+</body>
+</html>

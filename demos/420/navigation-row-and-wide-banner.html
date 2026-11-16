@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Navigation row and wide banner</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.nav-pane { background: var(--sl1); border-radius: 16px; padding: 8px; display: flex; flex-direction: column; gap: 4px; }
+.nav-row { min-height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 12px; padding: 0 12px; background: var(--sl2); }
+[data-view="after"] .nav-row { justify-content: flex-start; }
+.page-card { background: var(--sl0); border-radius: 28px; padding: 12px; display: flex; flex-direction: column; gap: 12px; }
+.banner { background: var(--sc); color: var(--on-sc); padding: 16px; border-radius: 28px; }
+[data-view="before"] .banner { clip-path: inset(14px 0 0 0); margin-top: -14px; }
+[data-view="after"] .banner { margin: 12px; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="navigation-row-and-wide-banner">
+  <h1>Navigation row and welcome banner on a wide screen</h1>
+  <p class="muted">Press Before and After to compare the two layouts. The banner box shows or hides the welcome banner.</p>
+
+  <section class="card" aria-labelledby="layout-title">
+    <div class="stack">
+      <h2 id="layout-title">Wide screen preview</h2>
+      <div class="row" role="group" aria-label="Layout to show">
+        <button type="button" class="chip" id="show-before" aria-pressed="true">Before</button>
+        <button type="button" class="chip" id="show-after" aria-pressed="false">After</button>
+        <label class="row"><input class="switch" type="checkbox" id="show-banner" checked> <span>Show the banner</span></label>
+      </div>
+
+      <div class="grid" id="preview" data-view="before" style="grid-template-columns: minmax(140px, 200px) 1fr;">
+        <nav class="nav-pane" aria-label="Pretend navigation pane">
+          <div class="nav-row">Overview</div>
+          <div class="nav-row">Map</div>
+          <div class="nav-row">Notifications</div>
+        </nav>
+        <div class="page-card">
+          <div class="banner" id="banner">Welcome home (pretend banner)</div>
+          <p class="muted">Pretend page content</p>
+        </div>
+      </div>
+
+      <div class="row">
+        <button type="button" data-demo-reset>Start again</button>
+      </div>
+      <p class="note" id="result" aria-live="polite">Showing the layout before the fix. Notifications sits in the middle, and the top of the banner is cut off.</p>
+    </div>
+  </section>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var preview = document.getElementById('preview');
+  var before = document.getElementById('show-before');
+  var after = document.getElementById('show-after');
+  var showBanner = document.getElementById('show-banner');
+  var banner = document.getElementById('banner');
+  var result = document.getElementById('result');
+  var reset = document.querySelector('[data-demo-reset]');
+
+  function describe() {
+    var view = preview.getAttribute('data-view');
+    var text = view === 'before'
+      ? 'Showing the layout before the fix. Notifications sits in the middle, and the top of the banner is cut off.'
+      : 'Showing the layout after the fix. Notifications starts at the start edge, and the banner is a rounded card with space around it.';
+    if (!showBanner.checked) text += ' The banner is hidden.';
+    result.textContent = text;
+  }
+
+  function setView(view) {
+    preview.setAttribute('data-view', view);
+    before.setAttribute('aria-pressed', String(view === 'before'));
+    after.setAttribute('aria-pressed', String(view === 'after'));
+    describe();
+  }
+
+  before.addEventListener('click', function () { setView('before'); });
+  after.addEventListener('click', function () { setView('after'); });
+  showBanner.addEventListener('change', function () {
+    banner.hidden = !showBanner.checked;
+    describe();
+  });
+
+  reset.addEventListener('click', function () {
+    showBanner.checked = true;
+    banner.hidden = false;
+    setView('before');
+  });
+})();
+</script>
+</body>
+</html>

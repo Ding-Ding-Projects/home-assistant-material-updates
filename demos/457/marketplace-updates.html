@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marketplace updates install without the panel warning</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="marketplace-updates">
+  <h1>Marketplace updates install without the panel warning</h1>
+  <p class="muted">Update an item that is already installed, then try installing a new one with and without the warning accepted.</p>
+
+  <section class="card stack" aria-labelledby="warn-heading">
+    <h2 id="warn-heading">Marketplace warning</h2>
+    <label class="row">
+      <input type="checkbox" id="warn">
+      <span>I have read the Marketplace warning (needed only to add something new)</span>
+    </label>
+  </section>
+
+  <section class="card stack" aria-labelledby="items-heading">
+    <h2 id="items-heading">Pretend items</h2>
+    <ul id="items" class="list"></ul>
+  </section>
+
+  <p id="result" class="note" aria-live="polite">Nothing has been changed yet.</p>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var initial = [
+    { id: 'garden', name: 'Pretend Garden Lights', installed: true, version: '1.2.0', next: '1.3.0' },
+    { id: 'weather', name: 'Pretend Weather Card', installed: false, version: '2.0.1' },
+    { id: 'energy', name: 'Pretend Energy Graph', installed: false, version: '0.9.4' }
+  ];
+  var items = [];
+  var list = document.getElementById('items');
+  var warn = document.getElementById('warn');
+  var result = document.getElementById('result');
+
+  function setResult(text, cls) {
+    result.textContent = text;
+    result.className = 'note' + (cls ? ' ' + cls : '');
+  }
+
+  function render() {
+    list.textContent = '';
+    items.forEach(function (item) {
+      var li = document.createElement('li');
+      var text = document.createElement('div');
+      text.style.flex = '1';
+      var name = document.createElement('strong');
+      name.textContent = item.name;
+      var meta = document.createElement('div');
+      meta.className = 'small muted';
+      meta.textContent = item.installed ? 'Installed, version ' + item.version : 'Not installed, version ' + item.version;
+      text.appendChild(name);
+      text.appendChild(meta);
+      li.appendChild(text);
+
+      var badge = document.createElement('span');
+      badge.className = 'badge';
+      badge.textContent = item.installed ? (item.next ? 'Update ready' : 'Up to date') : 'New';
+      li.appendChild(badge);
+
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      if (item.installed) {
+        btn.className = item.next ? 'filled' : 'tonal';
+        btn.textContent = item.next ? 'Update to ' + item.next : 'Up to date';
+        btn.disabled = !item.next;
+        btn.addEventListener('click', function () {
+          item.version = item.next;
+          item.next = null;
+          setResult(item.name + ' updated to ' + item.version + ' straight away. The warning was not needed.', 'good');
+          render();
+        });
+      } else {
+        btn.className = 'filled';
+        btn.textContent = 'Install';
+        btn.addEventListener('click', function () {
+          if (!warn.checked) {
+            setResult('Adding something new needs the Marketplace warning first. Tick the box above, then try again. Nothing was installed.', 'error');
+            return;
+          }
+          item.installed = true;
+          setResult(item.name + ' installed, version ' + item.version + '.', 'good');
+          render();
+        });
+      }
+      li.appendChild(btn);
+      list.appendChild(li);
+    });
+  }
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    items = JSON.parse(JSON.stringify(initial));
+    warn.checked = false;
+    setResult('Nothing has been changed yet.', '');
+    render();
+  });
+
+  items = JSON.parse(JSON.stringify(initial));
+  render();
+})();
+</script>
+</body>
+</html>

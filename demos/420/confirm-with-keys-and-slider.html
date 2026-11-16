@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Confirm with two keys and a slider</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.key-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; }
+.key-row label { flex: 1; }
+input[type="range"] { width: 100%; min-height: 48px; accent-color: var(--p); }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="confirm-with-keys-and-slider">
+  <h1>Confirm a purge with two keys and a slider</h1>
+  <p class="muted">Turn on both keys, then slide the bar to 100%. You never type a name.</p>
+
+  <section class="card" aria-labelledby="confirm-title">
+    <div class="stack">
+      <h2 id="confirm-title">Apply and purge</h2>
+      <p>Pretend storage: 12 old camera clips would be removed.</p>
+
+      <div class="key-row">
+        <label for="key-one">First key</label>
+        <input class="switch" type="checkbox" id="key-one">
+      </div>
+      <div class="key-row">
+        <label for="key-two">Second key</label>
+        <input class="switch" type="checkbox" id="key-two">
+      </div>
+
+      <div class="stack">
+        <label for="slide">Slide to 100% to confirm</label>
+        <div class="row">
+          <input type="range" id="slide" min="0" max="100" value="0">
+          <output id="slide-value" for="slide">0%</output>
+        </div>
+      </div>
+
+      <div class="row">
+        <button type="button" class="filled" id="apply" disabled>Apply and purge</button>
+        <button type="button" class="tonal" id="cancel">Cancel</button>
+        <button type="button" data-demo-reset>Start again</button>
+      </div>
+
+      <p class="note" id="status" aria-live="polite">Not ready yet. Turn on the first key, turn on the second key, and slide to 100%.</p>
+    </div>
+  </section>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var keyOne = document.getElementById('key-one');
+  var keyTwo = document.getElementById('key-two');
+  var slide = document.getElementById('slide');
+  var slideValue = document.getElementById('slide-value');
+  var apply = document.getElementById('apply');
+  var cancel = document.getElementById('cancel');
+  var status = document.getElementById('status');
+  var reset = document.querySelector('[data-demo-reset]');
+  var done = false;
+
+  function missing() {
+    var steps = [];
+    if (!keyOne.checked) steps.push('turn on the first key');
+    if (!keyTwo.checked) steps.push('turn on the second key');
+    if (slide.value !== '100') steps.push('slide to 100%');
+    return steps;
+  }
+
+  function update() {
+    slideValue.textContent = slide.value + '%';
+    if (done) return;
+    var steps = missing();
+    apply.disabled = steps.length > 0;
+    if (steps.length === 0) {
+      status.textContent = 'Ready. Pressing Apply and purge would remove the pretend clips. Nothing is removed in this demo.';
+    } else {
+      status.textContent = 'Not ready yet. Still to do: ' + steps.join(', ') + '.';
+    }
+  }
+
+  keyOne.addEventListener('change', update);
+  keyTwo.addEventListener('change', update);
+  slide.addEventListener('input', update);
+
+  apply.addEventListener('click', function () {
+    if (missing().length > 0) return;
+    done = true;
+    apply.disabled = true;
+    status.textContent = 'Done in the demo. The 12 pretend clips were removed. Nothing real was touched.';
+  });
+
+  cancel.addEventListener('click', function () {
+    done = false;
+    keyOne.checked = false;
+    keyTwo.checked = false;
+    slide.value = '0';
+    update();
+    status.textContent = 'Cancelled. Nothing was removed. ' + status.textContent;
+  });
+
+  reset.addEventListener('click', function () {
+    done = false;
+    keyOne.checked = false;
+    keyTwo.checked = false;
+    slide.value = '0';
+    update();
+    status.textContent = 'Not ready yet. Turn on the first key, turn on the second key, and slide to 100%.';
+  });
+
+  update();
+})();
+</script>
+</body>
+</html>

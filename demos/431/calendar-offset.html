@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calendar offset field</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+  label.row { min-height: 48px; cursor: pointer; flex-wrap: nowrap; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="calendar-offset">
+  <h1>Calendar offset field</h1>
+  <p class="muted">Switch on the optional offset. A valid offset is chosen for you. Choose the blank option and save to see the refusal.</p>
+
+  <section class="card stack" aria-labelledby="off-title">
+    <h2 id="off-title" class="small">Optional calendar offset</h2>
+    <label class="row">
+      <input type="checkbox" class="switch" id="enable">
+      <span>Use a calendar offset</span>
+    </label>
+    <label class="field">
+      Offset
+      <select id="offset" disabled>
+        <option value="">Choose a value</option>
+        <option value="-1">Minus one hour (pretend)</option>
+        <option value="0">No offset (pretend)</option>
+        <option value="1">Plus one hour (pretend)</option>
+      </select>
+    </label>
+    <div class="row">
+      <button type="button" class="filled" id="save" disabled>Save</button>
+    </div>
+  </section>
+
+  <p id="result" aria-live="polite" class="note">The offset field is off.</p>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var enable = document.getElementById('enable');
+  var offset = document.getElementById('offset');
+  var save = document.getElementById('save');
+  var result = document.getElementById('result');
+
+  function setState(on) {
+    offset.disabled = !on;
+    save.disabled = !on;
+    if (on && offset.value === '') {
+      offset.value = '0';
+    }
+    if (!on) {
+      result.textContent = 'The offset field is off.';
+    } else {
+      result.textContent = 'The offset field is on and its control is active.';
+    }
+  }
+
+  enable.addEventListener('change', function () {
+    if (enable.checked) {
+      offset.value = '0';
+    }
+    setState(enable.checked);
+  });
+
+  save.addEventListener('click', function () {
+    if (offset.value === '') {
+      result.textContent = 'Choose a valid offset before saving. Nothing was saved.';
+      return;
+    }
+    var label = offset.options[offset.selectedIndex].text;
+    result.textContent = 'Saved in this demo only: ' + label + '.';
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    enable.checked = false;
+    offset.value = '';
+    setState(false);
+  });
+
+  setState(false);
+})();
+</script>
+</body>
+</html>

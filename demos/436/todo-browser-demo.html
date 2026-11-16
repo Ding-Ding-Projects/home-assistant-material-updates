@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: sample to-do automation</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+[hidden] { display: none !important; }
+.check { display: flex; align-items: center; gap: 12px; min-height: 48px; }
+.check input { width: 24px; height: 24px; flex: none; }
+.check .rm { margin-left: auto; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="todo-browser-demo">
+  <h1>The sample to-do automation runs in the browser demo</h1>
+  <p class="muted">Run the Shopping List automation to check off the groceries. Then add or remove an item and run it again. The sample service checks its target first.</p>
+
+  <section class="card stack" aria-labelledby="list-h">
+    <h2 id="list-h" class="small">Shopping List</h2>
+    <ul class="list" id="items" aria-label="Shopping list items"></ul>
+    <p id="count" class="small muted" aria-live="polite"></p>
+
+    <div class="row">
+      <label class="field" for="new-item" style="flex:1 1 220px">New item
+        <input type="text" id="new-item" placeholder="for example Tea">
+      </label>
+      <button type="button" class="tonal" id="add">Add item</button>
+    </div>
+    <p id="add-msg" class="small" aria-live="polite"></p>
+  </section>
+
+  <section class="card stack" aria-labelledby="auto-h">
+    <h2 id="auto-h" class="small">Automation: complete the groceries</h2>
+    <div class="row">
+      <button type="button" class="filled" id="run">Run automation</button>
+      <button type="button" class="tonal" id="remove-all">Delete the Shopping List</button>
+    </div>
+    <p id="run-out" class="note" aria-live="polite">Not run yet.</p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var INITIAL = ['Milk', 'Eggs', 'Bread', 'Apples'];
+
+  var list = null;   // null means the Shopping List no longer exists
+  var checked = {};  // item name -> true when ticked
+  var itemsEl = document.getElementById('items');
+  var count = document.getElementById('count');
+  var newItem = document.getElementById('new-item');
+  var addMsg = document.getElementById('add-msg');
+  var runOut = document.getElementById('run-out');
+  var removeAll = document.getElementById('remove-all');
+
+  function render() {
+    itemsEl.innerHTML = '';
+    if (list === null) {
+      count.textContent = 'The Shopping List is gone.';
+      itemsEl.hidden = true;
+      removeAll.disabled = true;
+      return;
+    }
+    itemsEl.hidden = false;
+    removeAll.disabled = false;
+    list.forEach(function (name) {
+      var li = document.createElement('li');
+      var label = document.createElement('label');
+      label.className = 'check';
+      var box = document.createElement('input');
+      box.type = 'checkbox';
+      box.checked = !!checked[name];
+      box.addEventListener('change', function () { checked[name] = box.checked; render(); });
+      label.appendChild(box);
+      label.appendChild(document.createTextNode(' ' + name));
+      li.appendChild(label);
+      var rm = document.createElement('button');
+      rm.type = 'button';
+      rm.className = 'tonal rm';
+      rm.textContent = 'Remove ' + name;
+      rm.setAttribute('aria-label', 'Remove ' + name + ' from the list');
+      rm.addEventListener('click', function () {
+        list = list.filter(function (n) { return n !== name; });
+        delete checked[name];
+        render();
+      });
+      li.appendChild(rm);
+      itemsEl.appendChild(li);
+    });
+    var done = list.filter(function (n) { return checked[n]; }).length;
+    count.textContent = list.length + (list.length === 1 ? ' item' : ' items') + ' on the list, ' + done + ' ticked.';
+  }
+
+  document.getElementById('add').addEventListener('click', function () {
+    var name = newItem.value.trim();
+    if (list === null) { addMsg.className = 'small'; addMsg.textContent = 'The Shopping List is gone. Start again to restore it.'; return; }
+    if (name === '') { addMsg.className = 'note error'; addMsg.textContent = 'Type an item name first.'; return; }
+    if (list.indexOf(name) !== -1) { addMsg.className = 'note error'; addMsg.textContent = name + ' is already on the list.'; return; }
+    list.push(name);
+    newItem.value = '';
+    addMsg.className = 'small';
+    addMsg.textContent = 'Added ' + name + '.';
+    render();
+  });
+
+  document.getElementById('run').addEventListener('click', function () {
+    // The sample service validates its target against the current demo state first.
+    if (list === null) {
+      runOut.className = 'note error';
+      runOut.textContent = 'Could not run: the Shopping List no longer exists. Press Start again to restore it.';
+      return;
+    }
+    var before = list.filter(function (n) { return checked[n]; }).length;
+    list.forEach(function (n) { checked[n] = true; });
+    runOut.className = 'note good';
+    runOut.textContent = 'Checked off ' + (list.length - before) + ' item(s). Every item on the list is now ticked.';
+    render();
+  });
+
+  removeAll.addEventListener('click', function () {
+    list = null;
+    checked = {};
+    runOut.className = 'note';
+    runOut.textContent = 'The Shopping List was deleted in this demo.';
+    render();
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    list = INITIAL.slice();
+    checked = {};
+    newItem.value = '';
+    addMsg.textContent = '';
+    runOut.className = 'note';
+    runOut.textContent = 'Not run yet.';
+    render();
+  });
+
+  list = INITIAL.slice();
+  render();
+})();
+</script>
+</body>
+</html>

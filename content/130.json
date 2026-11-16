@@ -1,0 +1,41 @@
+{
+  "build": 130,
+  "headline": "Settings pages and tools open as tabs of their own, and the phone menus are fixed",
+  "summary": "Settings pages and tools can now open as tabs of their own, chosen from the New tab catalog. Settings sections got their own tab menus, and the phone Pages sheet lists and opens settings and tool tabs. A browser pass at four screen widths found several phone problems, and they are fixed.",
+  "summary_yue": "設定頁同工具而家可以喺「新分頁」目錄入面開成各自嘅分頁，再揀一次就跳返去嗰個已經開住嘅分頁。設定分區有咗自己嘅分頁選單，手機嘅頁面表都會列出同開設定同工具分頁。喺瀏覽器四種闊度逐樣睇過之後，搵到嘅幾個手機問題都修好咗。",
+  "highlights": [
+    {
+      "id": "settings-and-tools-as-tabs",
+      "title": "Settings pages and tools open as tabs of their own",
+      "areas": ["interface"],
+      "what": "From the New tab catalog, a settings page or a tool opens as a tab of its own, with its icon and title. Choosing the same page again brings back the tab that is already open, rather than opening a second one. The tab you are on is the selected one. These tabs can be pinned, grouped, locked and given a look like any other tab, and they stay after a reload. A page the account is not allowed to see is hidden, not deleted.",
+      "what_yue": "喺「新分頁」目錄入面揀一個設定頁或者工具，佢會開成一個有圖示同標題嘅獨立分頁。再揀同一樣嘢，就會跳返去已經開住嗰個分頁，唔會多開一個。你用緊嗰個分頁會被揀住。呢類分頁同其他分頁一樣，可以釘住、分組、鎖住，又可以改外觀，重新載入之後仲喺度。賬戶唔可以睇嘅頁面會被隱藏，唔會被刪走。",
+      "why": "A settings page or a tool could not be kept open as its own tab, so getting back to one meant searching for it again.",
+      "try": [
+        "Open the New tab catalog and choose Profile.",
+        "Choose Profile again and see that the tab already open is selected instead.",
+        "Pin a tab, reload the page, and check that the tab is still there.",
+        "Press Start again to close the tabs and show the catalog as it was at the start."
+      ],
+      "sha": ["875b30677"],
+      "demo": "demos/130/settings-and-tools-as-tabs.html"
+    },
+    {
+      "id": "section-tab-menus-and-phone-fixes",
+      "title": "Settings section tab menus and fixes on phones",
+      "areas": ["interface"],
+      "what": "Most settings pages now have a section tab menu, which was missing before. A text colour chosen for a section tab now shows. On a phone, lifting a finger after a long press no longer presses the row underneath, and the menu stays open. Phone bottom sheets reach the right edge. The phone Pages sheet lists and opens settings and tool tabs, and closing the tab you are using moves you to a neighbouring tab. The group picker names a section's tabs by their labels.",
+      "what_yue": "大部分設定頁而家都有分頁選單，以前係冇嘅。你揀咗嘅分頁字色而家會真係顯示出嚟。手機上長按之後放手，唔會再撳到下面嗰一行，選單會留住。手機底部面板會貼返右邊。手機頁面表會列出同開設定同工具嘅分頁；如果閂咗你用緊嗰個分頁，就會跳去隔籬嗰個。分組揀選器會用分頁嘅名稱嚟叫一個分區嘅分頁。",
+      "why": "Several menus were missing or misbehaved on a phone, so a browser pass was run at 1440, 1000, 390 and 320 px and the problems found were fixed.",
+      "try": [
+        "Open a settings page and find its section tab menu.",
+        "Open the Pages sheet, then open a settings tab and a tool tab.",
+        "Close the tab you are using and see which tab takes over.",
+        "Press Start again to put the sheet back to its first state."
+      ],
+      "sha": ["8a37d4c04"],
+      "demo": "demos/130/section-tab-menus-and-phone-fixes.html"
+    }
+  ],
+  "other": []
+}

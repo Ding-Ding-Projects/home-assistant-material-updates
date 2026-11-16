@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Backup hosting sends the image and port you choose</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="backup-image-and-ports">
+  <h1>Backup hosting sends the image and port you choose</h1>
+  <p class="muted">Pick image tags, type ports or leave them empty, then press Start to see what would be sent.</p>
+
+  <form id="form" class="card stack" novalidate aria-labelledby="form-heading">
+    <h2 id="form-heading">Hosting options (pretend)</h2>
+
+    <div class="grid">
+      <label class="field" for="docker-tag">Docker image tag</label>
+      <select id="docker-tag">
+        <option value="">Default image tag</option>
+        <option value="stable">stable (pretend)</option>
+        <option value="beta">beta (pretend)</option>
+      </select>
+
+      <label class="field" for="ssh-tag">SSH image tag</label>
+      <select id="ssh-tag">
+        <option value="">Default image tag</option>
+        <option value="stable">stable (pretend)</option>
+        <option value="beta">beta (pretend)</option>
+      </select>
+    </div>
+
+    <div class="grid">
+      <label class="field" for="docker-port">Docker port (leave empty for the default)</label>
+      <input type="text" inputmode="numeric" id="docker-port" autocomplete="off">
+
+      <label class="field" for="ssh-port">SSH port (leave empty for the default)</label>
+      <input type="text" inputmode="numeric" id="ssh-port" autocomplete="off">
+
+      <label class="field" for="vbox-port">VirtualBox port (leave empty for the default)</label>
+      <input type="text" inputmode="numeric" id="vbox-port" autocomplete="off">
+    </div>
+
+    <div class="row">
+      <button type="submit" class="filled">Start</button>
+    </div>
+  </form>
+
+  <section class="card stack" aria-labelledby="out-heading">
+    <h2 id="out-heading">Result</h2>
+    <div id="errors" class="stack" aria-live="polite"></div>
+    <ul id="summary" class="list"></ul>
+  </section>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var form = document.getElementById('form');
+  var errors = document.getElementById('errors');
+  var summary = document.getElementById('summary');
+  var fields = [
+    { id: 'docker-port', name: 'Docker port' },
+    { id: 'ssh-port', name: 'SSH port' },
+    { id: 'vbox-port', name: 'VirtualBox port' }
+  ];
+
+  function checkPort(value, name) {
+    if (value === '') return null;
+    if (!/^[0-9]+$/.test(value)) return name + ' must be a whole number with digits only.';
+    var n = parseInt(value, 10);
+    if (n === 0) return name + ' cannot be zero. Leave it empty to keep the default.';
+    if (n > 65535) return name + ' must be 65535 or lower.';
+    return null;
+  }
+
+  function addItem(text, cls) {
+    var li = document.createElement('li');
+    var span = document.createElement('span');
+    span.textContent = text;
+    if (cls) span.className = cls;
+    li.appendChild(span);
+    summary.appendChild(li);
+  }
+
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+    errors.textContent = '';
+    summary.textContent = '';
+    var problems = [];
+
+    fields.forEach(function (f) {
+      var value = document.getElementById(f.id).value.trim();
+      var problem = checkPort(value, f.name);
+      if (problem) problems.push(problem);
+    });
+
+    if (problems.length > 0) {
+      problems.forEach(function (text) {
+        var note = document.createElement('div');
+        note.className = 'note error';
+        note.textContent = text;
+        errors.appendChild(note);
+      });
+      var stop = document.createElement('div');
+      stop.className = 'note';
+      stop.textContent = 'Nothing was sent. Fix the port above and press Start again.';
+      errors.appendChild(stop);
+      return;
+    }
+
+    var dockerTag = document.getElementById('docker-tag').value;
+    var sshTag = document.getElementById('ssh-tag').value;
+    var ok = document.createElement('div');
+    ok.className = 'note good';
+    ok.textContent = 'Sent to the hosting service (pretend). Empty fields kept their defaults.';
+    errors.appendChild(ok);
+
+    addItem('Docker image tag: ' + (dockerTag || 'default (kept)'));
+    addItem('SSH image tag: ' + (sshTag || 'default (kept)'));
+    fields.forEach(function (f) {
+      var value = document.getElementById(f.id).value.trim();
+      addItem(f.name + ': ' + (value === '' ? 'default (kept)' : value));
+    });
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    form.reset();
+    errors.textContent = '';
+    summary.textContent = '';
+  });
+})();
+</script>
+</body>
+</html>

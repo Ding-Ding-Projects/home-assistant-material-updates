@@ -1,0 +1,50 @@
+{
+  "build": 420,
+  "headline": "Destructive confirmations use keys and a slider, and faults from build 413 are fixed in code",
+  "summary": "Build 420 changes how a person confirms an action that deletes or purges something. The last step is now always two keys and a slider, and nothing has to be typed, including for storage purges and for media, Matter fabrics and Thread networks. It also fixes layout faults and page errors found on build 413, such as the automation editor's Save button being hidden under the side pane. None of these fixes has been checked in a browser yet.",
+  "summary_yue": "420 版改咗破壞性操作嘅確認方法：最後一步一律用兩把鎖匙加滑桿，唔使打字，儲存空間清除、媒體、Matter fabrics 同 Thread 網絡都係咁。亦都修咗 413 版搵到嘅版面同頁面錯誤，例如自動化編輯器嘅「儲存」掣俾側欄遮住、導覽列「通知」唔啱位。呢啲修正未喺瀏覽器睇過。",
+  "highlights": [
+    {
+      "id": "confirm-with-keys-and-slider",
+      "title": "Destructive confirmations use two keys and a slider, not a typed name",
+      "areas": ["interface"],
+      "what": "When an action would delete or purge something, the second step of the confirmation is now always the two keys and the slider. Nothing has to be typed. This also applies where the thing is named, such as storage purges, media, Matter fabrics and Thread networks. The raw dashboard editor's status bar no longer falls below the bottom of the window, and the automation editor's Check, Dry run and Save buttons are no longer hidden under the side pane; that fix works for left-to-right layouts only, and right-to-left is not handled yet. Colours that are near black were called Deepest teal. Near-black, greys and near-white now have their own names, in English and Cantonese.",
+      "what_yue": "以後凡係會刪走或者清除嘢嘅確認，第二步一律用兩把鎖匙加滑桿，唔使打字。連儲存空間清除、媒體、Matter fabrics 同 Thread 網絡都係咁。原始儀表板編輯器嘅狀態列唔會再跌出視窗，自動化編輯器開住側欄嗰陣，「檢查」、「試行」同「儲存」掣唔會再俾遮住。近黑色唔會再叫「最深藍綠」，近黑、灰同近白都有自己嘅名。自動化編輯器呢個修正淨係支援由左至右嘅版面，由右至左未處理。",
+      "why": "The owner's rule is that a confirmation uses the two keys and the slider, with nothing typed. Some confirmations still asked for a typed name, and a few layouts hid their buttons.",
+      "why_yue": "屋主嘅規則係確認只用兩把鎖匙加滑桿，唔准要人打字。之前有啲確認仲要打名，有幾個版面又會將掣遮住。",
+      "try": ["Use the controls in the demo below. The Apply and purge button is off at the start.", "Turn on the first key and the second key.", "Slide the bar all the way to 100%. The button turns on, and you never type a name."],
+      "sha": ["d26f8c47a"],
+      "demo": "demos/420/confirm-with-keys-and-slider.html"
+    },
+    {
+      "id": "navigation-row-and-wide-banner",
+      "title": "Notifications row and welcome banner fixed on wide screens",
+      "areas": ["interface"],
+      "what": "On a wide window, the Notifications row in the navigation pane now reads from the start edge, like the other rows, instead of sitting off-centre. The welcome banner on the wide home page is now a rounded card of its own, set in from the top and the sides, so the rounded edge of the page card no longer cuts it off. The phone layout does not change. The same change also fixes a page error on the built-in overview page, which happened when a section called a method on its layout element before that element had loaded.",
+      "what_yue": "闊螢幕嗰陣，導覽窗格入面嗰行「通知」而家同其他行一樣靠左對齊，唔會無端端置中。闊螢幕首頁嗰條歡迎橫額而家係一張自己嘅圓角卡，四邊留位，唔會俾頁面嘅圓角切咗頭。手機版面冇改。概覽頁嗰個頁面錯誤都執咗。",
+      "why": "The Notifications row sat in the middle, and the top of the welcome banner was cut by the rounded edge of the page card.",
+      "why_yue": "「通知」一行冇啱齊，歡迎橫額頂部俾圓角切咗。",
+      "try": ["Press Before to see the layout as it was.", "Press After to see the fixed layout.", "Tick the banner box to show or hide the banner in both views."],
+      "sha": ["48a0667c3"],
+      "demo": "demos/420/navigation-row-and-wide-banner.html"
+    },
+    {
+      "id": "feature-pass-fixes",
+      "title": "Faults found by using every feature on build 413 are fixed in code",
+      "areas": ["interface"],
+      "what": "A pass that used every feature on build 413 for real found faults on several pages, and fixes for them are in this build. A time trigger with no weekday list made the week-ahead panel blank, and now the missing list is read as every day. A theme whose name has spaces and no quotes was not recognised when added from a ZIP, and now it is. People, Roles and Tags showed their title twice. The type column of the dashboards list was empty until a reload. A page that brings its own help icon showed two icons in the tool pill on wide windows, and now only the shared one is shown.",
+      "what_yue": "用 413 版逐樣功能真係試過一次，搵到嘅問題執咗啲：冇星期列表嘅時間觸發，一星期預覽會白畫面，而家冇列表就當係每日都做；ZIP 入面主題名有空格就認唔到，而家認得；人物、角色同標籤頁標題出咗兩次；儀表板清單嘅類型欄要重新載入先有字；闊螢幕嗰陣工具藥丸有兩粒問號掣，而家只留共用嗰粒。全部未喺瀏覽器睇過。",
+      "why": "Each feature was tried for real on a throwaway instance, and these faults came out of that.",
+      "why_yue": "每樣功能都喺一次性嘅實例度真係試過，呢啲問題就係咁搵出嚟。",
+      "try": ["Type a word in the search box, such as dashboards or theme.", "Press an area chip to show only that area.", "Read the count line, which says how many faults are listed."],
+      "sha": ["7146cd41e"],
+      "demo": "demos/420/feature-pass-fixes.html"
+    }
+  ],
+  "other": [
+    { "title": "Closeout notes corrected: the remote also keeps a channel branch that the release workflow uses", "sha": ["f0728c7e2"] },
+    { "title": "Build 413 checked in a browser as the published image, its release read back, and three faults written down for later", "sha": ["c24ab60b5"] },
+    { "title": "README pictures replaced with captures of build 413, with three new pictures added", "sha": ["020e930dd"] },
+    { "title": "Feature status, roadmap and articles brought up to date through batch 54", "sha": ["990348159"] }
+  ]
+}

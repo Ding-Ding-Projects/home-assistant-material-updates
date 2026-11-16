@@ -1,0 +1,43 @@
+{
+ "build": 425,
+ "core": "2026.11.1.425",
+ "supervisor": "2026.11.0.425",
+ "os": "18.5.425",
+ "tag": "v2026.11.1.425",
+ "source": "f7f282a80",
+ "date": "2026-11-13T10:25:10-05:00",
+ "previous_build": 422,
+ "changes": [
+  {
+   "sha": "f7f282a80",
+   "date": "2026-11-13T10:25:10-05:00",
+   "title": "Automatic updates, continue on error for all, a visual dictionary editor",
+   "areas": [
+    "core",
+    "interface"
+   ],
+   "detail": "Batch 60. Four requests from the owner, and the last layout leftovers. The frontend parts have not been seen in a browser yet.\n\nAutomatic updates (owner: \"missing auto updates for all apps, also make it auto update for all apps option too\") - A new server integration, auto_update, loaded by default. Settings: update everything automatically, a choice per item, and a backup first when the update supports one. It installs when an update becomes available, one at a time, never a skipped version, and never retries a version that failed. Home Assistant Core, the Supervisor and the operating system are never updated automatically; they restart the whole system and keep their own row. - Run for real on a throwaway instance of the published image with the new files mounted: nothing installed while off, one item installed when only it was on, the rest installed in turn with \"everything\", a skipped version left alone, a failure recorded and not retried, the three protected updates refused, settings kept over a restart. - Updates page: an \"Automatic updates\" card with the two switches, an \"Automatic\" switch on every row, and the last automatic result with a 24-hour time.\n\nAutomation and scrip",
+   "detail_yue": "第 60 批。屋主四個要求一次過：（一）自動更新，可以逐個開，亦可以一掣 「全部自動更新」，伺服器做，唔使開住瀏覽器；核心、Supervisor、作業系統 永遠唔會自動更新。（二）自動化編輯器加「所有動作出錯都繼續」總掣。 （三）字典欄位有圖形編輯器，唔使再對住 YAML。（四）手機工具面板、 儲存列、時鐘小圖示遮住內容等版面問題。伺服器部分喺一次性實例真係跑過， 前端部分未喺瀏覽器睇。"
+  },
+  {
+   "sha": "0de76e7bd",
+   "date": "2026-11-13T09:22:20-05:00",
+   "title": "Visual faults found by looking at every capture of build 422",
+   "areas": [
+    "interface"
+   ],
+   "detail": "Batch 59. All 88 captures of the published build (light and dark, wide and phone) were looked at one by one. These are the faults that look found. None of the fixes has been seen in a browser yet.\n\nPhone - Storage: both cards were wider than the screen; grid tracks could not shrink below their content. They fit now and long values wrap. - Devices list: an empty battery cell drew a dash and took the room, so row text was cut. Empty cells are left out on a phone. - System: the title was cut and lost the version; it wraps now. - Template tool: the editor showed three and a half lines; it gets a proper height, and the selected tab is scrolled into view. - Media: the player slider no longer touches the screen edge; tile names keep room at the end.\n\nPages - Lights, Climate and Security were blank in a home with nothing of that kind. Each has an empty state now: what belongs here, how to add some, and for administrators a button to devices and services. - One title per page on Repairs, History, Integrations and Climate. Security still repeats its title when an alarm panel exists. - People and Roles: the footer sits at the bottom on short pages; the top row of People is on one line; Roles ",
+   "detail_yue": "第 59 批。422 版 88 張截圖逐張睇，搵到嘅畫面問題一次過執：手機儲存頁 啲卡闊過個屏、裝置清單啲字俾條橫線逼到切咗、燈光／氣候／保安頁喺冇 嗰類裝置嘅屋企係白畫面（而家有返空狀態）、幾版標題出兩次、闊屏工具列 衝出右邊、深色主題啲卡同開關睇唔清……全部未喺瀏覽器睇。"
+  },
+  {
+   "sha": "a731b5b9a",
+   "date": "2026-11-13T08:25:41-05:00",
+   "title": "Records: release 420 read back, build 422 live",
+   "areas": [
+    "docs"
+   ],
+   "detail": "Documents only; no build is started by this push.\n\n- Release v2026.11.1.420: run succeeded, not a draft, not a prerelease, 25 files, and its notes say when it was updated. - Build 2026.11.1.422 (batch 58) passed its browser pass with no page errors and is live since 08:25 Toronto time. Its four fixes were not looked at one by one in that build, and the notes say so.",
+   "detail_yue": "記錄：420 版發佈頁讀返無問題；422 版瀏覽器檢查零錯誤，08:25 上線。 嗰四個小修正未逐個喺新版睇，照實寫低。淨係文件，唔會觸發構建。"
+  }
+ ]
+}

@@ -1,0 +1,26 @@
+{
+ "build": 124,
+ "core": "2026.11.1.124",
+ "supervisor": "2026.11.0.124",
+ "os": "18.5.124",
+ "tag": "v2026.11.1.124",
+ "source": "447cde08f",
+ "date": "2026-11-12T00:52:01-05:00",
+ "previous_build": 123,
+ "changes": [
+  {
+   "sha": "447cde08f",
+   "date": "2026-11-12T00:52:01-05:00",
+   "title": "Tab options, app install progress, drop-to-upload, repair failure line",
+   "areas": [
+    "docs",
+    "core",
+    "deploy",
+    "interface",
+    "supervisor"
+   ],
+   "detail": "Batch 28. The tab strip finally has opinions: it docks to any edge, groups, pins, locks, searches four ways and has its own right-click menu. Before this it was a row of buttons that mostly knew how to be a row of buttons.\n\n- Tab options: dock left/right/top/bottom, pinned region, groups with picker, menu, editor and look, per-tab look, tab and group locks, overflow list, bulk close with preview, four separate searches. Settings section tabs are real tabs with overflow, pin, hide and reorder. The phone Pages sheet has per-page actions and bulk close. Driven in a local build in headless Edge at all four edges and at phone width; seven defects found there are fixed in this commit. - App install progress: bar, steps and a log terminal on the app page, the store card and the activity tray. Driven on a throwaway full-mode instance. The Supervisor only reports a percentage, so no layer list. - Drop a picture, video or audio file on any page: overlay, upload queue in the activity tray, message with a jump to Media or Images. Seen with simulated drags. - Larger uploads and automatic conversion of dropped files, a phone entry point, and search inside the automation editor are IN PROGRESS in",
+   "detail_yue": "第 28 批。分頁條終於有主見：四邊都泊得、可以分組、釘住、上鎖、四種搜尋， 仲有自己嘅右鍵選單。以前佢只係一排識得做一排嘅掣。安裝應用程式有進度條同 日誌終端機；拖個檔案落任何一頁就上載；維修失敗會老實講，整爛埋第二樣都會 講。上載加大、自動轉檔、手機入口同自動化編輯器搜尋仲做緊，過到編譯同單元 測試，但未喺瀏覽器睇過，唔好當佢完成。"
+  }
+ ]
+}

@@ -1,0 +1,35 @@
+{
+  "build": 441,
+  "headline": "Compare history with an earlier window, and read script conditions without overlap",
+  "summary": "Build 441 lets the history view compare the chosen time window with an earlier one, and stops a slow answer from landing on a newer chart. Script mode controls stay in view while the list scrolls, and condition results now sit beneath their summary instead of covering text. The Core update was also prepared for manual, source-bound delivery through the normal build entrypoint. The live update and the final checks are still to come.",
+  "summary_yue": "441 版令歷史圖可以同早前一段時間對比，遲到嘅舊回覆亦唔會跑返落新圖上面。腳本模式控制列捲動時留喺可見位置，條件結果放喺摘要下面，唔再蓋住文字。Core 更新亦改為經正常建置入口手動交付，對應原始碼。實際更新同最後驗證仲未做。",
+  "highlights": [
+    {
+      "id": "history-comparison",
+      "title": "History can compare an earlier time window",
+      "areas": ["interface"],
+      "what": "The history view can now show an earlier time window next to the one you chose, so you can see how a value changed compared with the period before. The exported records are kept as they were. Changing the settings or leaving the page makes any request that is still loading count as out of date, so a late answer is ignored and cannot draw over a newer chart.",
+      "what_yue": "歷史圖而家可以將你揀嘅時段同早前一段時間並排對比，睇到數值點樣變。匯出嘅原始記錄保持原樣。轉設定或者離開頁面，仲未返嘅舊請求就會作廢，遲到嘅回覆會被忽略，唔會畫落新圖上面。",
+      "why": "A chart that only shows one period cannot answer whether something is getting better, and a slow old reply could replace a newer chart.",
+      "try": ["Pick a period in the history chart.", "Turn on comparison and choose an earlier window.", "Pick a second period quickly and see that only the newest result stays on the chart."],
+      "sha": ["8300184d2"],
+      "demo": "demos/441/history-comparison.html"
+    },
+    {
+      "id": "script-condition-results",
+      "title": "Script conditions read clearly beside their summary",
+      "areas": ["interface"],
+      "what": "Persistent condition results now sit beneath their summary instead of sharing an overlay slot, so they no longer hide the text around them. The script mode row stays reachable while you scroll, and the search area below it leaves room for the row's real height.",
+      "what_yue": "條件結果而家放喺摘要下面，唔再同浮層爭位，唔會再遮住其他文字。腳本模式列喺捲動時都可以撳到，下面嘅搜尋列會讓出實際高度。",
+      "why": "Results that covered text, or a mode row that scrolled out of reach, made a script hard to read and hard to control.",
+      "try": ["Open a script that has a condition.", "Scroll the list and check that the mode row stays in place.", "Read the condition result under its summary."],
+      "sha": ["ea0ef484b"],
+      "demo": "demos/441/script-condition-results.html"
+    }
+  ],
+  "other": [
+    { "title": "The machine wrapper for a supervised Core update is built through the root build entrypoint, after the selected machine is checked against the pinned architecture list.", "sha": ["394771b0f"] },
+    { "title": "Numbered Core source exports are built and released manually through the normal build entrypoint, without waiting for unrelated appliance images. The workstation identity is no longer written into the image marker, and a full publication now starts only by explicit request.", "sha": ["bcc49d0be"] },
+    { "title": "Handoff notes updated: the source is merged, while the live update button and the final verification are still outstanding.", "sha": ["90643d84f"] }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "build": 422,
+  "headline": "Four small fixes, including a steady order for the navigation pages",
+  "summary": "A few faults seen on build 420 are fixed. The string builder note now shows only when it applies, the phone sheet loses an empty strip, and the automation editor scrolls to a step without hiding it under the search card. The navigation pane also gives the same default page order on every load. None of these fixes had been seen in a browser yet when this was written.",
+  "summary_yue": "修咗幾個喺 420 版見到嘅小問題。字串建構器嗰個提示而家只會喺相關嗰陣出現；手機面板冇咗空白條；自動化編輯器跳去某一步嗰陣，唔會俾搜尋卡遮住；側欄頁面次序每次載入都一樣。寫呢段嘢嗰陣，未喺瀏覽器睇過呢幾項修正。",
+  "highlights": [
+    {
+      "id": "navigation-page-order",
+      "title": "Four small fixes, including a steady navigation order",
+      "areas": ["interface"],
+      "what": "The navigation pane keeps the same default order on every load: the default page, then the dashboards by title, then the built-in pages in their usual order, then the rest by title. A saved order is still used when there is one. The same build also stops an old note showing in the string builder, removes an empty strip on phone sheets, and stops the automation editor from scrolling a step under the search card. None of these four was seen in a browser yet at the time of writing.",
+      "what_yue": "側欄頁面而家每次載入次序都一樣：先係預設頁，跟住係儀表板（跟標題排），再係內置頁面（跟慣常次序），最後係其他頁（跟標題排）。如果你已經儲存咗自己嘅次序，就照用。另外三項：字串建構器嘅舊提示會收返、手機面板冇咗空白條、自動化編輯器滾去某一步嗰陣唔會俾搜尋卡遮住。寫呢段嘢嗰陣，四項都未喺瀏覽器睇過。",
+      "why": "The page list could come in a different order from one load to the next, so people could not count on finding a page where it was before.",
+      "why_yue": "側欄頁面次序每次載入都可能唔同，人哋唔可以肯定頁面仲喺老位。",
+      "try": [
+        "Open the navigation list and read the default order.",
+        "Press Reload from server. The server order changes, but the default list stays the same.",
+        "Move a page with its buttons, switch on Use saved order to see your order, then press Reset to default to go back."
+      ],
+      "sha": ["013f64e4c"],
+      "demo": "demos/422/navigation-order.html"
+    }
+  ],
+  "other": [
+    { "title": "Recorded four test passes on published builds 418 to 420: what was seen working, what was fixed and seen afterwards, and what is still open", "sha": ["7f22fe9c9"] }
+  ]
+}

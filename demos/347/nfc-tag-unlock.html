@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unlock a lock with an NFC tag</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+  [hidden] { display: none !important; }
+  input[type="password"] { font: inherit; min-height: 56px; width: 100%; padding: 0 16px; border-radius: 12px; border: 1px solid var(--out); background: var(--sl0); color: var(--on); }
+  .tag-a { border-left: 8px solid var(--green); }
+  .tag-b { border-left: 8px solid var(--amber); }
+  .tagline { border: 1px solid var(--outv); border-radius: 16px; padding: 12px 16px; display: flex; gap: 12px; align-items: center; }
+  .tag-swatch { width: 16px; height: 40px; border-radius: 8px; flex: none; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="nfc-tag-unlock">
+  <h1>Unlock a lock with an NFC tag</h1>
+  <p class="muted">Finish the set-up wizard with a password and a tag, then unlock with the tag, or use the password instead.</p>
+
+  <section class="card stack" aria-labelledby="wiz-title">
+    <h2 id="wiz-title">Set-up wizard</h2>
+    <p id="wiz-step" class="badge">Step 1 of 3: Password</p>
+
+    <div id="step-1" class="stack">
+      <label class="field">Password
+        <input type="password" id="pw" autocomplete="new-password">
+      </label>
+      <label class="field">Repeat the password
+        <input type="password" id="pw2" autocomplete="new-password">
+      </label>
+    </div>
+
+    <div id="step-2" class="stack" hidden>
+      <label class="field">Pretend tag to read
+        <select id="setup-pick">
+          <option value="A">Pretend tag A (blue)</option>
+          <option value="B">Pretend tag B (amber)</option>
+        </select>
+      </label>
+      <div class="row">
+        <button type="button" id="read-tag" class="tonal">Read tag</button>
+      </div>
+      <p class="muted small" id="tag-state">No tag read yet.</p>
+    </div>
+
+    <div id="step-3" class="stack" hidden>
+      <p id="done-text">The lock now opens with the password, or with the tag.</p>
+    </div>
+
+    <div class="row">
+      <button type="button" id="back" class="tonal">Back</button>
+      <button type="button" id="next" class="filled">Next</button>
+    </div>
+    <p class="note" id="wiz-msg" aria-live="polite"></p>
+  </section>
+
+  <section class="card stack" aria-labelledby="unlock-title">
+    <h2 id="unlock-title">Unlock prompt</h2>
+    <p class="muted" id="lock-note">Finish the set-up wizard first.</p>
+    <p><span class="badge" id="lock-state">Locked</span></p>
+
+    <div id="tag-mode" class="stack">
+      <label class="field">Pretend tag to scan
+        <select id="scan-pick">
+          <option value="A">Pretend tag A (blue)</option>
+          <option value="B">Pretend tag B (amber)</option>
+        </select>
+      </label>
+      <div class="row">
+        <button type="button" id="scan" class="filled" disabled>Scan tag</button>
+        <button type="button" id="to-pw" class="text" disabled>Use password instead</button>
+      </div>
+    </div>
+
+    <div id="pw-mode" class="stack" hidden>
+      <label class="field">Password
+        <input type="password" id="unlock-pw" autocomplete="current-password">
+      </label>
+      <div class="row">
+        <button type="button" id="unlock" class="filled" disabled>Unlock with password</button>
+        <button type="button" id="to-tag" class="text">Use tag instead</button>
+      </div>
+    </div>
+
+    <p>Wrong attempts so far: <span id="attempts">0</span></p>
+    <p class="note" id="unlock-msg" aria-live="polite"></p>
+    <div class="row">
+      <button type="button" id="relock" class="tonal" disabled>Lock again</button>
+    </div>
+  </section>
+
+  <div class="row">
+    <button type="button" data-demo-reset>Start again</button>
+  </div>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  'use strict';
+  function $(id) { return document.getElementById(id); }
+  var S;
+
+  function fresh() {
+    return { step: 1, pw: null, tag: null, done: false, locked: true, mode: 'tag', attempts: 0 };
+  }
+
+  function render() {
+    [1, 2, 3].forEach(function (n) { $('step-' + n).hidden = (S.step !== n); });
+    $('wiz-step').textContent = 'Step ' + S.step + ' of 3: ' + ['Password', 'Tag', 'Done'][S.step - 1];
+    $('back').disabled = (S.step === 1);
+    $('next').textContent = S.step === 3 ? 'Finished' : 'Next';
+    $('next').disabled = (S.step === 3);
+
+    $('tag-state').textContent = S.tag ? 'Tag ' + S.tag + ' read and saved.' : 'No tag read yet.';
+    $('done-text').textContent = S.done
+      ? 'The lock now opens with the password, or with tag ' + S.tag + '.'
+      : 'The lock now opens with the password, or with the tag.';
+
+    var ready = S.done;
+    $('lock-note').textContent = ready ? 'Locked until you unlock it.' : 'Finish the set-up wizard first.';
+    $('lock-state').textContent = S.locked ? 'Locked' : 'Unlocked';
+    $('scan').disabled = !ready;
+    $('to-pw').disabled = !ready;
+    $('unlock').disabled = !ready;
+    $('relock').disabled = !ready || S.locked;
+    $('tag-mode').hidden = (S.mode !== 'tag');
+    $('pw-mode').hidden = (S.mode !== 'password');
+    $('attempts').textContent = String(S.attempts);
+  }
+
+  function say(id, text) { $(id).textContent = text; }
+
+  $('next').addEventListener('click', function () {
+    if (S.step === 1) {
+      var a = $('pw').value, b = $('pw2').value;
+      if (!a) { say('wiz-msg', 'Type a password first.'); return; }
+      if (a !== b) { say('wiz-msg', 'The two passwords do not match. Type them again.'); return; }
+      S.pw = a;
+      S.step = 2;
+      say('wiz-msg', 'Password saved. Now read a tag.');
+    } else if (S.step === 2) {
+      if (!S.tag) { say('wiz-msg', 'Read a tag before going on.'); return; }
+      S.step = 3;
+      S.done = true;
+      say('wiz-msg', 'Set-up is finished.');
+    }
+    render();
+  });
+
+  $('back').addEventListener('click', function () {
+    if (S.step > 1) { S.step -= 1; say('wiz-msg', ''); render(); }
+  });
+
+  $('read-tag').addEventListener('click', function () {
+    S.tag = $('setup-pick').value;
+    say('wiz-msg', 'Tag ' + S.tag + ' is saved for this lock.');
+    render();
+  });
+
+  $('scan').addEventListener('click', function () {
+    var pick = $('scan-pick').value;
+    if (pick === S.tag) {
+      S.locked = false;
+      say('unlock-msg', 'Unlocked with tag ' + pick + '.');
+    } else {
+      S.attempts += 1;
+      say('unlock-msg', 'Tag ' + pick + ' is not the tag set up for this lock. It uses up one attempt.');
+    }
+    render();
+  });
+
+  $('to-pw').addEventListener('click', function () { S.mode = 'password'; say('unlock-msg', ''); render(); });
+  $('to-tag').addEventListener('click', function () { S.mode = 'tag'; say('unlock-msg', ''); render(); });
+
+  $('unlock').addEventListener('click', function () {
+    if ($('unlock-pw').value === S.pw) {
+      S.locked = false;
+      say('unlock-msg', 'Unlocked with the password.');
+    } else {
+      S.attempts += 1;
+      say('unlock-msg', 'Wrong password. It uses up one attempt.');
+    }
+    $('unlock-pw').value = '';
+    render();
+  });
+
+  $('relock').addEventListener('click', function () {
+    S.locked = true;
+    say('unlock-msg', 'Locked again.');
+    render();
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    S = fresh();
+    ['pw', 'pw2', 'unlock-pw'].forEach(function (id) { $(id).value = ''; });
+    $('setup-pick').value = 'A';
+    $('scan-pick').value = 'A';
+    say('wiz-msg', '');
+    say('unlock-msg', '');
+    render();
+  });
+
+  S = fresh();
+  render();
+})();
+</script>
+</body>
+</html>

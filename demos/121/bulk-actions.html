@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bulk actions demo</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+  .scroll-x table { min-width: 420px; }
+  .scroll-x td, .scroll-x th { vertical-align: middle; }
+  [hidden] { display: none !important; }
+  input[type="checkbox"] { width: 24px; height: 24px; min-width: 24px; }
+  .checkbox-cell { width: 56px; }
+  .checkbox-cell label { display: flex; align-items: center; justify-content: center; min-height: 48px; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="bulk-actions">
+  <h1>Bulk actions on tags</h1>
+  <p class="muted">Select rows, then delete. You see a preview first, and a second press confirms.</p>
+
+  <section class="card stack" aria-labelledby="h-tags">
+    <h2 id="h-tags" style="font-size:18px">Pretend tags</h2>
+    <div class="row">
+      <button type="button" class="tonal" id="select-all">Select all</button>
+      <button type="button" class="filled" id="delete-selected">Delete selected</button>
+    </div>
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th class="checkbox-cell"><span class="sr-only">Select</span></th><th scope="col">Tag</th><th scope="col">Used by</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card stack" id="preview" aria-labelledby="h-prev" hidden>
+    <h2 id="h-prev" style="font-size:18px">Preview</h2>
+    <ul class="list" id="preview-list"></ul>
+    <div class="row">
+      <button type="button" class="filled" id="confirm">Confirm delete</button>
+      <button type="button" class="tonal" id="cancel">Cancel</button>
+    </div>
+  </section>
+
+  <p class="note" id="result" aria-live="polite"></p>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var START = [
+    { id: 1, name: 'Pretend tag 1', usedBy: 'Used by an automation trigger', blocked: true },
+    { id: 2, name: 'Pretend tag 2', usedBy: 'Not used', blocked: false },
+    { id: 3, name: 'Pretend tag 3', usedBy: 'Not used', blocked: false },
+    { id: 4, name: 'Pretend tag 4', usedBy: 'Not used', blocked: false },
+    { id: 5, name: 'Pretend tag 5', usedBy: 'Not used', blocked: false }
+  ];
+  var tags = [];
+  var rows = document.getElementById('rows');
+  var preview = document.getElementById('preview');
+  var previewList = document.getElementById('preview-list');
+  var confirmBtn = document.getElementById('confirm');
+  var result = document.getElementById('result');
+  var del = document.getElementById('delete-selected');
+  var pendingConfirm = false;
+
+  function selectedIds() {
+    var ids = [];
+    rows.querySelectorAll('input[type="checkbox"]').forEach(function (c) {
+      if (c.checked) { ids.push(Number(c.getAttribute('data-id'))); }
+    });
+    return ids;
+  }
+
+  function render() {
+    rows.innerHTML = '';
+    tags.forEach(function (t) {
+      var tr = document.createElement('tr');
+      var tdc = document.createElement('td');
+      tdc.className = 'checkbox-cell';
+      var lab = document.createElement('label');
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.setAttribute('data-id', t.id);
+      cb.setAttribute('aria-label', 'Select ' + t.name);
+      cb.addEventListener('change', updateButtons);
+      lab.appendChild(cb);
+      tdc.appendChild(lab);
+      var tdn = document.createElement('td');
+      tdn.textContent = t.name;
+      var tdu = document.createElement('td');
+      tdu.textContent = t.usedBy;
+      tr.appendChild(tdc);
+      tr.appendChild(tdn);
+      tr.appendChild(tdu);
+      rows.appendChild(tr);
+    });
+    updateButtons();
+  }
+
+  function updateButtons() {
+    var any = selectedIds().length > 0;
+    del.disabled = !any;
+    if (!any) { closePreview(); }
+  }
+
+  function closePreview() {
+    preview.hidden = true;
+    pendingConfirm = false;
+    confirmBtn.textContent = 'Confirm delete';
+  }
+
+  document.getElementById('select-all').addEventListener('click', function () {
+    rows.querySelectorAll('input[type="checkbox"]').forEach(function (c) { c.checked = true; });
+    updateButtons();
+  });
+
+  del.addEventListener('click', function () {
+    var ids = selectedIds();
+    previewList.innerHTML = '';
+    ids.forEach(function (id) {
+      var t = tags.find(function (x) { return x.id === id; });
+      var li = document.createElement('li');
+      li.textContent = t.blocked
+        ? t.name + ': will be skipped, ' + t.usedBy.toLowerCase()
+        : t.name + ': will be deleted';
+      previewList.appendChild(li);
+    });
+    preview.hidden = false;
+    pendingConfirm = false;
+    confirmBtn.textContent = 'Confirm delete';
+    result.textContent = 'Preview open. Nothing is deleted yet.';
+  });
+
+  confirmBtn.addEventListener('click', function () {
+    if (!pendingConfirm) {
+      pendingConfirm = true;
+      confirmBtn.textContent = 'Press again to delete';
+      result.textContent = 'Press Confirm delete again to finish. Cancel stops the delete.';
+      return;
+    }
+    var ids = selectedIds();
+    var deleted = [];
+    var skipped = [];
+    ids.forEach(function (id) {
+      var t = tags.find(function (x) { return x.id === id; });
+      if (t.blocked) { skipped.push(t.name); } else { deleted.push(t.id); }
+    });
+    tags = tags.filter(function (t) { return deleted.indexOf(t.id) === -1; });
+    closePreview();
+    render();
+    var msg = 'Deleted ' + deleted.length + ' tag' + (deleted.length === 1 ? '' : 's') + '.';
+    if (skipped.length) { msg += ' Skipped ' + skipped.join(', ') + ': still used by an automation.'; }
+    result.textContent = msg;
+  });
+
+  document.getElementById('cancel').addEventListener('click', function () {
+    closePreview();
+    result.textContent = 'Delete cancelled. Nothing was removed.';
+  });
+
+  function reset() {
+    tags = START.map(function (t) { return Object.assign({}, t); });
+    closePreview();
+    render();
+    result.textContent = 'Five pretend tags. Select some, then press Delete selected.';
+  }
+  document.querySelectorAll('[data-demo-reset]').forEach(function (b) { b.addEventListener('click', reset); });
+  reset();
+})();
+</script>
+</body>
+</html>

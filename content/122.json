@@ -1,0 +1,27 @@
+{
+  "build": 122,
+  "headline": "Full mode runs the whole system inside one outer container",
+  "summary": "Build 122 adds a Full hosting mode. An outer container runs its own Docker engine, and the Supervisor, the core and every app run as containers inside it, so the computer needs only the one outer container. The app store, installs, ingress, backup and restore with apps, a core update, and stop and start were checked on a throwaway copy. The workflow job that publishes this mode has not run yet.",
+  "summary_yue": "第 122 版加入「完整模式」。一個外殼容器自己有一套 Docker 引擎，管理員、核心同每個應用程式都以容器形式喺入面行，所以部電腦淨係要跑一個外殼容器。應用商店、安裝、接駁、備份同還原、核心更新，以及停同啟動，都喺一份拋棄式副本試過。發佈呢個模式嘅工作流程仲未跑過。",
+  "highlights": [
+    {
+      "id": "full-hosting-mode",
+      "title": "Full mode runs the whole system in one container",
+      "areas": ["supervisor", "build"],
+      "what": "Full mode is a hosting option in which one outer container runs its own Docker engine. The Supervisor, the core and every app then run as containers inside it. This demo shows how stopping the outer container stops everything inside it, and how starting it brings the parts back. The same build also adds a sections layout for a dashboard page that holds only one card.",
+      "what_yue": "完整模式係一個外殼容器，入面自己有一套 Docker 引擎，管理員、核心同每個應用程式都以容器形式喺裏面行。呢個示範會俾你睇吓停咗外殼容器，入面所有嘢都會跟住停；再啟動，嘢就返晒嚟。同一版仲加咗一個分區版面，俾淨係得一個卡嘅儀表板頁用。",
+      "why": "A single outer container means the whole system can be started, stopped and moved as one unit, so a computer does not have to run a set of separate containers.",
+      "try": [
+        "Press Stop outer container and see the Supervisor, the core and the pretend app all stop.",
+        "Press Start outer container and see every part come back.",
+        "Press Core update to see the pretend core version go up by one.",
+        "Press Restart pretend app and see the message confirm that only the app restarted."
+      ],
+      "sha": ["f5b82618f"],
+      "demo": "demos/122/full-hosting-mode.html"
+    }
+  ],
+  "other": [
+    { "title": "The test setup now defines build-time values and form stubs, so the test run no longer prints a long list of unhandled errors. Nothing changes for people using the product.", "sha": ["4342caf56"] }
+  ]
+}

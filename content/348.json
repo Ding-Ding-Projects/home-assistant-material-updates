@@ -1,0 +1,45 @@
+{
+  "build": 348,
+  "headline": "Pages take the modern frame from the design boards, with new automation editor tools and a clearer media browser",
+  "summary": "Build 348 changes the frame around every page to match the design boards: a floating navigation pane on wide screens, one tool pill at the top of each page, and a floating bar at the bottom on phones. The automation editor gains a Tools menu with a flow view, a simulator, a health score and more. The media browser gets a large title at its top level, and embedded pages sit in rounded cards. These changes are unit tested, and none of them has been checked in a browser yet.",
+  "summary_yue": "348 版將每個頁面嘅外殼跟足設計圖：闊螢幕預設一塊浮起嘅左邊導覽窗格，頁頂一粒工具藥丸，手機底部一條浮動藥丸。自動化編輯器多咗工具選單，有流程圖、模擬同健康分數等等；媒體瀏覽器頂層有大標題，入咗資料夾就讓位畀資料夾名。全部只係單元測試過，未喺瀏覽器睇過。",
+  "highlights": [
+    {
+      "id": "modern-shell",
+      "title": "Pages use the modern frame: side pane, tool pill and phone bar",
+      "areas": ["interface"],
+      "what": "On wide screens the navigation pane is now the default. It is drawn as a floating card on the left, with the page as a second card beside it. You can still turn it off, and that choice is kept. Each page has one floating tool pill at the top instead of a search field and about ten icons, and the page search sits behind a magnifier. On a phone, a floating pill at the bottom holds Settings where Access used to be, and the accessibility tools moved into the Menu drawer. The automation editor now has one bar and one Save button, where it used to have two of each. Browsers that had an automatically saved top position are moved back to the left pane once.",
+      "what_yue": "闊螢幕而家預設一塊浮起嘅左邊導覽窗格，頁面係隔離一張卡。想關就可以關，你揀咗嘅會記住。每個頁面頂部只剩一粒浮動工具藥丸，搜尋收埋放大鏡後面。手機底部一條浮動藥丸，設定放咗以前「存取」嗰個位，無障礙工具就搬入選單。自動化編輯器由兩條列、兩粒儲存掣，變返一條、一粒。",
+      "why": "The owner said build 347 still did not look like the design. The colours matched, but the frame around each page did not.",
+      "why_yue": "屋主睇完 347 版話唔似設計圖。顏色啱晒，但係每個頁面嘅外殼仲係舊嘅。",
+      "try": ["Use the Navigation choice in the demo to turn the left pane on and off.", "Press the magnifier in the tool pill to open the search field.", "Switch on Phone view to see the floating bar at the bottom."],
+      "sha": ["b431284c5"],
+      "demo": "demos/348/modern-shell.html"
+    },
+    {
+      "id": "automation-tools",
+      "title": "Automation editor gains a Tools menu with flow view, simulator and health score",
+      "areas": ["interface"],
+      "what": "The automation editor has a new Tools entry in its menu. It holds a flow view with a minimap, a trace list, a simulator, a conflict and loop detector, plain-language text, a health score with its formula shown, a week-ahead view and an entity swap across automations with a review step. The simulator uses the existing dry run. It never calls a service, and it says which conditions it cannot judge. The dashboard editor gains tools too, such as screens side by side, a state simulator, an accessibility scan and a card library. Live breakpoints, replay of a recorded day, test case coverage and free pixel layout are not built, because nothing real backs them yet.",
+      "what_yue": "自動化編輯器個選單多咗「工具」，有流程圖、追蹤、模擬、衝突同循環偵測、健康分數、一星期預覽，仲有實體對換，換之前會叫你覆核。模擬用返現有嘅試行，唔會真係叫任何服務，遇到判斷唔到嘅條件會講清楚。儀表板編輯器都有新工具，例如並排睇多個螢幕、狀態模擬同無障礙掃描。冇真實資料撐住嘅嘢，例如即時斷點、重播一日同自由像素排版，暫時未整。",
+      "why": "Before an automation runs, it helps to see how it would behave and where it might conflict with another one.",
+      "why_yue": "個自動化未跑之前，睇到佢會點行、有冇同其他嘢打架，會安心啲。",
+      "try": ["Set the conditions in the simulator on or off.", "Press Run simulator to see whether the action would run.", "Type in the tools search box to find a tool by its name."],
+      "sha": ["99faa48fa"],
+      "demo": "demos/348/automation-tools.html"
+    },
+    {
+      "id": "media-browser-header",
+      "title": "Media browser gets a large title, and embedded pages sit in cards",
+      "areas": ["interface"],
+      "what": "The media browser has a large Media title with one summary line at its top level. When you open a folder, the title steps aside so that the folder name leads. Embedded pages no longer run edge to edge: their frame, address bar and notices sit in rounded cards with spacing around them. The history, activity, calendar, to-do, map, profile and maintenance pages already match their design boards through the shared theme. The dashboards, energy, climate, lights, security and first-run pages have not been compared with their boards yet.",
+      "what_yue": "媒體瀏覽器頂層有個大大隻「媒體」標題，仲有一句簡介。入咗資料夾，標題就讓位畀資料夾名做主角。內嵌頁面唔再貼到盡，個框、網址列同提示都放入圓角卡片，四周有啲空位。歷史、活動、日曆、待辦、地圖、個人檔案同維修嗰啲頁，已經透過共用嘅主題跟足設計圖；儀表板、能源、氣候、燈光、保安同首次設定嗰啲頁，仲未同設計圖對過。",
+      "why": "These everyday pages were brought in line with the modern design board.",
+      "why_yue": "呢啲日常頁面跟返現代設計圖。",
+      "try": ["Open a folder in the demo. The big title steps aside and the folder name leads.", "Press All media to go back to the top level.", "Hide the notice to see the card change."],
+      "sha": ["98ba6d94d"],
+      "demo": "demos/348/media-browser-header.html"
+    }
+  ],
+  "other": []
+}

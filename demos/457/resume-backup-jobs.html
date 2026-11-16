@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resume a backup job after restart, after checking its SSH host</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>[hidden] { display: none !important; }</style>
+</head>
+<body>
+<main class="demo" data-demo="resume-backup-jobs">
+  <h1>Resume a backup job after restart, after checking its SSH host</h1>
+  <p class="muted">Choose Resume on a job this computer owns, then approve or decline its saved SSH host before anything starts.</p>
+
+  <section class="card stack" aria-labelledby="jobs-heading">
+    <h2 id="jobs-heading">Backup jobs (pretend)</h2>
+    <ul id="jobs" class="list"></ul>
+  </section>
+
+  <section id="review" class="card stack" aria-labelledby="review-heading" hidden>
+    <h2 id="review-heading">Check the saved SSH host</h2>
+    <p id="host" class="note"></p>
+    <div class="row">
+      <button type="button" class="filled" id="approve">Approve this host</button>
+      <button type="button" class="tonal" id="decline">Decline</button>
+    </div>
+    <div id="approved" class="stack" hidden>
+      <label class="field" for="key">Optional key (masked, cleared straight after use)</label>
+      <input type="password" id="key" autocomplete="off">
+      <div class="row">
+        <button type="button" class="filled" id="resume">Resume the job</button>
+      </div>
+    </div>
+  </section>
+
+  <p id="status" class="note" aria-live="polite">No job has been resumed.</p>
+
+  <div class="row">
+    <button type="button" class="tonal" data-demo-reset>Start again</button>
+  </div>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+</main>
+<script>
+(function () {
+  var jobs = [
+    { id: 'a', name: 'Pretend backup A', owner: 'this computer', host: 'ssh-ed25519 demo-host-key-A' },
+    { id: 'b', name: 'Pretend backup B', owner: 'another device', host: 'ssh-ed25519 demo-host-key-B' }
+  ];
+  var current = null;
+  var resumed = {};
+  var list = document.getElementById('jobs');
+  var review = document.getElementById('review');
+  var hostText = document.getElementById('host');
+  var approved = document.getElementById('approved');
+  var key = document.getElementById('key');
+  var status = document.getElementById('status');
+
+  function setStatus(text, cls) {
+    status.textContent = text;
+    status.className = 'note' + (cls ? ' ' + cls : '');
+  }
+
+  function openReview(job) {
+    current = job;
+    hostText.textContent = 'Saved SSH host for ' + job.name + ': ' + job.host + ' (pretend key).';
+    approved.hidden = true;
+    review.hidden = false;
+    setStatus('Review the host before anything starts.', '');
+  }
+
+  function render() {
+    list.textContent = '';
+    jobs.forEach(function (job) {
+      var li = document.createElement('li');
+      var text = document.createElement('div');
+      text.style.flex = '1';
+      var name = document.createElement('strong');
+      name.textContent = job.name;
+      var owner = document.createElement('div');
+      owner.className = 'small muted';
+      owner.textContent = 'Owned by ' + job.owner + (resumed[job.id] ? ' (resumed)' : '');
+      text.appendChild(name);
+      text.appendChild(owner);
+      li.appendChild(text);
+
+      if (job.owner === 'this computer') {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'filled';
+        btn.textContent = 'Resume ' + job.name;
+        btn.disabled = !!resumed[job.id];
+        btn.addEventListener('click', function () { openReview(job); });
+        li.appendChild(btn);
+      } else {
+        var none = document.createElement('span');
+        none.className = 'badge';
+        none.textContent = 'No resume offered';
+        li.appendChild(none);
+      }
+      list.appendChild(li);
+    });
+  }
+
+  document.getElementById('decline').addEventListener('click', function () {
+    review.hidden = true;
+    current = null;
+    setStatus('Declined. Nothing started and no job was resumed.', 'warn');
+  });
+
+  document.getElementById('approve').addEventListener('click', function () {
+    approved.hidden = false;
+    setStatus('Host approved. The original request, archive and target will be reused.', 'good');
+  });
+
+  document.getElementById('resume').addEventListener('click', function () {
+    if (!current) return;
+    var hadKey = key.value.length > 0;
+    key.value = '';
+    resumed[current.id] = true;
+    setStatus('Resumed ' + current.name + ' with its original request, archive and target (pretend). Saved image and port kept.' + (hadKey ? ' The optional key was cleared at once.' : ''), 'good');
+    current = null;
+    review.hidden = true;
+    render();
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    current = null;
+    resumed = {};
+    key.value = '';
+    review.hidden = true;
+    approved.hidden = true;
+    setStatus('No job has been resumed.', '');
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
