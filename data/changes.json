@@ -1,9 +1,322 @@
 {
  "format": 1,
- "generated": "2026-11-16T23:07:17Z",
+ "generated": "2026-11-17T14:47:07Z",
  "repository": "Ding-Ding-Projects/home-assistant-material",
- "newest_build": 457,
+ "newest_build": 495,
  "releases": [
+  {
+   "build": 490,
+   "core": "2026.11.1.490",
+   "supervisor": "2026.11.0.490",
+   "os": "18.5.490",
+   "tag": "v2026.11.1.490",
+   "source": "b0535fcdf",
+   "date": "2026-11-17T04:35:51-05:00",
+   "previous_build": 487,
+   "changes": [
+    {
+     "sha": "b0535fcdf",
+     "date": "2026-11-17T04:35:51-05:00",
+     "title": "Device health, away digest, dry run replay, room wizard, update history, cloud host",
+     "areas": [
+      "build",
+      "deploy",
+      "docs",
+      "interface",
+      "supervisor"
+     ],
+     "detail": "Second wave of features, plus the plumbing for two more.\n\nIn the interface: - Device health, under Settings then System: low batteries, devices that went silent and weak signal, worst first, with tiles that filter the list. A device that reports nothing is listed as such instead of being guessed at, and \"days left\" only appears when recorded history actually supports it. - \"While you were away\" on the front door after an absence, built from the activity the instance already records and remembered on this device only. A switch and a gap setting live in Personal settings. - Dry run replay: \"Replay a past period\" under the editor's dry run shows how often the automation would have run over a past day or week, what stopped it and with which value. Anything history cannot answer is marked \"cannot tell\". No action is ever called. - Room setup wizard on the Areas page: name, devices, starter automations, done. Nothing is created unless ticked and starters are saved switched off. - Update history on the Updates page with going back to an earlier build behind the two-key confirmation. Kept per browser. The call that installs a chosen version has not yet been run against a real Supervisor. -",
+     "detail_yue": "裝置健康、離家摘要、試行重播、房間精靈、更新紀錄、雲端主機\n\n第二波功能，另加兩樣嘢嘅底層。\n\n介面方面： - 裝置健康（設定 → 系統）：電量低、冇晒聲氣同訊號弱嘅裝置，由最差 排起，數字磚可以直接過濾。冇回報健康資料嘅裝置會照直講，唔會亂估； 「仲有幾多日」要有紀錄支持先會出。 - 首頁「你唔喺度嗰陣」：離開一段時間之後先出現，用部機本身已經有嘅 活動紀錄砌出嚟，上次睇嘅時間只記喺呢部裝置。個人設定有開關同時間 間隔。 - 試行重播：編輯器試行結果下面有「重播過去一段時間」，話你知過去 一日或者一星期個自動化會行幾多次、邊個條件擋住、當時個數值係幾多。 紀錄答唔到嘅就寫「判斷唔到」。任何動作都唔會真係執行。 - 分區頁嘅房間設定精靈：改名、揀裝置、揀入門自動化、完成。冇剔嘅 唔會建立，入門自動化儲存時係關閉狀態。 - 更新頁嘅更新紀錄，可以經雙鑰匙確認返去舊版本。紀錄按瀏覽器保存。 指定版本安裝嗰個呼叫仲未喺真嘅 Supervisor 上面行過。 - 開發者工具：六個常用工具做藥丸掣，其餘收入「更多工具」各有一句 說明，狀態清單先顯示易讀名。\n\n介面以外： - 雲端主機：自選嘅「cloud」組合設定，用 `host.bat --cloud` 或者 `host.sh --cloud` 啟動，冇隧道憑證就拒絕；Supervisor 有設定、暫停、 繼續、移除同外部檢查嘅路由。由 Supervisor 啟動隧道程式嗰部分暫時 係有標明嘅替身，完整託管模式會老實講。隧道本身從未啟動過。 - 離線更新包：格式、製作工具、發佈工作同 Supervisor 路由，會逐件 檢查先郁手。而家淨係作業系統部分可以完全離線安裝，Core 同 Supervisor 會驗證然後報告需要網絡。Deploy Assistant 多咗 USB 手指 製作，唔會格式化，寫完逐個檔案讀返對。冇用過真手指或者真硬件。\n\n檢查：前端型別維持兩個已知錯誤，8336 個測試通過（三個已知失敗）， 本機建置 390 同 1440 闊度睇過零頁面錯誤；Supervisor 雲端主機 57 個、 離線更新 408 個測試通過；Deploy Assistant 178 個測試通過。"
+    },
+    {
+     "sha": "85655ade1",
+     "date": "2026-11-17T03:51:46-05:00",
+     "title": "Rich automation editor, visual action editors, modern dialogs and lists",
+     "areas": [
+      "interface"
+     ],
+     "detail": "The automation editor used to greet people with a wall of rows and, for some actions, a code box and a shrug. Now it states the automation as one sentence, numbers its When / Only if / Then blocks, and keeps Save where a hand expects it: in the header on a wide window, in the bottom bar on a phone, never both. Helpers can be created, edited and removed from inside the editor; removing one names the other automations that use it and goes through the two-key confirmation.\n\nEvery action now has a visual editor. Twenty-eight entity kinds get controls made for them (a light gets brightness and colour, a thermostat a stepper bounded by what it supports, a cover a position slider) and only show what the targeted device can really do. Other services get switches, sliders and choice tiles from their own field lists. The variables action and the two event data boxes lost their code-only status; a test walks every type and fails if one comes back. The code view is still there and round-trips unchanged.\n\nAlso in this change: - Statistic tiles that filter the list on Entities and Devices, and one shared empty-state block with a \"Clear search and filters\" action and a create button on Automation",
+     "detail_yue": "自動化編輯器大翻新：視覺化動作編輯器、新式對話框同清單\n\n以前個自動化編輯器一打開就係成牆嘅行，有啲動作仲淨係掟個程式碼框 俾你自己搞掂。而家佢會用一句說話講清楚個自動化做乜，「當／只有／ 然後」三塊有編號，儲存掣放喺手會去嘅位：闊螢幕喺頁首，手機喺底部， 唔會兩邊都有。輔助項目可以喺編輯器入面直接新增、修改同移除；移除 之前會講明仲有邊個自動化用緊，兼且要過雙鑰匙確認。\n\n每個動作都有視覺編輯器。二十八類實體有度身訂造嘅控制（燈有光度同 顏色，恆溫器有按裝置上下限嘅加減掣，窗簾有位置滑桿），而且只顯示 部裝置真係做到嘅嘢。其他服務就按自己嘅欄位清單出開關、滑桿同選項 磚。變數動作同兩個事件資料框唔再係淨得程式碼；有個測試會逐類行 一次，邊個走返轉頭就即刻紅燈。程式碼檢視仲喺度，來回轉換唔會走樣。\n\n今次仲有： - 實體同裝置頁嘅統計磚可以直接過濾清單；統一嘅空白狀態，有「清除 搜尋同篩選」，自動化、腳本同輔助項目仲有新增掣。 - 對話框：大標題識換行、搜尋得返頂部一個、主要動作係實心掣，600 闊度以下變成可以向下掃走嘅底部面板。 - 浮動掣會預留位，唔再壓住最後一行；提示訊息置中、闊螢幕最多兩個、 個個都閂得；有圖嗰個提示變成細藥丸，有對話框開住或者有人打緊字 就會等。 - 頁面標題唔會再喺一個字中間斷開。\n\n喺本機建置 390 同 1440 闊度、光暗兩款睇過，零頁面錯誤。型別檢查 維持兩個已知錯誤，測試維持三個已知失敗。"
+    }
+   ]
+  },
+  {
+   "build": 487,
+   "core": "2026.11.1.487",
+   "supervisor": "2026.11.0.487",
+   "os": "18.5.487",
+   "tag": "v2026.11.1.487",
+   "source": "51000eee6",
+   "date": "2026-11-17T02:50:51-05:00",
+   "previous_build": 481,
+   "changes": [
+    {
+     "sha": "51000eee6",
+     "date": "2026-11-17T02:50:51-05:00",
+     "title": "Modernise the shared page header, list pages and the Settings front",
+     "areas": [
+      "interface"
+     ],
+     "detail": "About a hundred pages shared one tired header, so they all get the new one at once: a round back button, a heavy title that wraps instead of giving up with an ellipsis, pill tabs with an indicator that slides, and a page-entry rise that respects the motion preference and reduced motion. List pages lose the stack of chrome: statistics are one strip of numerals, the tools fit one row with the overflow behind More, rows are tall rounded blocks, the selection row replaces the tool row in place, and the \"Showing N of N\" sentence only speaks when a filter is actually hiding something. On a phone the list had two scrollers fighting over one finger; now there is one. The Settings front leads with its search, one amber block when something needs attention, four numeral tiles and compact rows for everything else.\n\nSeen in a local build at 390 and 1440 px. Checks: types at the two known gallery errors, tests at the three known build-script failures.",
+     "detail_yue": "翻新共用頁首、清單頁同設定首頁\n\n成百頁共用同一個老頁首，今次一次過換晒：圓形返回掣、識得換行 唔再「…」嘅粗標題、有滑動指示嘅藥丸分頁、同埋尊重動態偏好嘅入場 動畫。清單頁唔再疊到成座山：統計變成一行數字，工具一行排晒， 放唔落嘅收入「更多」，每行變高身圓角，選取列原地取代工具列， 「顯示 N 之 N」得返真係有嘢被過濾先出聲。手機上面兩個捲軸爭一隻 手指嘅問題都解決咗，得返一個。設定首頁以搜尋做主角，有嘢要處理先 出琥珀色方塊，四塊大數字磚，其餘用精簡行。\n\n喺本機建置 390 同 1440 闊度睇過。型別檢查維持兩個已知錯誤， 測試維持三個已知失敗。"
+    },
+    {
+     "sha": "e9ed80261",
+     "date": "2026-11-17T02:38:49-05:00",
+     "title": "Add design canvas 35: boards for the new features",
+     "areas": [
+      "design"
+     ],
+     "detail": "Thirteen boards, drawn before a line of product code, so nobody has to guess what \"a visual editor for every action\" means at two in the morning. The automation editor now reads as one sentence with numbered blocks, every action gets controls made for the thing it controls instead of a code box that stares back, and helpers can be made, changed and removed without leaving the editor. Also on the canvas: modern dialogs and phone bottom sheets, one shared empty state, tiles that filter, tidied developer tools, update history with going back, backup self-check, USB stick maker, offline pack, the away digest, device health, dry run, the room wizard and the cloud host.\n\nReferences only. No product page changed in this commit.",
+     "detail_yue": "新增設計畫布 35：新功能嘅畫板\n\n十三塊畫板，寫產品程式之前畫好，費事半夜兩點先嚟估「每個動作都有 視覺編輯器」即係乜。自動化編輯器而家讀落似一句說話再加編號方塊， 每個動作都有度身訂造嘅控制，唔再係一格冷冰冰嘅程式碼框；輔助項目 喺編輯器入面就可以新增、修改同移除。其餘仲有新式對話框同手機底部 面板、統一嘅空白狀態、識過濾嘅磚、整理好嘅開發者工具、更新紀錄同 還原、備份自我檢查、USB 手指製作、離線更新包、離家摘要、裝置健康、 試行、房間精靈同雲端主機。\n\n純參考，今次冇改任何產品頁面。"
+    },
+    {
+     "sha": "63aaa961e",
+     "date": "2026-11-17T01:39:07-05:00",
+     "title": "Backups list on a phone: keep the hosting buttons out of the text line",
+     "areas": [
+      "interface"
+     ],
+     "detail": "On a narrow table every column without a slot of its own is joined into the second line under the name. The two hosting icon buttons qualified, so each row read \"8.87 GB, 1 hour ago, [server icon]\" and then gave up with an ellipsis. They are hidden on narrow layouts now; the same two actions were already in the row menu. The disabled \"Back up now\" button also says why it is disabled.\n\nNot yet looked at in a browser. The scrolling report is still open.",
+     "detail_yue": "手機睇備份清單：唔好再將託管掣塞入文字行\n\n窄版表格會將冇自己位嘅欄全部串埋落名下面第二行，兩粒託管圖示掣 啱啱好中招，搞到每行讀到一半就「…」。而家窄版收埋佢哋，功能本身 喺行尾選單一早有。「立即備份」停用嗰陣都會講原因。\n\n未喺瀏覽器睇過，捲動問題仲未解決。"
+    },
+    {
+     "sha": "e56cca6fa",
+     "date": "2026-11-17T01:38:26-05:00",
+     "title": "Add design canvas 34: the full interface polish direction",
+     "areas": [
+      "design"
+     ],
+     "detail": "Six boards that tell every page to pick one loud thing and let the rest sit down. The stock look had eighteen equal rows all shouting at the same volume, which is the visual equivalent of a meeting with no agenda. Now the front door, the Settings front and a list page each have a hero, big numerals for counts, tiles that double as filters, and two phone boards that prove nothing gets thrown overboard on a small screen. The motion board has six buttons, one per moment that has actually earned a little theatre; everything else stays still on purpose.\n\nThese are references only. No product page changed in this commit.",
+     "detail_yue": "新增設計畫布 34：成個介面嘅翻新方向\n\n六塊畫板，叫每一頁揀一樣嘢大聲，其餘收聲。以前十八行一齊嗌， 好似開會冇議程咁。而家首頁、設定首頁同清單頁都有主角、大數字、 識得過濾嘅磚，仲有兩塊手機畫板證明細螢幕都冇嘢被掉走。動態畫板 有六粒掣，每粒對應一個真係值得做戲嘅時刻，其他時候乖乖唔郁。\n\n純參考，今次冇改任何產品頁面。"
+    }
+   ]
+  },
+  {
+   "build": 481,
+   "core": "2026.11.1.481",
+   "supervisor": "2026.11.0.481",
+   "os": "18.5.481",
+   "tag": "v2026.11.1.481",
+   "source": "d00578e2e",
+   "date": "2026-11-17T00:32:44-05:00",
+   "previous_build": 478,
+   "changes": [
+    {
+     "sha": "d00578e2e",
+     "date": "2026-11-17T00:32:44-05:00",
+     "title": "Stop the update queue calling a real update failed; restart the device after a USB install",
+     "areas": [
+      "interface"
+     ],
+     "detail": "\"Update everything\" was run for real on a throwaway copy with a real Supervisor: a Core update from build 476 to 478. Nine seconds into the download the update reported \"not running\" for a moment, and the queue took that as \"went back to available without installing\". Core then updated and restarted correctly, but the queue stayed on the false failure and would never have reached a step after it. Every test had passed, and a look with pretend updates had found nothing. Now \"not running\" has to last (ninety seconds, eight minutes for Supervisor, Core and the operating system) before it counts, an install call that is still open counts as running, and a step that was judged failed is taken back as done once its update has arrived, so the queue carries on. A step keeps its name for when its entity is gone after a restart. In the USB install section \"Restart now\" opened the shared dialog, which defaults to a quick reload that would not start a new operating system; it now asks one question and restarts the device. A file that is no longer found triggers a fresh look, and verdict text uses the ordinary ink colour.",
+     "detail_yue": "「全部更新」喺一個有真 Supervisor 嘅臨時副本度真係行咗一次：Core 由 476 升去 478。下載咗九秒，個更新話咗一下「冇行緊」，隊列就當佢失敗。 其實 Core 之後正常升完級兼重啟，但隊列就企咗喺個假失敗度，後面嘅 步驟永遠唔會輪到。所有測試都過晒，用假更新睇亦都睇唔出。而家「冇 行緊」要持續一段時間先算數，安裝請求未返嚟就當仲行緊；就算判咗 失敗，個更新之後到咗都會改返做完成，隊列繼續行。另外 USB 安裝完 嗰粒「重新啟動」以前開嘅對話框預設係快速重新載入，起唔到新系統； 而家問一句就直接重啟部機。"
+    },
+    {
+     "sha": "49742a972",
+     "date": "2026-11-17T00:12:52-05:00",
+     "title": "Polish what a look at build 478 found: the glow edge, Cantonese dates and job names, small layout cuts",
+     "areas": [
+      "interface"
+     ],
+     "detail": "The confirmation's red glow ended at a visible edge because the layer holding it was clipped while still red at its sides; the earlier fix had changed the wrong gradient. The layer now fades to nothing on all four sides. In Cantonese mode the comparison's dates, the footer date and the names of the build jobs stayed English; dates are now formatted per language, written once per language in both-languages mode, and the eleven known job names have translations, with an unknown name shown as it is. The build picker's chosen value wraps instead of being cut. An expanded change uses the card's width. A step half under the editor's search bar kept losing its whole outline because the room left for the outline was counted against the visible part; the remaining part is now outlined, and outlines follow scrolling frame by frame. \"Confirmation drama\" has its summary tile. Tests pass at the usual baseline; none of this has been seen in a built app yet.",
+     "detail_yue": "確認對話框嘅紅光有條睇得見嘅邊，原因係嗰層喺邊位仲紅緊就畀人剪咗， 上次改錯咗另一個漸變；而家四邊都會淡出。廣東話模式入面，比較嘅日期、 頁腳日期同工序名以前係英文，而家日期跟語言寫，十一個工序名都有 翻譯。版本選擇器揀咗嘅值識得轉行唔再斬尾。編輯器入面畀搜尋列遮住 一半嘅步驟，露出嚟嗰部分而家會保留外框，外框亦都跟得上捲動。"
+    },
+    {
+     "sha": "1352b0423",
+     "date": "2026-11-17T00:01:53-05:00",
+     "title": "Record build 478: what was seen right, what is still wrong, what has never run for real",
+     "areas": [
+      "docs"
+     ],
+     "detail": "HANDOFF.md now says which repairs were seen working in the built app, which smaller faults remain (the confirmation glow edge, Cantonese fragments, a cut picker value), that the storage error a checker reported came from the checker's own script and not from the product, and, most importantly, that the update queue, the install from USB storage and the USB recovery step have never run against a real device.",
+     "detail_yue": "交接文件寫低咗 478 版邊啲修正喺砌好嘅版本度見到得咗、邊啲細毛病 仲未執，仲有最緊要嗰句：順序更新、USB 安裝同 USB 救援三樣都未喺 真機度行過。"
+    }
+   ]
+  },
+  {
+   "build": 478,
+   "core": "2026.11.1.478",
+   "supervisor": "2026.11.0.478",
+   "os": "18.5.478",
+   "tag": "v2026.11.1.478",
+   "source": "f599eaae8",
+   "date": "2026-11-16T22:36:31-05:00",
+   "previous_build": 476,
+   "changes": [
+    {
+     "sha": "f599eaae8",
+     "date": "2026-11-16T22:36:31-05:00",
+     "title": "Fix what a look at build 476 found on the Updates page, the confirmation and the editor",
+     "areas": [
+      "interface"
+     ],
+     "detail": "Six faults from looking at the built app. While the update queue ran on a wide window each row's title was squeezed to eight pixels and wrapped one letter per line, because the waiting note took the whole line; rows now wrap and the title keeps its room. Problem outlines stayed off the editor's bottom bar but were drawn over its sticky search bar at the top; the cutting now understands a bar above as well as below, and the editor's sticky bars register themselves. When the home already ran the build being built, the page said \"up to date\" and \"can be installed\" at once; it now says \"You already have build N\". The comparison no longer opens on a build compared with itself. Every string on the Updates page follows the language mode, with a both-languages sentence built once per language instead of one nested in the other. The confirmation glow fades before its edge. One fault is only a best guess: \"Confirmation drama\" set to Off did not stick, and the likely cause (a settings merge that could replace an unrecorded local change) is fixed and tested, but it has not been seen working in a browser.",
+     "detail_yue": "睇完 476 版搵到六個毛病，一次過執。更新隊列行緊嗰陣，闊螢幕每行個 標題畀人逼到得八個像素，一個字母一行，因為等候提示霸晒成行；而家 識得轉行。問題外框避得開編輯器底部列，但係上面嗰條搜尋列又踩咗 過界，而家上下都識避。部機已經係嗰個版本嘅時候，唔會再又話「已經 最新」又話「可以安裝」。比較唔會再自己同自己比。更新頁所有字都跟 語言模式。至於「確認戲劇程度」揀咗關閉但冇效，搵到一個好可能嘅 原因並且修咗、加咗測試，不過未喺瀏覽器證實。"
+    },
+    {
+     "sha": "2f25b9874",
+     "date": "2026-11-16T22:00:56-05:00",
+     "title": "Let headings wrap on the Updates page; centre the text in the progress ring",
+     "areas": [
+      "interface"
+     ],
+     "detail": "A look at build 476 found the big heading \"Core 2026.11.1.476 can be installed\" running out of its block and under the tile beside it, at every width including a phone. The shared heading style keeps an h2 on one line and cuts it with an ellipsis, and the new blocks inherited that. Headings in the Updates components now wrap, the hero heading is a little smaller and balanced, and the percentage and the job count sit together in the middle of the ring instead of the count landing on the ring itself. Checked by applying the same rules inside the running 476 image: no heading overflows its block at 1440, 390 or 320 px.",
+     "detail_yue": "睇返 476 版，「Core 2026.11.1.476 can be installed」嗰個大標題衝出咗 自己個方塊，仲鑽咗入隔籬嗰格下面，手機都一樣。原因係共用嘅標題樣式 規定 h2 唔准轉行。而家更新頁啲標題識得轉行，大標題細返少少，進度圈 入面個百分比同工序數目亦都排返喺正中。"
+    }
+   ]
+  },
+  {
+   "build": 476,
+   "core": "2026.11.1.476",
+   "supervisor": "2026.11.0.476",
+   "os": "18.5.476",
+   "tag": "v2026.11.1.476",
+   "source": "0d9211c6c",
+   "date": "2026-11-16T20:50:31-05:00",
+   "previous_build": 468,
+   "changes": [
+    {
+     "sha": "0d9211c6c",
+     "date": "2026-11-16T20:50:31-05:00",
+     "title": "Rebuild the Updates page in the bold design; add install from USB storage and a notes preview",
+     "areas": [
+      "interface"
+     ],
+     "detail": "The first Updates page worked and looked like a form. It now follows the design boards: a very large title, a progress ring with the percentage for the build on its way, tiles for when Core can be installed and when the whole release ends, a stage rail of seven proportional segments, and stage tiles in a wrapping grid (never a fixed row of seven, which was a real clipping fault on a phone). \"What changed\" shows the two builds as blocks around a huge count, and the counts per part are bars that toggle filters. A hand-started build used to show the workflow name as its latest change; it now shows the commit title. New: \"Install from USB storage\" lists update files the Supervisor finds on a stick with a plain verdict for each, installs behind the two-key confirmation, follows the copy and install, and never restarts by itself; it only appears where an operating system exists, and it joins the page's interlock. New: \"Notes for build N\" shows the headline, summary and highlights from the public updates log in the reader's language mode, and loads the full page in a sandboxed frame only when asked. Logic is tested; nothing here has been seen in a built app yet.",
+     "detail_yue": "第一版更新頁用得，不過個樣似填表。而家跟返設計板：特大標題、進度圈、 幾時裝得 Core 同成個版本幾時完嘅方塊、七段階段條，階段方塊會自己 轉行（以前硬排七格，喺手機真係斬字）。「改咗乜」用兩個版本方塊夾住 一個大數字，各部分嘅橫條撳得嚟篩選。新增「由 USB 儲存裝置安裝」： 列出手指入面搵到嘅更新檔同每個嘅判斷，要過雙鎖匙確認先裝，唔會自己 重啟。仲有「版本說明」預覽，跟你揀嘅語言顯示，撳先至載入完整頁面。 邏輯有測試，但未喺砌好嘅版本度睇過。"
+    },
+    {
+     "sha": "7db7b622d",
+     "date": "2026-11-16T20:38:13-05:00",
+     "title": "Let the Supervisor install an operating system update from a file on USB storage",
+     "areas": [
+      "supervisor"
+     ],
+     "detail": "A home with no connection had no way to update its system short of carrying the whole device somewhere with internet. The Supervisor can now list update files it finds on removable drives and install one that the owner picks. Only removable drives are read, read-only, and only names of the form haos_<board>-<version>.raucb in the root or in an updates, haos or home-assistant folder. Each file gets a verdict: ready, wrong device, not newer, too large, or not enough space. Installing re-runs the scan and accepts only a file the scan itself returned, copies it to the device while hashing, releases the stick, and hands the copy to the same installer the online update uses, whose signature check is never bypassed. No downgrade, no force, nothing automatic, admin only, and it cannot run together with another system update. Run in a Linux container: 698 tests pass, including the existing update tests. The first run there found a real fault, error messages built with their arguments swapped, now fixed. Not proven with a real stick on a real device.",
+     "detail_yue": "屋企冇網嘅話，以前想更新系統就得抬成部機去有網嘅地方。而家 Supervisor 識得喺 USB 手指度搵更新檔，等主人揀一個嚟裝。淨係讀可 移除嘅磁碟、淨係認指定檔名，每個檔都有判斷：裝得、唔啱呢部機、 唔夠新、太大或者唔夠位。裝之前會重新掃一次，抄落部機先放返枝手指， 簽名檢查一樣走唔甩；冇得降級、冇得強行、唔會自動裝。喺 Linux 容器 行過 698 個測試全部過，仲捉到一個真錯處。未用真手指喺真機試過。"
+    },
+    {
+     "sha": "473ce8227",
+     "date": "2026-11-16T20:27:13-05:00",
+     "title": "Make the two-key confirmation dramatic: turning keys, a charging core and a shockwave",
+     "areas": [
+      "design",
+      "interface"
+     ],
+     "detail": "Confirming something that cannot be undone felt like ticking a box on a tax form. The two keys now turn a quarter with a spring and light up amber, a core between them shows the slider as a ring with a big number and counter-rotating rings, and everything winds up as you slide: the rings and stripes speed up, a red glow closes in, the dialog starts to shake and the warning flickers, with status words that change from \"Turn both keys\" to \"Last chance to stop\". Letting go early eases the thumb back. Confirming gives one flash and two shockwaves on a layer of its own, and the confirm event is not delayed at all. What it requires is unchanged. A new personal setting, Confirmation drama (Off, Calm, Standard, Dramatic), scales it; reduced motion and Off show no motion, only the ring, the numbers and the words. The flicker stays under three times a second. Existing haptic and sound helpers are used and respect their settings. The design board is added to canvas 33. Logic is tested; the motion has not been seen in a built app yet.",
+     "detail_yue": "確認一啲冇得返轉頭嘅嘢，以前嗰種感覺同填報稅表剔格仔差唔多。而家 兩條鎖匙會彈住咁轉、著燈，中間有個核心顯示滑到幾多，越滑越緊張： 啲圈越轉越快、紅光逼埋嚟、成個對話框開始震，啲字由「扭晒兩條鎖匙」 變到「最後機會」。中途放手會彈返轉頭；滑到尾就一下閃光加兩圈衝擊波。 要求一樣冇變。個人設定多咗「確認戲劇程度」可以校，開咗減少動態就 完全唔郁，淨係睇個圈、數字同文字。"
+    },
+    {
+     "sha": "38d356959",
+     "date": "2026-11-16T20:21:23-05:00",
+     "title": "Add USB recovery: reinstall, reset apps or erase a device from a labelled stick",
+     "areas": [
+      "docs",
+      "os"
+     ],
+     "detail": "A device left broken by an update meant finding a screwdriver, taking the card out and flashing it on another computer. The operating system image now carries a recovery step that does nothing at all unless a USB stick labelled HA-RECOVERY appears, holding a request file with the exact confirmation phrase for its action. It can reinstall the operating system from an update file on the stick (the system's own signature check decides), schedule the existing reset of the app storage while keeping settings, or set the existing erase flag for a full reset. Each request runs once: it is renamed to started, then done or failed, and a plain result file is written to the stick. No other unit depends on it and every failure path lets the boot continue. Tested against pretend hardware only (79 script checks); it has not been proven on a real Raspberry Pi, and the document says so, along with what a stick cannot repair: destroyed boot files, or both system copies unbootable.",
+     "detail_yue": "以前更新搞壞部機，就要搵螺絲批拆殼、攞張卡出嚟喺第二部電腦重新燒過。 而家作業系統多咗個救援步驟：平時完全唔郁，除非插咗一枝標籤叫 HA-RECOVERY 嘅 USB 手指，入面有份寫明確認字句嘅要求檔。佢可以由 手指重裝作業系統（簽名一樣要過關）、清走壞咗嘅應用程式儲存但保留 設定，或者成部機還原。每份要求淨係做一次，做完會喺手指度留低結果。 暫時只係用假硬件測試過，未喺真嘅 Raspberry Pi 行過，文件都有寫明。"
+    },
+    {
+     "sha": "c30008148",
+     "date": "2026-11-16T20:11:58-05:00",
+     "title": "Add \"Update everything\" that installs in a safe order, and stop updates being started together",
+     "areas": [
+      "interface"
+     ],
+     "detail": "The Updates page offered three Update buttons for Supervisor, Core and the operating system and let all three be pressed at once, which is a fine way to restart the Supervisor under a Core update while the device reboots under both. \"Update everything\" now runs the pending updates one at a time: Supervisor, then apps and everything else, then Core, then the operating system last because it restarts the device. It lists the order before it starts, survives the restarts in between by resuming when the page reconnects, and stops with a plain message if a step fails, leaving the rest untouched. While any update is running every other Update button is disabled and says what it is waiting for. On a phone the row title gets its own line with the versions under it. The ordering and step rules are covered by tests; the page has not been seen in a built app yet.",
+     "detail_yue": "更新頁以前畀你三粒掣一齊撳，Supervisor、Core 同作業系統一齊更新， 即係叫部機喺重啟緊嘅時候再重啟，唔出事先奇。而家有「全部更新」： 逐個嚟，先 Supervisor，再到應用程式同其他，跟住 Core，作業系統 擺最尾因為佢會重啟部機。開始之前會列晒次序，中間重啟完識得自己 接返落去，有一步失敗就停低講清楚。有嘢更新緊嘅時候，其他更新掣 會暫時撳唔到，仲會寫明等緊邊個。"
+    }
+   ]
+  },
+  {
+   "build": 468,
+   "core": "2026.11.1.468",
+   "supervisor": "2026.11.0.468",
+   "os": "18.5.468",
+   "tag": "v2026.11.1.468",
+   "source": "e4e67a49a",
+   "date": "2026-11-16T18:50:13-05:00",
+   "previous_build": 462,
+   "changes": [
+    {
+     "sha": "e4e67a49a",
+     "date": "2026-11-16T18:50:13-05:00",
+     "title": "Collect typed keys from the first key press; cut problem outlines to where their step is visible",
+     "areas": [
+      "docs",
+      "interface"
+     ],
+     "detail": "A look at build 462 found the sidebar search kept every letter at human speed but still dropped all but the first in a fast burst: the keys arrived before the dialog had even loaded, so nobody was home to catch them. Collecting now starts in the same turn as the first key, in a small shared module, and the dialog takes the text when its field has focus. It lets go of the keyboard by itself after six seconds if no dialog ever asks. Problem outlines followed their step out of its scrolling container and, on a wide window, were drawn over the page footer. They are now cut to the area the step can actually be seen in, across shadow roots, and a sliver too small to read is not outlined. HANDOFF.md records builds 457 and 462, the update feed change, the change list, the Updates page and the updates log.",
+     "detail_yue": "睇返 462 版，側欄搜尋慢慢打係齊字，但係一輪嘴咁快打就得返第一個字： 啲字到咗，個對話框仲未開門，冇人接。而家第一下撳掣嗰刻就開始接字， 等對話框攞到焦點先交返，六秒冇人嚟攞就自己收工。另外問題外框以前會 跟住個步驟捲出界，闊螢幕仲會畫咗落頁腳度；而家只會畫喺睇得見嘅範圍， 剩得一條線咁窄就乾脆唔畫。"
+    },
+    {
+     "sha": "8ef0d673a",
+     "date": "2026-11-16T18:16:03-05:00",
+     "title": "Add build progress and a version comparison to the Updates page",
+     "areas": [
+      "design",
+      "interface"
+     ],
+     "detail": "The Updates page could say \"Everything is up to date\" and nothing else, like a station board that only ever shows \"On time\". It now has an \"Update coming soon\" card that reads the public build runs: build number, the Core version it becomes, a progress bar over the jobs, the stage in words, a labelled estimate, every job with its state, and plain messages when a build fails, is replaced, or the public list cannot be reached. Below it, \"What changed between versions\" compares any two builds from the published change list: a side-by-side table, counts per part of the product that act as filters, a search with the pattern builder, and the changes grouped by build with the explanation in the reader's language mode. Both read public pages from the browser only; nothing about the home is sent. Logic is covered by tests; the page has not been seen in a built app yet.",
+     "detail_yue": "更新頁以前淨係識講「全部都係最新」，好似個車站顯示屏永遠得「準時」 兩個字。而家多咗張「更新就嚟到」卡：邊個版本、去到邊個階段、進度條、 估計時間、每個工序嘅狀態都睇到，砌唔成或者畀新版頂替咗都會老實講。 下面仲可以揀任何兩個版本嚟比較，分部分篩選、搜尋，解釋跟返你揀嘅 語言。全部只係讀公開頁面，屋企嘅資料一啲都唔會送出去。"
+    },
+    {
+     "sha": "27e2d9461",
+     "date": "2026-11-16T18:04:41-05:00",
+     "title": "Add the Updates design canvas and publish a change list with the update feed",
+     "areas": [
+      "design",
+      "build"
+     ],
+     "detail": "Installed homes could see a version number and nothing about what it contained, like a parcel with a tracking code and no label. The feed publisher now also writes changes.json: every build with the commits since the build before it, the part of the product each one touched, and the explanation in English and Cantonese, rebuilt from history on each run so it needs no previous copy. A failure there never holds back the feed. Design canvas 33 holds four boards for the Updates page: the \"Update coming soon\" card with its progress bar, every state of that card, and the comparison of two versions on a wide window and a phone.",
+     "detail_yue": "以前部機淨係見到個版本號，入面有乜完全唔知，好似收到個包裹淨係得張 追蹤編號。而家更新名單會跟埋一份改動清單：每個版本改咗啲乜、改邊個 部分、中英文解釋都有，每次由歷史重新砌，壞咗都唔會阻住更新名單。 設計畫布 33 有四塊板：「更新就嚟到」進度卡、佢嘅所有狀態，同埋闊螢幕 同手機嘅版本比較。"
+    }
+   ]
+  },
+  {
+   "build": 462,
+   "core": "2026.11.1.462",
+   "supervisor": "2026.11.0.462",
+   "os": "18.5.462",
+   "tag": "v2026.11.1.462",
+   "source": "ef78b7991",
+   "date": "2026-11-16T16:56:51-05:00",
+   "previous_build": 457,
+   "changes": [
+    {
+     "sha": "ef78b7991",
+     "date": "2026-11-16T16:56:51-05:00",
+     "title": "Keep every key typed into the sidebar search; stop problem outlines painting over the editor bar",
+     "areas": [
+      "interface"
+     ],
+     "detail": "The sidebar search handed the first letter to the command palette and then dropped whatever was typed while the palette was still putting its shoes on: \"sett\" arrived as \"tt\", \"s\" or \"ett\" depending on typing speed. The palette now collects keys itself from the moment it is asked to open until its field has focus, then hands the whole text to the field. Problem outlines and badges live in one fixed layer above the page, so they walked straight over the automation editor's bottom bar once their step scrolled under it. Bars can now register as covers: an outline is cut at the bar's edge, and a badge whose step is under the bar is not drawn. A small test covers the cutting.",
+     "detail_yue": "側欄搜尋以前交咗第一個字畀指令面板之後，面板仲着緊鞋，中間打嘅字就 唔見晒，打「sett」會變「tt」或者得返個「s」。而家面板由開始打開嗰刻 自己接住啲字，等個輸入格攞到焦點先一次過交返。另外問題標記同外框 係浮喺成版上面嘅，捲到自動化編輯器底部列下面就會踩過界；而家底部列 識得報到，外框去到邊就斬到邊，標記喺列下面就唔畫。"
+    },
+    {
+     "sha": "ec56bdf20",
+     "date": "2026-11-16T16:21:55-05:00",
+     "title": "Move the Core and Supervisor update feed as soon as their images exist",
+     "areas": [
+      "build"
+     ],
+     "detail": "Installed instances kept saying \"Up to date\" for hours, because the feed only moved in the very last job, after every operating system image had finished its one to two hour bake. The Core image was sitting on the shelf the whole time with nobody told it was there. A new job now moves the Core and Supervisor entries right after the container image is published, on every build. Operating system entries are left alone: only the release job advances them, once signed update files exist.",
+     "detail_yue": "已安裝嘅機成日話「已經係最新」，因為更新名單要等到所有作業系統映像 焗完先肯郁，成個幾兩個鐘。其實 Core 映像一早已經擺咗上架，只係冇人 通知。而家容器映像一出，新工序就即刻更新 Core 同 Supervisor 嘅版本； 作業系統嗰部分照舊，等發佈工序簽好名先至郁。"
+    },
+    {
+     "sha": "8c60e5e30",
+     "date": "2026-11-16T14:59:10-05:00",
+     "title": "Widen Cantonese and both-languages coverage to Settings, the sidebar and home cards",
+     "areas": [
+      "interface"
+     ],
+     "detail": "The Cantonese mode used to translate the frame and then leave the whole picture in English, like a menu with only the prices translated. It now covers the Settings dashboard (every card, secondary line, banner and count summary), the sidebar and panel names, the notification drawer, the home greeting, hero, lights, security and dashboards cards, and all common action words; 261 more strings in yue-own.json. Count lines and the greeting summary are built once per language and then joined, so the both-languages view shows two whole lines and not one mixed sentence. The sidebar re-renders on a mode change. Still English: the Settings tip line (it carries link values), list page tables, and call sites that do not yet go through the mode-aware text function.",
+     "detail_yue": "廣東話模式以前淨係識翻譯個框，入面成版都仲係英文，好似餐牌淨係譯咗價錢。 而家設定頁每張卡、副標題、提示同數量摘要，側欄同面板名，通知欄，主頁問候、 燈光、保安同儀表板卡，仲有常用按鈕字眼，全部有返廣東話，一共加多 261 句。 雙語模式會分開兩行完整顯示，唔會撈埋一句。"
+    }
+   ]
+  },
   {
    "build": 457,
    "core": "2026.11.1.457",

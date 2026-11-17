@@ -1,0 +1,23 @@
+{
+  "build": 487,
+  "headline": "One new page header, tidier list pages, and a Settings front that starts with search",
+  "summary": "Build 487 gives about a hundred pages the same new header, with a round back button and titles that wrap instead of being cut short. Tabs are pills with a sliding indicator. List pages show their statistics as one strip of numbers, keep their tools in one row with More behind it, and show a Showing line only when a filter hides something. On a phone a list has one scroller, not two. The Settings front opens with search, shows one amber block when something needs attention, and offers four tiles with big numbers. The Backups list on a phone no longer shows stray buttons in its text.",
+  "summary_yue": "487 版為大約一百個頁面換上同一個新標題列：圓形返回掣，標題會轉行，唔會被截短。分頁變成膠囊形狀，底下嘅指示線會滑動。列表頁嘅統計數字排成一條數字帶，工具收喺一行入面，其餘收進「More」；只有篩選真係藏咗嘢，先會顯示「Showing N of N」。喺手機度，列表只有一條捲動軸，唔會再有兩條打架。設定首頁先出搜尋，有嘢要處理就出一個琥珀色提示，再有四個大數字卡。手機上嘅備份列表，文字行入面唔會再夾住散嘅按鈕。",
+  "highlights": [
+    {
+      "id": "interface-polish",
+      "title": "Pages share one new header, with pill tabs and tidier lists",
+      "areas": ["interface"],
+      "what": "Every page now uses the same header: a round back button and a bold title that wraps instead of being cut off. Tabs are pills, and the indicator slides to the one you choose. On list pages the statistics sit in one strip of numbers, the tools fit one row with the rest behind More, and rows are tall and rounded. Choosing items swaps the tool row for a selection row in the same place. The Settings front leads with search, then one amber block when something needs attention, four tiles with big numbers, and compact rows for everything else.",
+      "what_yue": "每個頁面而家都用同一個標題列：圓形返回掣，粗體標題太長會轉行，唔會用省略號截走。分頁係膠囊形，指示線會滑去你揀嘅嗰個。列表頁嘅統計數字排成一條，工具排喺一行，其餘收入「More」；揀咗項目之後，選取列會喺原來嘅位置代替工具列。設定首頁先出搜尋，之後有嘢要處理就出現琥珀色提示，再係四個大數字卡，其餘設定用緊湊嘅列排列。",
+      "why": "Many pages had their own tired header, and list pages stacked too much chrome above their rows, so on a phone two scrollers fought over one finger.",
+      "try": ["In the first demo section, press each tab and watch the indicator slide.", "In the list section, change the filter and see the Showing line appear, then press More.", "In the Settings section, type in the search box and see the rows filter."],
+      "sha": ["51000eee6"],
+      "demo": "demos/487/interface-polish.html"
+    }
+  ],
+  "other": [
+    { "title": "Reference boards for the interface polish and the new features (design canvases 34 and 35), with no product page changed", "sha": ["e56cca6fa", "e9ed80261"] },
+    { "title": "The Backups list on a phone no longer shows the hosting icon buttons inside the text line, and the disabled Back up now button says why it is disabled", "sha": ["63aaa961e"] }
+  ]
+}

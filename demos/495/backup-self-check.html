@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: backup self-check</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+[hidden] { display: none !important; }
+.check { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 12px 0; border-top: 1px solid var(--outv); }
+.check:first-child { border-top: none; }
+.check .n { flex: 1 1 200px; }
+.check .res { min-width: 96px; text-align: center; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="backup-self-check">
+  <h1>Backup self-check proves a backup opens, not that a restore would succeed</h1>
+  <p class="muted">Run the self-check on the demo backup. Tick the box to make one copy disagree, then run it again to see a failed check.</p>
+
+  <section class="card stack" aria-labelledby="bs-h">
+    <h2 id="bs-h" class="small">Backup self-check: Nightly backup (pretend)</h2>
+    <label class="row"><input type="checkbox" id="bad" class="switch"> <span>Make one copy disagree with its record</span></label>
+    <div class="row">
+      <button type="button" class="filled" id="run">Run self-check</button>
+    </div>
+    <ul class="list" id="checks" aria-label="Self-check results">
+      <li class="check" data-key="complete"><span class="n">The file is complete</span><span class="badge res">Not run</span></li>
+      <li class="check" data-key="record"><span class="n">It matches its record</span><span class="badge res">Not run</span></li>
+      <li class="check" data-key="key"><span class="n">It unlocks with the backup key</span><span class="badge res">Not run</span></li>
+      <li class="check" data-key="parts"><span class="n">It contains all its parts</span><span class="badge res">Not run</span></li>
+      <li class="check" data-key="copies"><span class="n">Its copies match</span><span class="badge res">Not run</span></li>
+    </ul>
+    <p id="summary" class="note" aria-live="polite">Run the self-check to see the results.</p>
+    <p class="small muted">A passed self-check shows that this backup opens and its parts agree. It does not prove that a restore would succeed.</p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var LABEL = { pass: 'Passed', fail: 'Failed', none: 'Not run' };
+  var items = Array.prototype.slice.call(document.querySelectorAll('#checks .check'));
+  var bad = document.getElementById('bad');
+  var summary = document.getElementById('summary');
+  var runBtn = document.getElementById('run');
+  var state = {};
+  var ran = false;
+
+  function render() {
+    items.forEach(function (li) {
+      var k = li.getAttribute('data-key');
+      var r = state[k] || 'none';
+      var b = li.querySelector('.res');
+      b.textContent = LABEL[r];
+      b.className = 'badge res' + (r === 'fail' ? ' error' : r === 'pass' ? ' good' : '');
+    });
+    if (!ran) { summary.className = 'note'; summary.textContent = 'Run the self-check to see the results.'; return; }
+    var failed = items.filter(function (li) { return state[li.getAttribute('data-key')] === 'fail'; }).length;
+    if (failed === 0) {
+      summary.className = 'note good';
+      summary.textContent = 'All five checks passed. The backup opens and its parts agree.';
+    } else {
+      summary.className = 'note error';
+      summary.textContent = failed + (failed === 1 ? ' check failed' : ' checks failed') + '. This backup should not be relied on until it is made again.';
+    }
+  }
+
+  runBtn.addEventListener('click', function () {
+    ran = true;
+    items.forEach(function (li) {
+      var k = li.getAttribute('data-key');
+      state[k] = (k === 'copies' && bad.checked) ? 'fail' : 'pass';
+    });
+    runBtn.textContent = 'Run again';
+    render();
+  });
+  bad.addEventListener('change', function () { if (ran) { runBtn.click(); } });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    ran = false; state = {}; bad.checked = false; runBtn.textContent = 'Run self-check';
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

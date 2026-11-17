@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: cloud host steps</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+[hidden] { display: none !important; }
+.cstep { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 12px 0; border-top: 1px solid var(--outv); }
+.cstep:first-child { border-top: none; }
+.cstep .n { flex: 1 1 200px; }
+.cstep .st { min-width: 110px; text-align: center; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="cloud-host-steps">
+  <h1>Cloud host: reach your home from outside, off by default</h1>
+  <p class="muted">Read the risks first. Then choose a route. The steps show where each one stands.</p>
+
+  <section class="card stack" aria-labelledby="ch-h">
+    <h2 id="ch-h" class="small">Cloud host</h2>
+    <div class="note warn" role="note"><strong>Risks first.</strong> A tunnel makes your home reachable from the internet. Keep the home updated and protected by its own sign-in before you turn it on.</div>
+
+    <div class="row"><button type="button" class="tonal" id="on" aria-pressed="false">Turn the cloud host on</button></div>
+    <p id="off-note" class="small muted">The cloud host is off. Nothing is reachable from outside.</p>
+
+    <div id="rest" hidden class="stack">
+      <label class="field" for="route">Route
+        <select id="route">
+          <option value="supervisor">With the Supervisor</option>
+          <option value="script">Without the Supervisor: host script route</option>
+          <option value="full">Full hosting mode</option>
+        </select>
+      </label>
+      <p id="route-note" class="note" aria-live="polite"></p>
+
+      <ul class="list" id="steps" aria-label="Cloud host steps">
+        <li class="cstep" data-step="0"><span class="n">Read the risks</span><span class="badge st">Ready</span></li>
+        <li class="cstep" data-step="1"><span class="n">Choose the route</span><span class="badge st">Ready</span></li>
+        <li class="cstep" data-step="2"><span class="n">Start the tunnel</span><span class="badge st">Waiting</span></li>
+        <li class="cstep" data-step="3"><span class="n">Check the outside address</span><span class="badge st">Waiting</span></li>
+      </ul>
+      <div class="row"><button type="button" class="filled" id="start">Start the tunnel</button></div>
+    </div>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var on = document.getElementById('on');
+  var offNote = document.getElementById('off-note');
+  var rest = document.getElementById('rest');
+  var route = document.getElementById('route');
+  var routeNote = document.getElementById('route-note');
+  var start = document.getElementById('start');
+  var steps = Array.prototype.slice.call(document.querySelectorAll('#steps .cstep'));
+  var NOTES = {
+    supervisor: 'The tunnel is started through the Supervisor. It can be started here.',
+    script: 'Without the Supervisor, the host script route is used. Follow the script steps on the host; this page cannot start the tunnel itself.',
+    full: 'Full hosting mode cannot start the tunnel yet. Choose another route to continue.'
+  };
+  function isOn() { return on.getAttribute('aria-pressed') === 'true'; }
+  var state = ['Ready', 'Ready', 'Waiting', 'Waiting'];
+  var LABEL = { Ready: 'Ready', Waiting: 'Waiting', Done: 'Done', Blocked: 'Blocked' };
+
+  function render() {
+    steps.forEach(function (li, i) {
+      var b = li.querySelector('.st');
+      b.textContent = LABEL[state[i]];
+      b.className = 'badge st' + (state[i] === 'Blocked' ? ' error' : state[i] === 'Done' ? ' good' : '');
+    });
+    offNote.hidden = isOn();
+    rest.hidden = !isOn();
+    on.setAttribute('aria-pressed', String(isOn()));
+    routeNote.textContent = NOTES[route.value];
+  }
+
+  on.addEventListener('click', function () {
+    on.setAttribute('aria-pressed', String(!isOn()));
+    if (isOn()) { state[0] = 'Done'; } else { state = ['Ready', 'Ready', 'Waiting', 'Waiting']; }
+    render();
+  });
+  route.addEventListener('change', function () {
+    state[1] = 'Done';
+    state[2] = route.value === 'full' ? 'Blocked' : 'Ready';
+    state[3] = 'Waiting';
+    render();
+  });
+  start.addEventListener('click', function () {
+    if (!isOn()) return;
+    if (route.value === 'full') { state[2] = 'Blocked'; render(); return; }
+    if (route.value === 'script') { state[2] = 'Waiting'; state[3] = 'Waiting'; render(); return; }
+    state[2] = 'Done';
+    state[3] = 'Done';
+    render();
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    route.value = 'supervisor';
+    state = ['Ready', 'Ready', 'Waiting', 'Waiting'];
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

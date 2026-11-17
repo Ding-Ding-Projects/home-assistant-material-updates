@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: interface polish</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+[hidden] { display: none !important; }
+.pills { position: relative; display: inline-flex; gap: 4px; padding: 4px; border-radius: 28px; background: var(--sl2); max-width: 100%; flex-wrap: wrap; }
+.pill { position: relative; z-index: 1; min-height: 48px; padding: 0 18px; border: none; border-radius: 24px; background: transparent; color: var(--onv); }
+.pill[aria-selected="true"] { color: var(--on-sc); }
+.pill-ind { position: absolute; top: 4px; bottom: 4px; left: 4px; border-radius: 24px; background: var(--sc); transition: left .25s, width .25s; }
+.pill-panel { min-height: 48px; }
+.strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.strip div { background: var(--sl2); border-radius: 16px; padding: 10px; text-align: center; }
+.strip b { display: block; font-size: 28px; line-height: 32px; font-weight: 500; color: var(--p); }
+.tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.tools > button { min-height: 48px; padding: 0 14px; }
+.menu { position: relative; }
+.menu-list { position: absolute; right: 0; top: 52px; background: var(--sl0); border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,.2); padding: 6px; z-index: 3; display: flex; flex-direction: column; min-width: 220px; }
+.menu-list button { justify-content: flex-start; border: none; color: var(--on); }
+.rowitem { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 20px; background: var(--sl2); min-height: 64px; }
+.rowitem.seen { opacity: .7; }
+.rowitem .t { flex: 1; }
+.selbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; background: var(--pc); color: var(--on-pc); border-radius: 24px; padding: 6px 12px; }
+.amber { background: var(--amberc); color: var(--amber); border-radius: 20px; padding: 14px 16px; }
+.amber[hidden] { display: none; }
+.tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.tile { background: var(--sl2); border-radius: 20px; padding: 14px; }
+.tile b { display: block; font-size: 32px; font-weight: 500; color: var(--p); }
+.srow { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 48px; padding: 8px 4px; border-top: 1px solid var(--outv); }
+.srow:first-child { border-top: none; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="interface-polish">
+  <h1>One header, pill tabs and tidier lists</h1>
+  <p class="muted">Three parts of the new look: pill tabs with a sliding indicator, a list with a statistics strip and a More menu, and the Settings front with a search.</p>
+
+  <section class="card stack" aria-labelledby="tabs-h">
+    <h2 id="tabs-h" class="small">1. Pill tabs</h2>
+    <div class="pills" role="tablist" aria-label="Sections" id="pills">
+      <span class="pill-ind" id="ind" aria-hidden="true"></span>
+      <button type="button" role="tab" class="pill" id="tab-0" aria-selected="true" aria-controls="pill-panel" data-i="0">Front door</button>
+      <button type="button" role="tab" class="pill" id="tab-1" aria-selected="false" aria-controls="pill-panel" data-i="1" tabindex="-1">Devices</button>
+      <button type="button" role="tab" class="pill" id="tab-2" aria-selected="false" aria-controls="pill-panel" data-i="2" tabindex="-1">Updates</button>
+    </div>
+    <p id="pill-panel" role="tabpanel" aria-live="polite" class="pill-panel">Front door: the summary of today at home.</p>
+  </section>
+
+  <section class="card stack" aria-labelledby="list-h">
+    <h2 id="list-h" class="small">2. List with a statistics strip</h2>
+    <div class="strip" aria-label="Statistics">
+      <div><b id="s-all">6</b>Items</div>
+      <div><b id="s-need">2</b>Need attention</div>
+      <div><b id="s-seen">0</b>Seen</div>
+    </div>
+    <div id="toolrow" class="tools">
+      <button type="button" class="tonal" id="sel-mode" aria-pressed="false">Select</button>
+      <button type="button" class="chip" data-filter="all" aria-pressed="true">All</button>
+      <button type="button" class="chip" data-filter="need" aria-pressed="false">Need attention</button>
+      <span class="menu">
+        <button type="button" class="tonal" id="more" aria-haspopup="true" aria-expanded="false" aria-controls="more-list">More</button>
+        <div id="more-list" class="menu-list" hidden>
+          <button type="button" role="menuitem" id="m-seen">Mark all as seen</button>
+          <button type="button" role="menuitem" id="m-reset">Mark all as not seen</button>
+        </div>
+      </span>
+    </div>
+    <div id="selrow" class="selbar" hidden>
+      <span id="sel-count">0 selected</span>
+      <button type="button" class="tonal" id="sel-seen">Mark as seen</button>
+      <button type="button" class="text" id="sel-clear">Clear selection</button>
+    </div>
+    <p id="showing" class="small muted" aria-live="polite" hidden></p>
+    <ul class="list" id="items" aria-label="Items">
+      <li class="rowitem" data-need="1" data-text="kitchen sensor battery low"><label class="row"><input type="checkbox" class="pick" aria-label="Select kitchen sensor"></label><span class="t">Kitchen sensor: battery low</span><span class="badge error">Needs attention</span></li>
+      <li class="rowitem" data-need="0" data-text="front door closed"><label class="row"><input type="checkbox" class="pick" aria-label="Select front door"></label><span class="t">Front door: closed</span><span class="badge good">OK</span></li>
+      <li class="rowitem" data-need="1" data-text="core update ready"><label class="row"><input type="checkbox" class="pick" aria-label="Select core update"></label><span class="t">Core update ready to install</span><span class="badge error">Needs attention</span></li>
+      <li class="rowitem" data-need="0" data-text="hall light on"><label class="row"><input type="checkbox" class="pick" aria-label="Select hall light"></label><span class="t">Hall light: on</span><span class="badge good">OK</span></li>
+      <li class="rowitem" data-need="0" data-text="bedroom temperature"><label class="row"><input type="checkbox" class="pick" aria-label="Select bedroom temperature"></label><span class="t">Bedroom: 21 degrees</span><span class="badge good">OK</span></li>
+      <li class="rowitem" data-need="0" data-text="backup finished"><label class="row"><input type="checkbox" class="pick" aria-label="Select backup"></label><span class="t">Backup finished last night</span><span class="badge good">OK</span></li>
+    </ul>
+  </section>
+
+  <section class="card stack" aria-labelledby="set-h">
+    <h2 id="set-h" class="small">3. Settings front</h2>
+    <label class="field" for="set-q">Search settings
+      <input type="search" id="set-q" placeholder="Search settings">
+    </label>
+    <div class="amber" id="amber">
+      <p><b id="amber-n">2</b> things need attention.</p>
+      <div class="row"><button type="button" class="tonal" id="fix">Fix one</button></div>
+    </div>
+    <div class="tiles" aria-label="Summary">
+      <div class="tile"><b id="t-dev">24</b>Devices</div>
+      <div class="tile"><b>3</b>Automations</div>
+      <div class="tile"><b>2</b>Backups</div>
+      <div class="tile"><b>1</b>Dashboards</div>
+    </div>
+    <div id="srows">
+      <div class="srow" data-text="language english cantonese"><span>Language</span><span class="small muted">English and Cantonese</span></div>
+      <div class="srow" data-text="appearance theme dark light"><span>Appearance</span><span class="small muted">Light, dark, colours</span></div>
+      <div class="srow" data-text="backup hosting storage"><span>Backups</span><span class="small muted">Two backups kept</span></div>
+      <div class="srow" data-text="notifications alerts"><span>Notifications</span><span class="small muted">Important only</span></div>
+      <div class="srow" data-text="updates install queue"><span>Updates</span><span class="small muted">Check each night</span></div>
+    </div>
+    <p id="set-count" class="small muted" aria-live="polite">5 settings shown.</p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  // 1. Pill tabs with a sliding indicator
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+  var ind = document.getElementById('ind');
+  var panel = document.getElementById('pill-panel');
+  var PANELS = ['Front door: the summary of today at home.', 'Devices: the lights, sensors and plugs you have.', 'Updates: what is ready to install and what is finished.'];
+
+  function selectTab(i, focus) {
+    tabs.forEach(function (t, n) {
+      t.setAttribute('aria-selected', String(n === i));
+      t.tabIndex = n === i ? 0 : -1;
+    });
+    var t = tabs[i];
+    ind.style.left = t.offsetLeft + 'px';
+    ind.style.width = t.offsetWidth + 'px';
+    panel.textContent = PANELS[i];
+    if (focus) t.focus();
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener('click', function () { selectTab(i, false); });
+    t.addEventListener('keydown', function (e) {
+      var n = i;
+      if (e.key === 'ArrowRight') n = (i + 1) % tabs.length;
+      else if (e.key === 'ArrowLeft') n = (i + tabs.length - 1) % tabs.length;
+      else return;
+      e.preventDefault();
+      selectTab(n, true);
+    });
+  });
+
+  // 2. List with statistics, filter, More menu and selection row
+  var items = Array.prototype.slice.call(document.querySelectorAll('#items .rowitem'));
+  var filter = 'all';
+  var selMode = false;
+  var more = document.getElementById('more');
+  var moreList = document.getElementById('more-list');
+  var toolrow = document.getElementById('toolrow');
+  var selrow = document.getElementById('selrow');
+  var showing = document.getElementById('showing');
+
+  function picks() { return items.filter(function (li) { return li.querySelector('.pick').checked; }); }
+
+  function refreshList() {
+    var shown = 0;
+    var seen = 0;
+    var need = 0;
+    items.forEach(function (li) {
+      var n = li.getAttribute('data-need') === '1';
+      var match = filter === 'all' || n;
+      li.hidden = !match;
+      if (match) shown++;
+      if (li.classList.contains('seen')) seen++;
+      if (n && !li.classList.contains('seen')) need++;
+    });
+    document.getElementById('s-all').textContent = items.length;
+    document.getElementById('s-need').textContent = need;
+    document.getElementById('s-seen').textContent = seen;
+    showing.hidden = shown === items.length;
+    showing.textContent = 'Showing ' + shown + ' of ' + items.length + '.';
+    var n = picks().length;
+    selrow.hidden = !(selMode && n > 0);
+    toolrow.hidden = selrow.hidden === false;
+    document.getElementById('sel-count').textContent = n + (n === 1 ? ' selected' : ' selected');
+    chips();
+  }
+
+  function chips() {
+    document.querySelectorAll('[data-filter]').forEach(function (c) {
+      c.setAttribute('aria-pressed', String(c.getAttribute('data-filter') === filter));
+    });
+  }
+
+  document.querySelectorAll('[data-filter]').forEach(function (c) {
+    c.addEventListener('click', function () { filter = c.getAttribute('data-filter'); refreshList(); });
+  });
+
+  document.getElementById('sel-mode').addEventListener('click', function () {
+    selMode = !selMode;
+    this.setAttribute('aria-pressed', String(selMode));
+    if (!selMode) items.forEach(function (li) { li.querySelector('.pick').checked = false; });
+    refreshList();
+  });
+
+  items.forEach(function (li) { li.querySelector('.pick').addEventListener('change', function () { if (picks().length) selMode = true; refreshList(); }); });
+
+  more.addEventListener('click', function () {
+    var open = moreList.hidden;
+    moreList.hidden = !open;
+    more.setAttribute('aria-expanded', String(open));
+    if (open) moreList.querySelector('button').focus();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !moreList.hidden) { moreList.hidden = true; more.setAttribute('aria-expanded', 'false'); more.focus(); }
+  });
+  document.getElementById('m-seen').addEventListener('click', function () {
+    items.forEach(function (li) { li.classList.add('seen'); });
+    moreList.hidden = true; more.setAttribute('aria-expanded', 'false'); refreshList();
+  });
+  document.getElementById('m-reset').addEventListener('click', function () {
+    items.forEach(function (li) { li.classList.remove('seen'); });
+    moreList.hidden = true; more.setAttribute('aria-expanded', 'false'); refreshList();
+  });
+
+  document.getElementById('sel-seen').addEventListener('click', function () {
+    picks().forEach(function (li) { li.classList.add('seen'); li.querySelector('.pick').checked = false; });
+    refreshList();
+  });
+  document.getElementById('sel-clear').addEventListener('click', function () {
+    items.forEach(function (li) { li.querySelector('.pick').checked = false; });
+    selMode = false;
+    document.getElementById('sel-mode').setAttribute('aria-pressed', 'false');
+    refreshList();
+  });
+
+  // 3. Settings front with search and the amber block
+  var setRows = Array.prototype.slice.call(document.querySelectorAll('#srows .srow'));
+  var setQ = document.getElementById('set-q');
+  var setCount = document.getElementById('set-count');
+  var amber = document.getElementById('amber');
+  var amberN = document.getElementById('amber-n');
+  var attention = 2;
+
+  function filterSettings() {
+    var q = setQ.value.trim().toLowerCase();
+    var shown = 0;
+    setRows.forEach(function (r) {
+      var match = q === '' || r.getAttribute('data-text').indexOf(q) !== -1 || r.textContent.toLowerCase().indexOf(q) !== -1;
+      r.hidden = !match;
+      if (match) shown++;
+    });
+    setCount.textContent = shown + (shown === 1 ? ' setting shown.' : ' settings shown.');
+  }
+  function renderAmber() {
+    amber.hidden = attention === 0;
+    amberN.textContent = attention;
+  }
+  setQ.addEventListener('input', filterSettings);
+  document.getElementById('fix').addEventListener('click', function () {
+    if (attention > 0) attention--;
+    renderAmber();
+  });
+
+  // Reset
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    selectTab(1, false);
+    filter = 'all';
+    selMode = false;
+    items.forEach(function (li) { li.classList.remove('seen'); li.querySelector('.pick').checked = false; });
+    document.getElementById('sel-mode').setAttribute('aria-pressed', 'false');
+    moreList.hidden = true; more.setAttribute('aria-expanded', 'false');
+    refreshList();
+    setQ.value = '';
+    filterSettings();
+    attention = 2;
+    renderAmber();
+  });
+
+  selectTab(1, false);
+  refreshList();
+  filterSettings();
+  renderAmber();
+})();
+</script>
+</body>
+</html>

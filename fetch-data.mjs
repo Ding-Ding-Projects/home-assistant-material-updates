@@ -1,6 +1,7 @@
-// Downloads the public change list and writes data/changes.json plus one slice per version.
+// Downloads the public change list and merges it into data/changes.json plus one slice per version.
+// Releases already stored are kept when they roll off the public list.
 // If the download fails or the data is not valid, the existing files are kept and the exit code is 0.
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { ROOT, REPOSITORY } from './lib.mjs';
 
@@ -21,9 +22,27 @@ try {
   const res = await fetch(URL_, { headers: { Accept: 'application/json' } });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const data = await res.json();
-  const releases = (data.releases || []).filter((r) => r && r.tag);
-  const problem = valid({ ...data, releases });
+  const fetched = (data.releases || []).filter((r) => r && r.tag);
+  const problem = valid({ ...data, releases: fetched });
   if (problem) throw new Error(`invalid data: ${problem}`);
+  // The public list only carries the most recent releases, so older ones roll off it.
+  // A version that has been published here must never disappear: keep every release
+  // already on disk, and never replace a stored release with a shorter copy of itself.
+  const byBuild = new Map();
+  const existingPath = join(ROOT, 'data', 'changes.json');
+  if (existsSync(existingPath)) {
+    try {
+      const existing = JSON.parse(readFileSync(existingPath, 'utf8'));
+      if (!valid(existing)) for (const r of existing.releases) byBuild.set(r.build, r);
+    } catch {
+      // An unreadable stored file is replaced by the fetched list below.
+    }
+  }
+  for (const r of fetched) {
+    const stored = byBuild.get(r.build);
+    if (!stored || r.changes.length > stored.changes.length) byBuild.set(r.build, r);
+  }
+  const releases = [...byBuild.values()].sort((x, y) => y.build - x.build);
   const out = { ...data, releases };
   mkdirSync(join(ROOT, 'data', 'slices'), { recursive: true });
   writeFileSync(join(ROOT, 'data', 'changes.json'), JSON.stringify(out, null, 1) + '\n');

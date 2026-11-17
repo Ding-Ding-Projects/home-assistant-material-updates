@@ -1,0 +1,31 @@
+{
+  "build": 490,
+  "headline": "A clearer automation editor, device health, and a room setup wizard",
+  "summary": "Build 490 redraws the automation editor. An automation is stated as one sentence, its When, Only if and Then blocks are numbered, and each action gets controls made for the device it controls. Helpers can be made and removed inside the editor. Dialogs and lists are modernised, and the Developer tools are grouped. New pages and features include Device health, a While you were away summary on the front door, a dry run that replays a past period, a room setup wizard, and update history with a way back to an earlier build.",
+  "summary_yue": "490 版重新設計自動化編輯器。一個自動化會用一句句子講晒，When、Only if 同 Then 嘅區塊都有編號，每個動作都有啱嗰件裝置嘅控制。編輯器入面可以新增同刪除輔助工具。對話框同列表都更新咗，開發者工具亦分咗組。新嘅頁面同功能包括裝置健康、前門嘅「While you were away」摘要、可以重播過去一段時間嘅試行、房間設定精靈，以及可以返回舊版本嘅更新紀錄。",
+  "highlights": [
+    {
+      "id": "automation-editor-redrawn",
+      "title": "The automation editor reads as one sentence, with controls for each device",
+      "areas": ["interface"],
+      "what": "The automation editor now states the automation as one sentence and numbers its When, Only if and Then blocks. Save sits in the header on a wide window and in the bottom bar on a phone, never both. Every action has a visual editor: a light gets brightness and colour, a thermostat gets a stepper that stays within what it supports, and a cover gets a position slider. Other services get switches, sliders and choice tiles. Helpers can be created, edited and removed from inside the editor, and removing one names the automations that use it. Dialogs have large titles, become bottom sheets on a phone, and the toasts are centred and can be dismissed.",
+      "what_yue": "自動化編輯器而家用一句句子講晒個自動化，When、Only if 同 Then 區塊都有編號。Save 喺闊嘅視窗係放喺標題列，喺手機就放喺底部列，兩處唔會同時有。每個動作都有自己嘅視覺編輯器：燈有亮度同顏色，溫控器有喺佢支援範圍之內嘅增減掣，窗簾有位置滑桿。其他服務就用開關、滑桿同選擇格。輔助工具可以喺編輯器入面新增、改同刪，刪之前會話你知邊啲自動化正在用佢。對話框標題夠大，喺手機會變成底部面板，提示訊息會置中，亦可以關閉。",
+      "why": "The old editor showed a wall of rows, and some actions could only be changed in a code box, which made a simple light change hard to do.",
+      "try": ["Change the trigger and see the sentence at the top update.", "Choose Light and move the brightness slider and pick a colour.", "Choose Thermostat and press Higher and Lower until the stepper stops at its limit and says so."],
+      "sha": ["85655ade1"],
+      "demo": "demos/490/automation-editor-redrawn.html"
+    },
+    {
+      "id": "device-health-and-new-pages",
+      "title": "Device health, the While you were away summary, dry run replay, a room setup wizard and update history",
+      "areas": ["interface", "supervisor"],
+      "what": "Device health sits under Settings, then System. It lists low batteries, devices that have gone silent and weak signal, worst first, and its tiles filter the list. A device that reports nothing is listed as such rather than guessed at, and days left only appears when the recorded history supports it. While you were away summarises the front door after an absence, using the activity the instance already records, and is remembered on this device only. Replay a past period, under the editor's dry run, shows how often an automation would have run over a past day or week. Anything the history cannot answer is marked cannot tell, and no action is ever called. The room setup wizard on the Areas page asks for a name, devices, starter automations and then finishes; starters are saved switched off. Update history on the Updates page can go back to an earlier build behind the two-key confirmation. The call that installs a chosen version has not yet been run against a real Supervisor.",
+      "what_yue": "裝置健康喺設定、系統入面。佢會列出電量低、突然冇聲、訊號弱嘅裝置，最差嗰個排喺最前，個磚可以篩選列表。冇回報任何嘢嘅裝置會照實寫出嚟，唔會估；「剩餘天數」只有紀錄嘅歷史真係支持先會顯示。While you were away 會喺你離開一段時間之後，喺前門總結發生過嘅嘢，用實例本身已經記錄嘅活動，只會記喺呢部裝置度。喺編輯器嘅試行下面，「Replay a past period」會顯示一個自動化喺過去一日或者一個星期會運行幾多次，點解停咗，同埋當時嘅數值。歷史答唔到嘅會標示為 cannot tell，而且唔會真係執行任何動作。Areas 頁嘅房間設定精靈會問名稱、裝置、起始自動化，然後完成；起始自動化會以關閉狀態儲存。Updates 頁嘅更新紀錄可以返回舊版本，但要先過兩鍵確認。安裝指定版本嗰個指令，仲未喺真正嘅 Supervisor 上面試過。",
+      "why": "Batteries and quiet devices were easy to miss, and nobody could tell what an automation would have done last week without running it for real.",
+      "try": ["Press the Low batteries tile and see the list narrow to the devices with low charge.", "Press Silent and see the devices that have gone quiet, listed worst first.", "Press Start again to see every device back in the list."],
+      "sha": ["b0535fcdf"],
+      "demo": "demos/490/device-health-and-new-pages.html"
+    }
+  ],
+  "other": []
+}

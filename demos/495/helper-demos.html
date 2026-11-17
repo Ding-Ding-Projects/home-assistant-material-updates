@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: helper demos</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+[hidden] { display: none !important; }
+.helper { display: flex; flex-direction: column; gap: 10px; padding: 14px 0; border-top: 1px solid var(--outv); }
+.helper:first-of-type { border-top: none; }
+.counter { display: flex; align-items: center; gap: 12px; }
+.counter output { min-width: 64px; text-align: center; font-size: 28px; font-weight: 500; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="helper-demos">
+  <h1>Making a helper shows a working demo of its kind</h1>
+  <p class="muted">Four kinds of helper, each one working. Change a switch, slider, counter or timer and see its state follow.</p>
+
+  <section class="card stack" aria-labelledby="h-h">
+    <h2 id="h-h" class="small">Helper demos</h2>
+
+    <div class="helper">
+      <div class="row"><label class="row"><input type="checkbox" class="switch" id="sw"> <span>Switch: away mode</span></label><span id="sw-out" class="badge">Off</span></div>
+      <p class="small muted">A switch turns a thing on or off.</p>
+    </div>
+
+    <div class="helper">
+      <label class="field" for="sl">Slider: fan speed <output id="sl-out" for="sl">40</output> percent
+        <input type="range" id="sl" min="0" max="100" step="10" value="40">
+      </label>
+    </div>
+
+    <div class="helper">
+      <p class="small">Counter: visitors counted today (limit 0 to 10)</p>
+      <div class="counter">
+        <button type="button" class="tonal" id="minus" aria-label="Take one away">Minus one</button>
+        <output id="cnt" for="minus plus" aria-live="polite">0</output>
+        <button type="button" class="tonal" id="plus" aria-label="Add one">Plus one</button>
+      </div>
+      <p class="small" id="cnt-note" aria-live="polite"></p>
+    </div>
+
+    <div class="helper">
+      <p class="small">Timer: counts down from 10 seconds</p>
+      <p class="badge" id="tm" aria-live="polite">10 seconds left</p>
+      <div class="row">
+        <button type="button" class="filled" id="tm-go">Start timer</button>
+        <button type="button" class="tonal" id="tm-reset">Reset timer</button>
+      </div>
+    </div>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var sw = document.getElementById('sw');
+  var swOut = document.getElementById('sw-out');
+  var sl = document.getElementById('sl');
+  var slOut = document.getElementById('sl-out');
+  var cnt = document.getElementById('cnt');
+  var cntNote = document.getElementById('cnt-note');
+  var minus = document.getElementById('minus');
+  var plus = document.getElementById('plus');
+  var tm = document.getElementById('tm');
+  var tmGo = document.getElementById('tm-go');
+  var left = 10;
+  var ticker = null;
+  var count = 0;
+
+  function renderSwitch() { swOut.textContent = sw.checked ? 'On' : 'Off'; }
+  function renderCount() {
+    cnt.textContent = count;
+    minus.disabled = count <= 0;
+    plus.disabled = count >= 10;
+    cntNote.textContent = count === 10 ? 'The limit of 10 is reached.' : '';
+  }
+  function renderTimer() {
+    tm.textContent = left === 0 ? 'Time is up' : left + (left === 1 ? ' second left' : ' seconds left');
+    tmGo.textContent = ticker ? 'Pause timer' : (left === 0 ? 'Start again' : 'Start timer');
+  }
+  function stopTicker() { if (ticker) { clearInterval(ticker); ticker = null; } }
+
+  sw.addEventListener('change', renderSwitch);
+  sl.addEventListener('input', function () { slOut.textContent = sl.value; });
+  minus.addEventListener('click', function () { if (count > 0) { count--; renderCount(); } });
+  plus.addEventListener('click', function () { if (count < 10) { count++; renderCount(); } });
+
+  tmGo.addEventListener('click', function () {
+    if (ticker) { stopTicker(); renderTimer(); return; }
+    if (left === 0) left = 10;
+    ticker = setInterval(function () {
+      left--;
+      if (left <= 0) { left = 0; stopTicker(); }
+      renderTimer();
+    }, 1000);
+    renderTimer();
+  });
+  document.getElementById('tm-reset').addEventListener('click', function () {
+    stopTicker(); left = 10; renderTimer();
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    sw.checked = false; renderSwitch();
+    sl.value = 40; slOut.textContent = '40';
+    count = 0; renderCount();
+    stopTicker(); left = 10; renderTimer();
+  });
+
+  renderSwitch(); renderCount(); renderTimer();
+})();
+</script>
+</body>
+</html>

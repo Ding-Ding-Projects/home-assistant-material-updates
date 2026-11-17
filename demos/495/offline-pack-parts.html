@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: offline update pack parts</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+[hidden] { display: none !important; }
+.part { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 12px 0; border-top: 1px solid var(--outv); }
+.part:first-child { border-top: none; }
+.part .n { flex: 1 1 200px; }
+.part .res { min-width: 180px; text-align: center; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="offline-pack-parts">
+  <h1>An offline update pack installs what it can and says what needs a network</h1>
+  <p class="muted">Tick the box to pretend this device has no network. Then install the pack and read which parts installed.</p>
+
+  <section class="card stack" aria-labelledby="op-h">
+    <h2 id="op-h" class="small">Offline update pack (pretend)</h2>
+    <label class="row"><input type="checkbox" id="nonet" class="switch"> <span>This device has no network connection</span></label>
+    <ul class="list" id="parts" aria-label="Parts in the pack">
+      <li class="part" data-needs="0"><span class="n">Operating system</span><span class="small muted">Works offline</span><span class="badge res" aria-live="polite">Not installed yet</span></li>
+      <li class="part" data-needs="1"><span class="n">Supervisor</span><span class="small muted">Needs a network</span><span class="badge res" aria-live="polite">Not installed yet</span></li>
+      <li class="part" data-needs="1"><span class="n">Core</span><span class="small muted">Needs a network</span><span class="badge res" aria-live="polite">Not installed yet</span></li>
+    </ul>
+    <div class="row"><button type="button" class="filled" id="install">Install the pack</button></div>
+    <p id="summary" class="note" aria-live="polite">Press Install the pack to see the result.</p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var nonet = document.getElementById('nonet');
+  var install = document.getElementById('install');
+  var summary = document.getElementById('summary');
+  var parts = Array.prototype.slice.call(document.querySelectorAll('#parts .part'));
+  var done = false;
+
+  function render() {
+    parts.forEach(function (li) {
+      var b = li.querySelector('.res');
+      if (!done) { b.textContent = 'Not installed yet'; b.className = 'badge res'; return; }
+      var needs = li.getAttribute('data-needs') === '1';
+      if (!needs) { b.textContent = 'Installed from the pack'; b.className = 'badge res good'; }
+      else if (nonet.checked) { b.textContent = 'Skipped: needs a network'; b.className = 'badge res error'; }
+      else { b.textContent = 'Installed from the pack'; b.className = 'badge res good'; }
+    });
+    if (!done) { summary.className = 'note'; summary.textContent = 'Press Install the pack to see the result.'; return; }
+    var ok = parts.filter(function (li) { return li.querySelector('.res').textContent.indexOf('Installed') === 0; }).length;
+    var skipped = parts.length - ok;
+    summary.className = skipped ? 'note warn' : 'note good';
+    summary.textContent = ok + ' of ' + parts.length + ' parts installed.' +
+      (skipped ? ' ' + skipped + (skipped === 1 ? ' part needs' : ' parts need') + ' a network. Connect and install the pack again to finish them.' : ' Nothing needs a network.');
+  }
+
+  install.addEventListener('click', function () { done = true; render(); });
+  nonet.addEventListener('change', function () { if (done) { done = false; render(); } });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    done = false; nonet.checked = false; render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

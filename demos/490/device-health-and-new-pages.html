@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: device health</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+[hidden] { display: none !important; }
+.tiles3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.tile-btn { min-height: 96px; flex-direction: column; align-items: flex-start; justify-content: center; gap: 4px; text-align: start; padding: 12px 16px; border-radius: 20px; background: var(--sl2); color: var(--on); border: 1px solid transparent; }
+.tile-btn b { font-size: 32px; font-weight: 500; color: var(--p); }
+.tile-btn[aria-pressed="true"] { background: var(--sc); color: var(--on-sc); }
+.tile-btn[aria-pressed="true"] b { color: var(--on-sc); }
+.dev { display: flex; flex-direction: column; gap: 4px; padding: 12px 0; border-top: 1px solid var(--outv); }
+.dev:first-child { border-top: none; }
+.dev .head { font-weight: 500; }
+.flags { display: flex; flex-wrap: wrap; gap: 6px; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="device-health-and-new-pages">
+  <h1>Device health: low batteries, silent devices and weak signal, worst first</h1>
+  <p class="muted">Press a tile to filter the list. A device that reports nothing says so, and days left only shows when the history supports it.</p>
+
+  <section class="card stack" aria-labelledby="dh-h">
+    <h2 id="dh-h" class="small">Device health</h2>
+    <div class="tiles3" role="group" aria-label="Filter the devices">
+      <button type="button" class="tile-btn" data-filter="low" aria-pressed="false"><b id="c-low">0</b>Low batteries</button>
+      <button type="button" class="tile-btn" data-filter="silent" aria-pressed="false"><b id="c-silent">0</b>Silent</button>
+      <button type="button" class="tile-btn" data-filter="weak" aria-pressed="false"><b id="c-weak">0</b>Weak signal</button>
+      <button type="button" class="tile-btn" data-filter="all" aria-pressed="true"><b id="c-all">6</b>All devices</button>
+    </div>
+    <p id="count" class="small muted" aria-live="polite"></p>
+    <ul class="list" id="devs" aria-label="Devices, worst first"></ul>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  // battery: percent, or null for a mains device. silentHours: hours since last report.
+  // history: days of recorded history (days left is shown only at 7 days or more).
+  var DEVICES = [
+    { name: 'Garden sensor', battery: 8, rate: 1.2, silentHours: 52, signal: -85, history: 14 },
+    { name: 'Kitchen plug', battery: null, rate: 0, silentHours: 30, signal: -88, history: 30 },
+    { name: 'Hall motion sensor', battery: 12, rate: 0.5, silentHours: 0, signal: -60, history: 21 },
+    { name: 'Front door lock', battery: 18, rate: 0.3, silentHours: 2, signal: -64, history: 9 },
+    { name: 'Bedroom sensor', battery: 35, rate: 0, silentHours: 1, signal: -72, history: 2 },
+    { name: 'Office light', battery: null, rate: 0, silentHours: 0, signal: -58, history: 30 }
+  ];
+  var LOW = 20, SILENT = 24, WEAK = -80;
+  var filter = 'all';
+  var list = document.getElementById('devs');
+  var count = document.getElementById('count');
+  var tiles = Array.prototype.slice.call(document.querySelectorAll('[data-filter]'));
+
+  function isLow(d) { return d.battery !== null && d.battery <= LOW; }
+  function isSilent(d) { return d.silentHours >= SILENT; }
+  function isWeak(d) { return d.signal <= WEAK; }
+
+  function score(d) {
+    return (isLow(d) ? 2 : 0) + (isSilent(d) ? 2 : 0) + (isWeak(d) ? 1 : 0);
+  }
+
+  function daysLeft(d) {
+    if (d.battery === null) return 'Mains powered, no battery';
+    if (d.rate <= 0 || d.history < 7) return 'Days left: cannot tell';
+    return 'Days left: about ' + Math.round(d.battery / d.rate);
+  }
+
+  function flagText(d) {
+    var out = [];
+    out.push(d.battery === null ? 'No battery to report' : 'Battery ' + d.battery + ' percent');
+    out.push(isSilent(d) ? 'Silent for ' + d.silentHours + ' hours' : 'Reported ' + (d.silentHours === 0 ? 'just now' : d.silentHours + ' hours ago'));
+    out.push('Signal ' + d.signal + ' dBm' + (isWeak(d) ? ' (weak)' : ''));
+    out.push(daysLeft(d));
+    return out;
+  }
+
+  function sorted() {
+    return DEVICES.slice().sort(function (a, b) {
+      var s = score(b) - score(a);
+      if (s !== 0) return s;
+      var ba = a.battery === null ? 999 : a.battery;
+      var bb = b.battery === null ? 999 : b.battery;
+      return ba - bb;
+    });
+  }
+
+  function matches(d) {
+    if (filter === 'low') return isLow(d);
+    if (filter === 'silent') return isSilent(d);
+    if (filter === 'weak') return isWeak(d);
+    return true;
+  }
+
+  function render() {
+    document.getElementById('c-all').textContent = DEVICES.length;
+    document.getElementById('c-low').textContent = DEVICES.filter(isLow).length;
+    document.getElementById('c-silent').textContent = DEVICES.filter(isSilent).length;
+    document.getElementById('c-weak').textContent = DEVICES.filter(isWeak).length;
+    tiles.forEach(function (t) { t.setAttribute('aria-pressed', String(t.getAttribute('data-filter') === filter)); });
+
+    list.innerHTML = '';
+    var shown = sorted().filter(matches);
+    shown.forEach(function (d) {
+      var li = document.createElement('li');
+      li.className = 'dev';
+      var head = document.createElement('span');
+      head.className = 'head';
+      head.textContent = d.name;
+      li.appendChild(head);
+      var flags = document.createElement('div');
+      flags.className = 'flags';
+      flagText(d).forEach(function (t) {
+        var b = document.createElement('span');
+        b.className = 'badge' + (t.indexOf('Silent') === 0 || t.indexOf('Battery') === 0 && isLow(d) || t.indexOf('(weak)') !== -1 ? ' error' : '');
+        b.textContent = t;
+        flags.appendChild(b);
+      });
+      li.appendChild(flags);
+      list.appendChild(li);
+    });
+    count.textContent = shown.length === 0 ? 'No devices match this filter.' :
+      'Showing ' + shown.length + ' of ' + DEVICES.length + ' devices, worst first.';
+  }
+
+  tiles.forEach(function (t) {
+    t.addEventListener('click', function () { filter = t.getAttribute('data-filter'); render(); });
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    filter = 'all';
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: automation editor</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+[hidden] { display: none !important; }
+.sentence { font-size: 18px; line-height: 28px; background: var(--sl2); border-radius: 20px; padding: 14px 16px; }
+.block { border-top: 1px solid var(--outv); padding-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+.block:first-child { border-top: none; padding-top: 0; }
+.num { display: inline-flex; width: 28px; height: 28px; border-radius: 14px; background: var(--pc); color: var(--on-pc); align-items: center; justify-content: center; font-weight: 500; font-size: 14px; }
+.tiles2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+.stepper { display: flex; align-items: center; gap: 12px; }
+.stepper output { min-width: 96px; text-align: center; font-size: 28px; font-weight: 500; }
+.stepper button { min-width: 56px; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="automation-editor-redrawn">
+  <h1>An automation as one sentence, with controls for each device</h1>
+  <p class="muted">Change a block and watch the sentence at the top follow. Then choose a different action and see its own controls.</p>
+
+  <section class="card stack" aria-labelledby="ed-h">
+    <h2 id="ed-h" class="small">Automation editor</h2>
+    <p class="sentence" id="sentence" aria-live="polite"></p>
+
+    <div class="block">
+      <div class="row"><span class="num">1</span><strong>When</strong></div>
+      <label class="field" for="trigger">Trigger
+        <select id="trigger">
+          <option value="motion">the hall motion sensor detects motion</option>
+          <option value="sunset">the sun sets</option>
+          <option value="door">the front door opens</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="block">
+      <div class="row"><span class="num">2</span><strong>Only if</strong></div>
+      <label class="field" for="cond">Condition
+        <select id="cond">
+          <option value="none">no condition</option>
+          <option value="home">someone is home</option>
+          <option value="dark">it is dark outside</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="block">
+      <div class="row"><span class="num">3</span><strong>Then</strong></div>
+      <label class="field" for="action">Action
+        <select id="action">
+          <option value="light">Light</option>
+          <option value="thermostat">Thermostat</option>
+        </select>
+      </label>
+
+      <div id="light-box" class="stack">
+        <label class="field" for="bright">Brightness: <output id="bright-out" for="bright">60</output> percent
+          <input type="range" id="bright" min="0" max="100" step="5" value="60">
+        </label>
+        <div>
+          <p class="small muted" id="colour-h">Colour</p>
+          <div class="tiles2" role="group" aria-labelledby="colour-h" id="colours">
+            <button type="button" class="chip" data-colour="warm white" aria-pressed="false">Warm white</button>
+            <button type="button" class="chip" data-colour="cool white" aria-pressed="true">Cool white</button>
+            <button type="button" class="chip" data-colour="amber" aria-pressed="false">Amber</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="thermo-box" class="stack" hidden>
+        <p class="small muted">The stepper stays between 7 and 30 degrees, in half-degree steps.</p>
+        <div class="stepper" role="group" aria-label="Target temperature">
+          <button type="button" class="tonal" id="down">Lower</button>
+          <output id="temp" for="down up" aria-live="polite">21.0</output>
+          <button type="button" class="tonal" id="up">Higher</button>
+        </div>
+        <p class="small" id="limit" aria-live="polite"></p>
+      </div>
+    </div>
+
+    <div class="row">
+      <button type="button" class="filled" id="save">Save</button>
+      <p class="small muted" id="save-msg" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var TRIGGER = {
+    motion: 'the hall motion sensor detects motion',
+    sunset: 'the sun sets',
+    door: 'the front door opens'
+  };
+  var COND = { none: '', home: ', only if someone is home', dark: ', only if it is dark outside' };
+  var trigger = document.getElementById('trigger');
+  var cond = document.getElementById('cond');
+  var action = document.getElementById('action');
+  var bright = document.getElementById('bright');
+  var brightOut = document.getElementById('bright-out');
+  var colourBtns = Array.prototype.slice.call(document.querySelectorAll('[data-colour]'));
+  var lightBox = document.getElementById('light-box');
+  var thermoBox = document.getElementById('thermo-box');
+  var up = document.getElementById('up');
+  var down = document.getElementById('down');
+  var temp = document.getElementById('temp');
+  var limit = document.getElementById('limit');
+  var sentence = document.getElementById('sentence');
+  var saveMsg = document.getElementById('save-msg');
+  var MIN = 7, MAX = 30, STEP = 0.5;
+  var degrees = 21;
+  var colour = 'cool white';
+
+  function fmt(n) { return n.toFixed(1); }
+
+  function renderThermo() {
+    temp.textContent = fmt(degrees);
+    temp.value = degrees;
+    down.disabled = degrees <= MIN;
+    up.disabled = degrees >= MAX;
+    limit.textContent = degrees <= MIN ? 'The lowest this thermostat can be set is 7 degrees.' :
+      degrees >= MAX ? 'The highest this thermostat can be set is 30 degrees.' : '';
+  }
+
+  function renderSentence() {
+    var act;
+    if (action.value === 'light') {
+      act = 'turn the hall light to ' + bright.value + ' percent ' + colour;
+    } else {
+      act = 'set the thermostat to ' + fmt(degrees) + ' degrees';
+    }
+    sentence.textContent = 'When ' + TRIGGER[trigger.value] + COND[cond.value] + ', then ' + act + '.';
+  }
+
+  function renderAction() {
+    var light = action.value === 'light';
+    lightBox.hidden = !light;
+    thermoBox.hidden = light;
+    renderSentence();
+  }
+
+  trigger.addEventListener('change', renderSentence);
+  cond.addEventListener('change', renderSentence);
+  action.addEventListener('change', function () { renderAction(); saveMsg.textContent = ''; });
+  bright.addEventListener('input', function () { brightOut.textContent = bright.value; renderSentence(); });
+  colourBtns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      colour = b.getAttribute('data-colour');
+      colourBtns.forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      renderSentence();
+    });
+  });
+  up.addEventListener('click', function () { if (degrees < MAX) { degrees = Math.min(MAX, degrees + STEP); renderThermo(); renderSentence(); } });
+  down.addEventListener('click', function () { if (degrees > MIN) { degrees = Math.max(MIN, degrees - STEP); renderThermo(); renderSentence(); } });
+
+  document.getElementById('save').addEventListener('click', function () {
+    saveMsg.textContent = 'Pretend save: this demonstration keeps nothing.';
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    trigger.value = 'motion';
+    cond.value = 'none';
+    action.value = 'light';
+    bright.value = 60; brightOut.textContent = '60';
+    colour = 'cool white';
+    colourBtns.forEach(function (x) { x.setAttribute('aria-pressed', String(x.getAttribute('data-colour') === colour)); });
+    degrees = 21;
+    renderThermo();
+    renderAction();
+    saveMsg.textContent = '';
+  });
+
+  renderThermo();
+  renderAction();
+})();
+</script>
+</body>
+</html>

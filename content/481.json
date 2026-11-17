@@ -1,0 +1,23 @@
+{
+  "build": 481,
+  "headline": "The update queue stops calling a working update failed, and a USB install can restart the device",
+  "summary": "Build 481 fixes the Update everything queue. A step is no longer marked failed while its install call is still open, and a step that was marked failed by mistake is set back to done once the update is seen at its target, so the queue carries on to the steps after it. In the USB section, Restart now asks for one confirmation and then restarts the device, instead of doing a quick reload. The build also tidies a few layouts from the review of build 478.",
+  "summary_yue": "481 版修正「Update everything」隊列。安裝指令仲未完嘅時候，嗰一步唔會再被標示為失敗；如果一步曾經俾錯標做失敗，而更新已經去到目標版本，就會改返做完成，隊列可以繼續行落去。USB 區嘅 Restart now 而家會先問一次確認，然後先重新啟動裝置，唔再係快速重新載入。今版亦順手整理咗上一輪 478 版覆核中見到嘅幾處版面。",
+  "highlights": [
+    {
+      "id": "update-queue-false-failure",
+      "title": "Update everything no longer calls a working step failed",
+      "areas": ["interface"],
+      "what": "Update everything runs its steps in order. A step now counts as running for as long as its install call is still open, so a short moment of not running no longer ends the step as a failure. A step that was marked failed by mistake is set back to done once its update is seen at the target version, and the rest of the queue carries on. In the USB install section, Restart now asks for one confirmation and then restarts the device.",
+      "what_yue": "Update everything 會按次序行每一步。而家只要安裝指令仲未完，嗰一步就當係執行緊，一陣短暫嘅「未有運行」唔會即刻當係失敗。一步如果俾錯標做失敗，而更新已經見到去咗目標版本，就會改返做完成，隊列繼續行。USB 安裝區入面，Restart now 會先問你一次確認，然後先重新啟動裝置。",
+      "why": "A false failure stopped the queue from reaching the steps after it, even though the update itself had finished correctly.",
+      "try": ["Press Start queue and watch the three steps run in order.", "Tick the box for a short not-running moment, press Start queue again, and see the install step stay on Running.", "Press Mark as failed by mistake, then Update is at target, and see the step become done and the queue finish."],
+      "sha": ["d00578e2e"],
+      "demo": "demos/481/update-queue-false-failure.html"
+    }
+  ],
+  "other": [
+    { "title": "Polish after the build 478 review: the confirmation glow edge, Cantonese dates and job names, and small layout cuts", "sha": ["49742a972"] },
+    { "title": "Record of build 478: what the review saw working, what is still wrong, and what has never run on a real device", "sha": ["1352b0423"] }
+  ]
+}

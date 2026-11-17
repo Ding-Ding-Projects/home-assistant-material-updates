@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: queue card healing</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+[hidden] { display: none !important; }
+.qcard { display: flex; flex-direction: column; gap: 10px; }
+.qcard .head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.qcard .msg { font-size: 15px; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="queue-card-healing">
+  <h1>After a successful Core update the queue card says Done, not did not update</h1>
+  <p class="muted">Start the Core update. Then try a moment when the card wrongly says did not update, and see it healed to Done once the update is seen.</p>
+
+  <section class="card stack" aria-labelledby="qc-h">
+    <h2 id="qc-h" class="small">Queue card: Core update</h2>
+    <div class="qcard">
+      <div class="head"><strong>Core update</strong><span class="badge" id="badge">Not started</span></div>
+      <p class="msg" id="msg" aria-live="polite">The Core update has not started.</p>
+      <div class="row">
+        <button type="button" class="filled" id="start">Start Core update</button>
+        <button type="button" class="tonal" id="blip" disabled>Simulate a not-running moment</button>
+        <button type="button" class="tonal" id="seen" disabled>Core update is seen at its target</button>
+      </div>
+    </div>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var badge = document.getElementById('badge');
+  var msg = document.getElementById('msg');
+  var startBtn = document.getElementById('start');
+  var blipBtn = document.getElementById('blip');
+  var seenBtn = document.getElementById('seen');
+  var phase = 'idle'; // idle, installing, wrong, done
+
+  function render() {
+    var map = {
+      idle: ['Not started', 'The Core update has not started.'],
+      installing: ['Installing', 'Installing the Core update. Nothing is wrong.'],
+      wrong: ['Did not update', 'The card says did not update, but the update is still on its way. It will heal once it is seen.'],
+      done: ['Done', 'The Core update installed and restarted. The queue carries on.']
+    };
+    badge.textContent = map[phase][0];
+    badge.className = 'badge' + (phase === 'done' ? ' good' : phase === 'wrong' ? ' error' : '');
+    msg.textContent = map[phase][1];
+    startBtn.disabled = phase !== 'idle';
+    blipBtn.disabled = phase !== 'installing';
+    seenBtn.disabled = !(phase === 'installing' || phase === 'wrong');
+  }
+
+  startBtn.addEventListener('click', function () { phase = 'installing'; render(); });
+  blipBtn.addEventListener('click', function () { if (phase === 'installing') { phase = 'wrong'; render(); } });
+  seenBtn.addEventListener('click', function () { if (phase === 'installing' || phase === 'wrong') { phase = 'done'; render(); } });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () { phase = 'idle'; render(); });
+
+  render();
+})();
+</script>
+</body>
+</html>

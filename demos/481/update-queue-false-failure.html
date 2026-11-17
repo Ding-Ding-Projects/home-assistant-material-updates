@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: update queue and false failures</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.qstep { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 12px 0; border-top: 1px solid var(--outv); }
+.qstep:first-child { border-top: none; }
+.qstep .n { flex: 1 1 180px; font-weight: 500; }
+.qstep .st { min-width: 96px; text-align: center; }
+.st.waiting { background: var(--sl4); color: var(--onv); }
+.st.running { background: var(--pc); color: var(--on-pc); }
+.st.done { background: var(--greenc); color: var(--green); }
+.st.failed { background: var(--errc); color: var(--on-errc); }
+.note-box { min-height: 48px; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="update-queue-false-failure">
+  <h1>Update everything runs its steps in order and does not call a working step failed</h1>
+  <p class="muted">Press Start queue to watch three steps run in order. Try the not-running moment, then the wrong failure and its healing.</p>
+
+  <section class="card stack" aria-labelledby="queue-h">
+    <h2 id="queue-h" class="small">Update everything</h2>
+
+    <label class="row"><input type="checkbox" id="blip" class="switch" aria-describedby="blip-d"> <span>Show a short not-running moment during the install</span></label>
+    <p id="blip-d" class="small muted">When this is on, the install reports not running for a moment. The queue waits to be sure instead of failing.</p>
+
+    <ol class="list" id="queue" aria-label="Queue steps">
+      <li class="qstep" data-step="0"><span class="n">Download the Core update</span><span class="badge st waiting">Waiting</span></li>
+      <li class="qstep" data-step="1"><span class="n">Install the Core update</span><span class="badge st waiting">Waiting</span></li>
+      <li class="qstep" data-step="2"><span class="n">Restart and confirm the new version</span><span class="badge st waiting">Waiting</span></li>
+    </ol>
+
+    <div class="row">
+      <button type="button" class="filled" id="start">Start queue</button>
+      <button type="button" class="tonal" id="wrong" disabled>Mark as failed by mistake</button>
+      <button type="button" class="tonal" id="target" disabled>Update is at target</button>
+    </div>
+
+    <div class="note note-box" id="msg" aria-live="polite">Press Start queue to begin.</div>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var NAMES = ['Download the Core update', 'Install the Core update', 'Restart and confirm the new version'];
+  var DURATION = [1200, 4000, 1200];
+  var LABEL = { waiting: 'Waiting', running: 'Running', done: 'Done', failed: 'Failed' };
+  var rows = Array.prototype.slice.call(document.querySelectorAll('#queue .qstep'));
+  var blip = document.getElementById('blip');
+  var startBtn = document.getElementById('start');
+  var wrongBtn = document.getElementById('wrong');
+  var targetBtn = document.getElementById('target');
+  var msg = document.getElementById('msg');
+  var state = ['waiting', 'waiting', 'waiting'];
+  var timers = [];
+  var idx = -1;
+  var paused = false;
+
+  function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+
+  function render() {
+    rows.forEach(function (li, i) {
+      var b = li.querySelector('.st');
+      b.className = 'badge st ' + state[i];
+      b.textContent = LABEL[state[i]];
+    });
+    wrongBtn.disabled = !(state[1] === 'running');
+    targetBtn.disabled = !(state[1] === 'failed');
+  }
+
+  function say(text) { msg.textContent = text; }
+
+  function runStep() {
+    if (idx >= NAMES.length) {
+      say('Queue finished. All three steps are done.');
+      render();
+      return;
+    }
+    state[idx] = 'running';
+    render();
+    say('Running: ' + NAMES[idx] + '.');
+    var s = idx;
+    if (s === 1 && blip.checked) {
+      timers.push(setTimeout(function () {
+        if (!paused && state[1] === 'running') {
+          say('Not running for a moment. The queue waits to be sure and keeps the install as Running.');
+        }
+      }, 1200));
+    }
+    timers.push(setTimeout(function () {
+      if (paused) return;
+      state[s] = 'done';
+      idx = s + 1;
+      render();
+      runStep();
+    }, DURATION[s]));
+  }
+
+  startBtn.addEventListener('click', function () {
+    clearTimers();
+    paused = false;
+    state = ['waiting', 'waiting', 'waiting'];
+    idx = 0;
+    runStep();
+  });
+
+  wrongBtn.addEventListener('click', function () {
+    if (state[1] !== 'running') return;
+    clearTimers();
+    paused = true;
+    state[1] = 'failed';
+    render();
+    say('The install was marked failed by mistake, so the queue has paused on it. Its update has not reached the target yet.');
+  });
+
+  targetBtn.addEventListener('click', function () {
+    if (state[1] !== 'failed') return;
+    paused = false;
+    state[1] = 'done';
+    idx = 2;
+    render();
+    say('The update is seen at the target version. The step is healed to Done and the queue carries on.');
+    runStep();
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    clearTimers();
+    paused = false;
+    idx = -1;
+    state = ['waiting', 'waiting', 'waiting'];
+    blip.checked = false;
+    render();
+    say('Press Start queue to begin.');
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
