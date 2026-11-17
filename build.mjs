@@ -230,8 +230,18 @@ function homePage() {
   for (const r of releases) for (const a of AREAS) if (r.areaCounts[a]) areaCountsVersions[a] = (areaCountsVersions[a] || 0) + 1;
   const chips = AREAS.filter((a) => areaCountsVersions[a]).map((a) => `<button type="button" class="chip" style="--w:${Math.max(4, Math.round((areaCountsVersions[a] / releases.length) * 100))}%" aria-pressed="false" data-area="${a}"><span data-yue="${esc(areaYue(a))}">${esc(areaLabel(a))}</span> <span class="count">${areaCountsVersions[a]}</span></button>`).join('');
   const builds = releases.map((r) => r.build).sort((a, b) => a - b);
-  const fromOpts = builds.map((b, i) => `<option value="${b}">${b}${i === 0 ? ', oldest' : ''}</option>`).join('');
-  const toOpts = builds.map((b, i) => `<option value="${b}">${b}${i === builds.length - 1 ? ', newest' : ''}</option>`).join('');
+  const optFor = (b, i, tag) => {
+    const r = releases.find((x) => x.build === b);
+    const day = r ? String(r.date || '').slice(0, 10) : '';
+    const head = r ? (r.headline || (r.changes[0] ? r.changes[0].title : '')) : '';
+    const mon = r ? fmtDay(r.date).replace(/^\d+ /, '') : '';
+    const kw = r ? `${b} ${r.core || ''} ${fmtDay(r.date)} ${day}` : String(b);
+    const badge = tag === 'oldest' ? 'oldest' : tag === 'newest' ? 'newest' : '';
+    return `<option value="${b}" data-l1="Build ${b}" data-sub="${esc(`${r ? fmtDay(r.date) : ''}${head ? ', ' + head : ''}`)}" data-kw="${esc(kw)}" data-group="${esc(mon)}"${badge ? ` data-badge="${badge}"` : ''}>Build ${b}${badge ? ', ' + badge : ''}</option>`;
+  };
+  const newestFirst = builds.slice().reverse();
+  const fromOpts = newestFirst.map((b) => { const i = builds.indexOf(b); return optFor(b, i, i === 0 ? 'oldest' : i === builds.length - 1 ? 'newest' : ''); }).join('');
+  const toOpts = newestFirst.map((b) => { const i = builds.indexOf(b); return optFor(b, i, i === builds.length - 1 ? 'newest' : i === 0 ? 'oldest' : ''); }).join('');
   const main = `
 <section class="intro" aria-labelledby="ix-h">
 <h1 id="ix-h" class="mega" data-yue="每個更新，講清楚">Every update, explained</h1>
@@ -311,7 +321,7 @@ function groupChanges(changes) {
 
 function changeHtml(c) {
   const detail = pair(str(c.detail), str(c.detail_yue), 'cdetail');
-  return `<details class="change" id="c-${esc(c.sha)}" data-areas="${esc(asArray(c.areas).join(' '))}">
+  return `<details class="change" id="c-${esc(c.sha)}" data-areas="${esc(asArray(c.areas).join(' '))}" data-date="${esc(str(c.date))}" data-expl="${detail ? 1 : 0}">
 <summary><input type="checkbox" class="sel" data-sel="changes" value="${esc(c.sha)}" aria-label="Select this change"><span class="ct">${esc(c.title)}</span><span class="small muted cdate">${esc(fmtShort(c.date))}</span><span class="small muted mono">${esc(c.sha)}</span></summary>
 <div class="cbody">${detail || '<p class="muted">No further explanation was published for this change.</p>'}<div class="row">${badges(c.areas)}</div></div>
 </details>`;
@@ -375,14 +385,18 @@ ${ds.map((h, k) => `<div class="tabpanel" role="tabpanel" id="panel-${h.id}" ari
 <div class="row">${exportMenu('changes', 'exp-changes')}</div>
 ${bulkBar('changes', { compare: false })}
 ${r.truncated ? `<p class="note warn">The change list for this version was shortened by the update feed, so some changes are not shown here.</p>` : ''}
-<div role="group" aria-label="Show changes to" class="row chg-chips">
-<button type="button" class="chip" aria-pressed="true" data-area=""><span data-yue="全部">Everything</span> <span class="count">${n}</span></button>
-${areaChips.map((a) => `<button type="button" class="chip" aria-pressed="false" data-area="${a}"><span data-yue="${esc(areaYue(a))}">${esc(areaLabel(a))}</span> <span class="count">${r.areaCounts[a]}</span></button>`).join('\n')}
+<div class="abars chg-bars" role="group" aria-label="Show only these parts of the product" data-yue-aria="只睇呢啲產品部分">
+${areaChips.map((a) => `<button type="button" class="abar" aria-pressed="false" data-area="${a}" style="--w:${Math.max(4, Math.round((r.areaCounts[a] / (n || 1)) * 100))}%"><span class="abar-t"><span class="abar-tick" aria-hidden="true"></span><span data-yue="${esc(areaYue(a))}">${esc(areaLabel(a))}</span></span><b>${r.areaCounts[a]}</b></button>`).join('')}
+</div>
+<div class="row filter-row chg-tools">
+<label class="field grow"><span data-yue="次序">Order</span><select id="chg-sort"><option value="new">Newest first</option><option value="old">Oldest first</option></select></label>
+<label class="chk"><input type="checkbox" class="switch" role="switch" id="chg-expl"><span data-yue="只顯示有說明嘅">With an explanation only</span></label>
+<button type="button" id="chg-clear" data-yue="清除篩選">Clear filters</button>
 </div>
 <p class="small muted" id="chg-count" aria-live="polite"></p>
 ${groups.map(([a, list]) => `<div class="chg-group" data-group="${a}"><h3 data-yue="${esc(a === 'other' ? '其他' : areaYue(a))}">${esc(a === 'other' ? 'Other' : areaLabel(a))}</h3>
 ${list.map(changeHtml).join('\n')}</div>`).join('\n')}
-<p class="note" id="chg-none" hidden data-yue="冇更改夾到。清除搜尋或者揀另一部分。">No change matches. Clear the search or choose another part.</p>
+<div class="note dashed" id="chg-none" hidden><span data-yue="冇更改夾到。清除篩選或者揀另一部分。">No change matches. Clear the filters or choose another part.</span> <button type="button" class="text" id="chg-none-clear" data-yue="清除篩選">Clear filters</button></div>
 </section>`;
 
   const update = `<section id="update" class="card" aria-labelledby="up-h">

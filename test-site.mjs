@@ -215,7 +215,7 @@ await test('toy locks block interaction and unlock with the PIN', async (page, o
   await go(page, '/settings/index.html');
   const set = async () => { for (const k of ['1', '2', '3', '4']) await page.click(`.keypad [data-k="${k}"]`); };
   await page.evaluate(() => { const h = [...document.querySelectorAll('h2')].find((x) => x.textContent === 'Messages and records'); window.HXT_ACTIONS.lock.run(h); });
-  await page.waitForSelector('.keypad'); await set(); await page.waitForTimeout(100); await set(); await page.waitForTimeout(400);
+  await page.waitForSelector('.keypad'); await set(); await page.waitForTimeout(100); await set(); await page.waitForFunction(() => /"hash":"[0-9a-f]{64}"/.test(JSON.stringify(window.HX.X().locks)), null, { timeout: 4000 }).catch(() => {}); await page.waitForTimeout(100);
   const locked = await page.evaluate(() => { const s = [...document.querySelectorAll('section')].find((x) => x.querySelector('h2') && x.querySelector('h2').textContent === 'Messages and records'); return s && s.hasAttribute('inert') && s.hasAttribute('data-locked'); }); ok(locked, 'element was not locked');
   const stored = await page.evaluate(() => JSON.stringify(window.HX.X().locks)); ok(!/"pin"/i.test(stored) && /"hash":"[0-9a-f]{64}"/.test(stored), 'PIN must be stored only as a SHA-256 digest');
   const clicked = await page.evaluate(() => { const b = document.getElementById('notes-open'); let hit = false; const f = () => { hit = true; }; document.addEventListener('click', f, { once: true }); const r = b.getBoundingClientRect(); const el = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return el === b; }); ok(!clicked, 'a locked button is still hit-testable');
@@ -297,6 +297,132 @@ await test('update wizard steps, ticks and summary', async (page, ok) => {
 await test('Cantonese and dark mode do not clip or scroll sideways', async (page, ok) => {
   for (const p of PAGES) { await go(page, p); await page.evaluate(() => { window.HAMU.setLang('both', true); const s = window.HAMU.SET(); s.theme = 'dark'; window.HAMU.applySet(); }); await page.waitForTimeout(150); const o = await hscroll(page); ok(o <= 1, `${p} both-languages dark: sideways scroll ${o}px`); }
 }, { width: 320 });
+
+// ---------- Searchable list boxes and change filters, at phone and wide width ----------
+const F = (id) => `.cb:has(#${id}) .cb-field`;
+const nums = (t) => (/(\d+) of (\d+)/.exec(t || '') || []).slice(1).map(Number);
+for (const w of [320, 1280]) {
+  await test('every select is a searchable list box: none left visible on home, compare, settings, tools', async (page, ok) => {
+    for (const p of ['/index.html', '/compare/index.html?from=347&to=457', '/settings/index.html', '/tools/convert/index.html']) {
+      await go(page, p);
+      const bad = await page.$$eval('select', (a) => a.filter((s) => { const r = s.getBoundingClientRect(); const c = s.closest('.cb'); return r.width > 2 || r.height > 2 || !s.classList.contains('cb-native') || !c || !c.querySelector('.cb-field') || s.tabIndex !== -1; }).map((s) => s.id || s.name || 'select'));
+      ok(bad.length === 0, `${p}: native select still showing or not upgraded: ${bad.join(', ')}`);
+      const tall = await page.$$eval('.cb-field', (a) => a.filter((f) => { const h = f.getBoundingClientRect().height; return h > 0 && h < 55; }).length); ok(tall === 0, `${p}: ${tall} list box fields are shorter than 56px`);
+    }
+    await go(page, '/settings/index.html'); await page.click('#rule-add'); await page.waitForSelector('#rule-theme');
+    const inDlg = await page.$$eval('#ov select', (a) => a.every((s) => s.classList.contains('cb-native') && !!s.closest('.cb'))); ok(inDlg, 'selects inside the dialog were not upgraded');
+    ok((await page.$$('#ov .cb-field')).length >= 3, 'dialog list boxes missing');
+    await page.keyboard.press('Escape'); await page.click('#ap-open'); await page.waitForSelector('#ap-kind'); ok(await page.$('.cb:has(#ap-kind) .cb-field') !== null, 'appearance editor select not upgraded');
+    ok(await hscroll(page) <= 1, 'sideways scroll');
+  }, { width: w });
+
+  await test('home: From build is a searchable list box, keyboard only, with the filtered list and URL following', async (page, ok) => {
+    await go(page, '/index.html');
+    await page.focus(F('f-from')); await page.keyboard.press('ArrowDown'); await page.waitForSelector('.cb-panel');
+    const sheet = await page.$eval('.cb-panel', (p) => p.classList.contains('cb-sheet')); ok(sheet === (w < 720), `bottom sheet should be ${w < 720} at ${w}px, was ${sheet}`);
+    const box = await page.$eval('.cb-panel', (p) => { const r = p.getBoundingClientRect(); return [r.left, r.top, r.right, r.bottom, innerWidth, innerHeight]; });
+    ok(box[0] >= -0.5 && box[1] >= -0.5 && box[2] <= box[4] + 0.5 && box[3] <= box[5] + 0.5, `open list is not inside the viewport: ${box.map(Math.round)}`);
+    ok(await hscroll(page) <= 1, 'sideways scroll with the list open');
+    ok(await page.evaluate(() => document.activeElement.classList.contains('cb-q')), 'search field is not focused on open');
+    const all = nums(await page.textContent('.cb-count')); ok(all[1] >= 20, `option count ${all}`);
+    ok(await page.$eval('#f-from', (s) => document.querySelector('.cb-field[aria-expanded="true"]') !== null && !!s), 'field is not marked expanded');
+    await page.keyboard.type('13 Nov'); await page.waitForTimeout(120);
+    const f = nums(await page.textContent('.cb-count')); ok(f[0] > 0 && f[0] < all[1], `typing 13 Nov did not filter: ${f}`);
+    ok((await page.$$('.cb-opt mark')).length > 0, 'matched text is not marked');
+    await page.keyboard.press('ArrowDown'); await page.keyboard.press('Enter'); await page.waitForTimeout(250);
+    ok(!(await page.$('.cb-panel')), 'list did not close after choosing');
+    ok(await page.evaluate((s) => document.activeElement === document.querySelector(s), F('f-from')), 'focus did not return to the field');
+    const st = await page.textContent('#vs-status'); const sh = nums(st); ok(sh[0] < sh[1], `versions list did not change: ${st}`);
+    const hash = await page.evaluate(() => location.hash); ok(/from=\d+/.test(hash), `hash: ${hash}`);
+    const label = (await page.textContent(F('f-from'))).trim();
+    await page.reload({ waitUntil: 'load' }); await page.waitForTimeout(300);
+    ok((await page.textContent(F('f-from'))).trim() === label, 'filtered view did not survive reload');
+    ok((await page.textContent('#vs-status')) === st, 'versions list differs after reload');
+    await page.click('#f-clear'); await page.waitForTimeout(200);
+    ok(/oldest/.test(await page.textContent(F('f-from'))), `Clear filters did not reset the shown value: ${await page.textContent(F('f-from'))}`);
+    ok(/^Showing (\d+) of \1 /.test(await page.textContent('#vs-status')), 'Clear filters did not restore the list');
+    await page.focus(F('f-to')); await page.keyboard.press('ArrowDown'); await page.waitForSelector('.cb-panel'); await page.keyboard.type('457'); await page.waitForTimeout(100);
+    ok(nums(await page.textContent('.cb-count'))[0] === 1, 'a build number did not narrow the list to one');
+    await page.keyboard.press('Escape'); await page.waitForTimeout(100);
+    ok(!(await page.$('.cb-panel')) && (await page.evaluate((s) => document.activeElement === document.querySelector(s), F('f-to'))), 'Escape did not close and return focus');
+    await page.click(F('f-feat')); await page.waitForSelector('.cb-panel'); await page.click('.cb-opt >> nth=1'); await page.waitForTimeout(200);
+    ok(/new features/.test(await page.textContent(F('f-feat'))), 'Kind did not change with the pointer');
+    ok(await hscroll(page) <= 1, 'sideways scroll');
+  }, { width: w });
+
+  await test('compare: both pickers by keyboard, then the table follows', async (page, ok) => {
+    await go(page, '/compare/index.html');
+    await page.focus(F('cmp-from')); await page.keyboard.press('ArrowDown'); await page.waitForSelector('.cb-panel'); await page.keyboard.type('347'); await page.keyboard.press('Enter'); await page.waitForTimeout(250);
+    await page.focus(F('cmp-to')); await page.keyboard.press('ArrowDown'); await page.waitForSelector('.cb-panel'); await page.keyboard.type('439'); await page.keyboard.press('Enter'); await page.waitForTimeout(300);
+    ok(/from=347&to=439/.test(page.url()), `url ${page.url()}`);
+    const th = (await page.$$eval('.cmp-table thead th', (a) => a.map((x) => x.textContent))).join('|'); ok(/From build 347/.test(th) && /To build 439/.test(th), `table header: ${th}`);
+    ok(await hscroll(page) <= 1, 'sideways scroll');
+  }, { width: w });
+
+  await test('settings: a list box in the rule editor changes the colours; Escape closes only the list', async (page, ok) => {
+    await go(page, '/settings/index.html'); await page.click('#rule-add'); await page.waitForSelector('#rule-theme');
+    await page.fill('#rule-from', '00:00'); await page.fill('#rule-to', '23:59');
+    await page.focus(F('rule-theme')); await page.keyboard.press('ArrowDown'); await page.waitForSelector('.cb-panel'); await page.keyboard.type('dark'); await page.keyboard.press('Enter'); await page.waitForTimeout(150);
+    ok((await page.$eval('#rule-theme', (s) => s.value)) === 'dark', 'colours list box did not set the native value');
+    await page.focus(F('rule-lang')); await page.keyboard.press('ArrowDown'); await page.waitForSelector('.cb-panel'); await page.keyboard.press('Escape'); await page.waitForTimeout(100);
+    ok(!(await page.$('.cb-panel')) && !!(await page.$('#ov')), 'Escape should close only the list, not the dialog');
+    await page.fill('#rule-name', 'List box rule'); await page.click('#rule-save'); await page.waitForTimeout(250);
+    ok(await page.evaluate(() => document.documentElement.getAttribute('data-theme') === 'dark'), 'the colours rule did not change the theme');
+  }, { width: w });
+
+  await test('compare: area bars filter the changes with search, the URL, the keyboard and the build list', async (page, ok) => {
+    await go(page, '/compare/index.html?from=437&to=439');
+    ok(/Showing 3 of 3 changes/.test(await page.textContent('#cmp-count')), `start: ${await page.textContent('#cmp-count')}`);
+    const bars = await page.$$eval('.abar', (a) => a.map((b) => [b.tagName, b.getAttribute('aria-pressed'), b.getBoundingClientRect().height])); ok(bars.length === 2 && bars.every((b) => b[0] === 'BUTTON' && b[1] === 'false' && b[2] >= 48), `bars: ${JSON.stringify(bars)}`);
+    await page.click('.abar[data-area="docs"]'); await page.waitForTimeout(150);
+    ok(/Showing 2 of 3 changes/.test(await page.textContent('#cmp-count')) && (await page.$$('#cmp-out details.change')).length === 2, 'Documentation bar did not reduce the list and the count');
+    ok((await page.getAttribute('.abar[data-area="docs"]', 'aria-pressed')) === 'true' && /areas=docs/.test(page.url()), 'bar state or URL not updated');
+    ok(await page.$eval('.abar[data-area="docs"]', (b) => getComputedStyle(b.querySelector('.abar-tick'), '::before').content.length > 2), 'chosen bar shows no tick');
+    const first = (await page.textContent('#cmp-out details.change .ct')).trim(); const word = (first.split(/\s+/).find((x) => /^[a-z]{5,}$/i.test(x)) || first.slice(0, 5)).toLowerCase();
+    await page.fill('#cmp-q', word); await page.waitForTimeout(150);
+    const both = nums(await page.textContent('#cmp-count')); ok(both[0] >= 1 && both[0] <= 2, `search plus bar: ${both}`);
+    await page.reload({ waitUntil: 'load' }); await page.waitForTimeout(400);
+    ok((await page.getAttribute('.abar[data-area="docs"]', 'aria-pressed')) === 'true' && (await page.inputValue('#cmp-q')) === word && nums(await page.textContent('#cmp-count'))[0] === both[0], 'filter did not survive reload');
+    await page.fill('#cmp-q', ''); await page.focus('.abar[data-area="docs"]'); await page.keyboard.press('Enter'); await page.waitForTimeout(150);
+    ok(/Showing 3 of 3 changes/.test(await page.textContent('#cmp-count')) && !/areas=/.test(page.url()), 'pressing the bar again (keyboard) did not restore the list');
+    await page.keyboard.press('Space'); await page.waitForTimeout(100); ok(/Showing 2 of 3/.test(await page.textContent('#cmp-count')), 'Space did not toggle the bar');
+    await page.check('#cmp-expl'); await page.waitForTimeout(100); ok(/expl=1/.test(page.url()), 'explanation switch not in the URL');
+    await page.focus(F('cmp-sort')); await page.keyboard.press('ArrowDown'); await page.waitForSelector('.cb-panel'); await page.keyboard.type('Old'); await page.keyboard.press('Enter'); await page.waitForTimeout(150);
+    ok(/sort=old/.test(page.url()), 'sort not in the URL');
+    await page.click('#cmp-clear'); await page.waitForTimeout(150);
+    ok(/Showing 3 of 3 changes/.test(await page.textContent('#cmp-count')) && !/areas=|expl=|sort=/.test(page.url()) && !(await page.isChecked('#cmp-expl')), 'Clear filters did not reset everything');
+    await page.fill('#cmp-q', 'zzzzzzqq'); await page.waitForTimeout(120); ok(await page.isVisible('#cmp-none'), 'no empty state'); await page.click('#cmp-empty-clear'); await page.waitForTimeout(100);
+    ok(/Showing 3 of 3/.test(await page.textContent('#cmp-count')), 'empty-state Clear did not restore');
+    await go(page, '/compare/index.html?from=347&to=457');
+    const total = nums(await page.textContent('#cmp-count'))[1];
+    await page.focus(F('cmp-builds')); await page.keyboard.press('ArrowDown'); await page.waitForSelector('.cb-panel'); ok(await page.$('.cb-tools') !== null, 'multi-select tools missing');
+    await page.keyboard.press('Enter'); await page.keyboard.press('ArrowDown'); await page.keyboard.press('Enter'); ok(!!(await page.$('.cb-panel')), 'multi-select closed after one choice'); await page.keyboard.press('Escape'); await page.waitForTimeout(150);
+    const part = nums(await page.textContent('#cmp-count')); ok(part[0] > 0 && part[0] < total && /2 chosen/.test(await page.textContent(F('cmp-builds'))), `build filter: ${part} of ${total}`);
+    ok(/builds=/.test(page.url()), 'builds not in the URL');
+    await page.fill('#cmp-q', 'zzzzzzqq'); await page.waitForTimeout(150);
+    ok(/2 builds have no matching change/.test(await page.textContent('#cmp-hidden-builds')), `hidden builds line: "${await page.textContent('#cmp-hidden-builds')}"`);
+    ok(await hscroll(page) <= 1, 'sideways scroll');
+  }, { width: w });
+
+  await test('version page: the same bars, switch, sort, clear and URL filter its change list', async (page, ok) => {
+    await go(page, '/releases/457/index.html');
+    const t0 = nums(await page.textContent('#chg-count')); ok(t0[0] === t0[1] && t0[1] > 5, `start: ${t0}`);
+    const bar = '.chg-bars .abar >> nth=0'; ok((await page.$eval(bar, (b) => b.getBoundingClientRect().height)) >= 48, 'bar shorter than 48px');
+    await page.click(bar); await page.waitForTimeout(150);
+    const t1 = nums(await page.textContent('#chg-count')); ok(t1[0] < t1[1] && /areas=/.test(page.url()), `after bar: ${t1} ${page.url()}`);
+    const visible = await page.$$eval('details.change:not([hidden])', (a) => a.length); ok(visible === t1[0], `visible changes ${visible} != count ${t1[0]}`);
+    await page.reload({ waitUntil: 'load' }); await page.waitForTimeout(300);
+    ok(nums(await page.textContent('#chg-count'))[0] === t1[0] && (await page.getAttribute(bar, 'aria-pressed')) === 'true', 'filter did not survive reload');
+    await page.fill('#chg-q', 'camera'); await page.waitForTimeout(150); ok(nums(await page.textContent('#chg-count'))[0] <= t1[0], 'search did not combine with the bar');
+    await page.click('#chg-clear'); await page.waitForTimeout(150);
+    ok(nums(await page.textContent('#chg-count'))[0] === t0[1] && !/areas=|q=/.test(page.url()) && (await page.inputValue('#chg-q')) === '', 'Clear filters did not reset');
+    await page.check('#chg-expl'); await page.waitForTimeout(100); ok(/expl=1/.test(page.url()) && nums(await page.textContent('#chg-count'))[0] <= t0[1], 'explanation switch');
+    await page.focus(F('chg-sort')); await page.keyboard.press('ArrowDown'); await page.waitForSelector('.cb-panel'); await page.keyboard.type('Old'); await page.keyboard.press('Enter'); await page.waitForTimeout(150); ok(/sort=old/.test(page.url()), 'sort not in the URL');
+    await page.fill('#chg-q', 'zzzzzzqq'); await page.waitForTimeout(120); ok(await page.isVisible('#chg-none'), 'no empty state'); await page.click('#chg-none-clear'); await page.waitForTimeout(100);
+    ok(nums(await page.textContent('#chg-count'))[0] === t0[1], 'empty-state Clear did not restore');
+    ok(await hscroll(page) <= 1, 'sideways scroll');
+  }, { width: w });
+}
 
 if (WANT_SHOTS) {
   for (const [w, hgt] of [[320, 740], [1280, 860]]) for (const theme of ['light', 'dark']) for (const lang of ['en', 'yue']) {

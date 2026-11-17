@@ -53,7 +53,7 @@ Pages: home (index.html), version (releases/N/), compare, features (and its arti
 | `command-palette` | Command palette | built (Built and run) | home, version, compare, features, settings | Every page; its search has a pattern builder. |
 | `context-menus` | Context menus | built (Built and run) | all pages | Right-click, Shift+F10 or the Menu key, and touch-and-hold (600 ms) open the element menu; Shift+right-click keeps the browser menu. Touch-and-hold was not run on a real touch device. |
 | `menu-shortcuts` | Menu shortcuts | built (Built and run) | palette | Each context menu item shows Alt+Shift+letter and the shortcuts work on the focused or last-used element. |
-| `rich-controls` | Rich controls | partly (Partly built) | home, settings | Selects, chips, segmented buttons and switches. The confirmation uses a slider. No steppers or pickers elsewhere. |
+| `rich-controls` | Rich controls | partly (Partly built) | home, settings | Every select is a searchable list box (search with the pattern builder, month groups, keyboard, anchored panel or phone bottom sheet, multi-select for builds), plus chips, area bars that filter, segmented buttons and switches. The confirmation uses a slider. No steppers or date pickers. |
 | `guided-forms` | Guided forms | partly (Partly built) | version | Each version page has a step-by-step update wizard (back, next, ticks, summary) with the plain list kept for no-script. No other form on the site needs steps. |
 | `info-icon-guidance` | Info buttons | partly (Partly built) | settings | Settings only. |
 | `settings-explanations` | Settings with explanations | built (Built and run) | settings | Settings page. |

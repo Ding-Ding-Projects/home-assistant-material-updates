@@ -175,7 +175,7 @@
     ov.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') { e.stopPropagation(); closeDialog(); }
       if (e.key === 'Tab') {
-        const f = $$('button,input,select,textarea,a[href],[tabindex="0"]', box).filter((x) => !x.disabled && x.offsetParent !== null);
+        const f = $('button,input,select:not(.cb-native),textarea,a[href],[tabindex="0"]', box).filter((x) => !x.disabled && x.offsetParent !== null);
         if (!f.length) return;
         const first = f[0]; const last = f[f.length - 1];
         if (e.shiftKey && doc.activeElement === first) { e.preventDefault(); last.focus(); } else if (!e.shiftKey && doc.activeElement === last) { e.preventDefault(); first.focus(); }
@@ -183,7 +183,7 @@
     });
     body.appendChild(ov);
     applyLang(ov);
-    const f = opts.focus ? $(opts.focus, box) : $('input,select,textarea,button:not([data-close])', box);
+    const f = opts.focus ? $(opts.focus, box) : $('input,select:not(.cb-native),textarea,button:not([data-close])', box);
     (f || box).focus();
     return box;
   }
@@ -304,6 +304,234 @@
     upd();
   }
   doc.addEventListener('click', (e) => { const b = e.target.closest('[data-regex]'); if (b) openWorkbench(b.dataset.regex); });
+
+  // ---------- Searchable list boxes: every <select> on the site is upgraded to one ----------
+  // The native <select> stays in the DOM (so the page works without scripts and form values do not change); it is
+  // hidden from sight and from the tab order. Choosing sets select.value (or option.selected) and fires bubbling
+  // "input" and "change" events, so every existing listener keeps working. Programmatic select.value writes are
+  // caught by a setter patched onto each upgraded select, option changes by a MutationObserver per select, and a
+  // "site:sync" event on the select or the document forces a re-read.
+  const CBV = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+  const cb = { seq: 0, openFor: null, mql: window.matchMedia ? window.matchMedia('(max-width: 719.98px)') : { matches: false } };
+  const cbText = (el) => { if (!el) return ''; const c = el.cloneNode(true); for (const x of c.querySelectorAll('.l2')) x.remove(); return c.textContent.trim(); };
+  const CB_BADGE = { newest: ['newest', '最新'], oldest: ['oldest', '最舊'] };
+  function cbOptions(sel) {
+    const out = [];
+    const add = (o, grp) => out.push({ o, value: o.value, text: o.textContent.trim(), l1: o.dataset.l1 || o.textContent.trim(), sub: o.dataset.sub || '', kw: o.dataset.kw || '', group: o.dataset.group || grp || '', badge: o.dataset.badge || '', disabled: o.disabled });
+    for (const n of sel.children) {
+      if (n.tagName === 'OPTION') add(n, '');
+      else if (n.tagName === 'OPTGROUP') for (const o of n.children) if (o.tagName === 'OPTION') add(o, n.label);
+    }
+    return out;
+  }
+  function upgradeSelect(sel) {
+    if (sel._cb || sel.hasAttribute('data-cb-skip') || !sel.parentNode) return;
+    const n = ++cb.seq;
+    const multi = sel.multiple || sel.hasAttribute('data-cb-multi');
+    const lab = sel.closest('label');
+    let labSpan = lab ? lab.querySelector(':scope > span') : null;
+    if (labSpan && !labSpan.id) labSpan.id = `cb-l-${n}`;
+    const visible = !!labSpan && !labSpan.classList.contains('sr-only');
+    const labText = () => (labSpan ? cbText(labSpan) : '') || sel.getAttribute('aria-label') || '';
+    const wrap = h('span', { class: 'cb' });
+    const cbLab = h('span', { class: 'cb-lab', id: `cb-lb-${n}` });
+    const val = h('span', { class: 'cb-val', id: `cb-v-${n}` });
+    const field = h('button', { type: 'button', class: 'cb-field', role: 'combobox', 'aria-haspopup': 'listbox', 'aria-expanded': 'false', 'aria-controls': `cb-list-${n}`, 'aria-labelledby': `${labSpan ? labSpan.id : cbLab.id} ${val.id}` },
+      h('span', { class: 'cb-text' }, visible ? null : cbLab, val));
+    field.appendChild(doc.createRange().createContextualFragment('<svg class="cb-chev" aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>'));
+    sel.parentNode.insertBefore(wrap, sel);
+    wrap.appendChild(field); wrap.appendChild(sel);
+    sel.classList.add('cb-native'); sel.tabIndex = -1; sel.setAttribute('aria-hidden', 'true'); sel.setAttribute('data-cb-native', '');
+    const st = { sel, field, multi, n, wrap, query: '' };
+    sel._cb = st;
+    function summary() {
+      const opts = cbOptions(sel);
+      if (multi) {
+        const on = opts.filter((x) => x.o.selected);
+        if (!on.length) return T(sel.dataset.cbAll || 'All', sel.dataset.cbAllYue || '全部');
+        if (on.length === 1) return on[0].text;
+        return T(`${on.length} chosen`, `已揀 ${on.length} 個`);
+      }
+      const cur = opts.find((x) => x.o.selected) || opts.find((x) => x.value === sel.value);
+      return cur ? cur.text : '';
+    }
+    function refresh() {
+      cbLab.textContent = labText();
+      val.textContent = summary() || ' ';
+      field.disabled = sel.disabled;
+      if (sel.hasAttribute('inert')) field.setAttribute('inert', ''); else field.removeAttribute('inert');
+      if (sel.getAttribute('aria-disabled') === 'true') field.setAttribute('aria-disabled', 'true'); else field.removeAttribute('aria-disabled');
+    }
+    st.refresh = refresh;
+    if (!multi) Object.defineProperty(sel, 'value', { configurable: true, get() { return CBV.get.call(this); }, set(v) { CBV.set.call(this, v); refresh(); } });
+    sel.addEventListener('change', refresh); sel.addEventListener('site:sync', refresh);
+    new MutationObserver(refresh).observe(sel, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['disabled', 'inert', 'aria-disabled', 'label', 'data-cb-all'] });
+    field.addEventListener('click', () => { if (cb.openFor === st) closeCb(); else openCb(st, ''); });
+    field.addEventListener('keydown', (e) => {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); openCb(st, ''); } else if (e.key.length === 1 && e.key !== ' ') { e.preventDefault(); openCb(st, e.key); }
+    });
+    refresh();
+  }
+  function upgradeAll(root) {
+    if (!root || root.nodeType !== 1) return;
+    if (root.tagName === 'SELECT') upgradeSelect(root);
+    for (const s of root.querySelectorAll ? root.querySelectorAll('select') : []) upgradeSelect(s);
+  }
+  function closeCb(noFocus) {
+    const st = cb.openFor; if (!st) return;
+    cb.openFor = null;
+    if (st.cleanup) st.cleanup();
+    if (st.panel) st.panel.remove(); if (st.back) st.back.remove();
+    st.panel = null; st.back = null;
+    st.field.setAttribute('aria-expanded', 'false');
+    if (!noFocus && doc.body.contains(st.field)) st.field.focus();
+  }
+  function openCb(st, seed) {
+    if (cb.openFor && cb.openFor !== st) closeCb(true);
+    if (cb.openFor === st || st.field.disabled) return;
+    cb.openFor = st;
+    const { sel, multi, n } = st;
+    const sheet = cb.mql.matches;
+    const title = (st.field.querySelector('.cb-lab') ? st.field.querySelector('.cb-lab').textContent : '') || (cbText(sel.closest('label') && sel.closest('label').querySelector(':scope > span'))) || sel.getAttribute('aria-label') || T('Choose', '揀');
+    const input = h('input', { type: 'search', class: 'cb-q', id: `cb-q-${n}`, role: 'combobox', 'aria-autocomplete': 'list', 'aria-expanded': 'true', 'aria-controls': `cb-list-${n}`, 'aria-haspopup': 'listbox', autocomplete: 'off', spellcheck: 'false', placeholder: T('Search or /pattern/', '搜尋或 /樣式/'), 'aria-label': `${T('Search in', '喺呢度搜尋')} ${title}` });
+    input.value = seed || '';
+    const rx = h('button', { type: 'button', class: 'pill-icon regex-btn', 'data-regex': `cb-q-${n}`, 'aria-label': T('Pattern builder for this search', '呢個搜尋嘅樣式建構器') });
+    rx.appendChild(doc.createRange().createContextualFragment('<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 17.5v.01M12 5v9M8 7.5l8 4M16 7.5l-8 4"/></svg>'));
+    const find = h('div', { class: 'find cb-find', role: 'search' }, input, sel.closest('#ov') ? null : rx);
+    const count = h('p', { class: 'small muted cb-count', 'aria-live': 'polite' });
+    const list = h('div', { class: 'cb-list', id: `cb-list-${n}`, role: 'listbox', 'aria-label': title, tabindex: '-1' });
+    if (multi) list.setAttribute('aria-multiselectable', 'true');
+    const empty = h('div', { class: 'cb-empty', hidden: '' }, h('span', { text: T('Nothing matches.', '冇配對。') }), ' ');
+    const clearQ = h('button', { type: 'button', class: 'text', text: T('Clear', '清除') }); empty.appendChild(clearQ);
+    const closeB = h('button', { type: 'button', class: 'text cb-close', text: T('Close', '閂') });
+    const head = h('div', { class: 'cb-head' }, h('h2', { class: 'cb-title', id: `cb-t-${n}`, text: title }), closeB);
+    const tools = multi ? h('div', { class: 'row cb-tools' }) : null;
+    let allB = null; let noneB = null; let chosen = null;
+    if (multi) {
+      allB = h('button', { type: 'button', class: 'tonal', text: T('Select all shown', '揀晒顯示嘅') });
+      noneB = h('button', { type: 'button', class: 'text', text: T('Clear', '清除') });
+      chosen = h('span', { class: 'small', 'aria-live': 'polite' });
+      tools.append(allB, noneB, chosen);
+    }
+    const panel = h('div', { class: `cb-panel${sheet ? ' cb-sheet' : ''}`, role: 'dialog', 'aria-label': title });
+    if (sheet) panel.setAttribute('aria-modal', 'true');
+    if (sheet) panel.appendChild(h('div', { class: 'cb-grab', 'aria-hidden': 'true' }));
+    panel.append(head, find, count, ...(tools ? [tools] : []), list, empty);
+    const back = sheet ? h('div', { class: 'cb-back' }) : null;
+    if (back) body.appendChild(back);
+    body.appendChild(panel);
+    st.panel = panel; st.back = back;
+    st.field.setAttribute('aria-expanded', 'true');
+    let items = []; let active = -1; let away = false;
+    const all = cbOptions(sel);
+    const grouped = all.length > 12 && all.some((x) => x.group);
+    function pick(x) {
+      if (x.disabled) return;
+      if (multi) {
+        x.o.selected = !x.o.selected;
+        sel.dispatchEvent(new Event('input', { bubbles: true })); sel.dispatchEvent(new Event('change', { bubbles: true }));
+        paint(true);
+      } else {
+        const changed = CBV.get.call(sel) !== x.value;
+        closeCb();
+        if (changed) { sel.value = x.value; sel.dispatchEvent(new Event('input', { bubbles: true })); sel.dispatchEvent(new Event('change', { bubbles: true })); }
+      }
+    }
+    function setActive(i, scroll) {
+      const els = list.querySelectorAll('[role="option"]');
+      for (const e of els) e.removeAttribute('data-active');
+      active = Math.max(0, Math.min(items.length - 1, i));
+      const cur = els[active];
+      if (cur) { cur.setAttribute('data-active', ''); input.setAttribute('aria-activedescendant', cur.id); if (scroll !== false) cur.scrollIntoView({ block: 'nearest' }); } else input.removeAttribute('aria-activedescendant');
+    }
+    function paint(keep) {
+      const mt = compile(input.value.trim());
+      searchError(input, mt);
+      const prevVal = keep && items[active] ? items[active].value : null;
+      items = all.filter((x) => mt.none || (mt.ok && mt.test(`${x.text} ${x.l1} ${x.sub} ${x.kw}`)));
+      list.textContent = '';
+      let grpEl = null; let lastG = null; let gi = 0;
+      items.forEach((x, i) => {
+        if (grouped && x.group !== lastG) {
+          lastG = x.group; gi += 1;
+          const gid = `cb-g-${n}-${gi}`;
+          grpEl = h('div', { class: 'cb-group', role: 'group', 'aria-labelledby': gid }, h('div', { class: 'cb-grp', id: gid, text: x.group }));
+          list.appendChild(grpEl);
+        }
+        const on = x.o.selected;
+        const l1 = h('span', { class: 'cb-l1' }); l1.appendChild(marked(x.l1, mt));
+        const txt = h('span', { class: 'cb-ot' }, l1);
+        if (x.sub) { const s = h('span', { class: 'cb-sub small muted' }); s.appendChild(marked(x.sub, mt)); txt.appendChild(s); }
+        const opt = h('div', { class: 'cb-opt', role: 'option', id: `cb-o-${n}-${i}`, 'aria-selected': String(!!on), 'aria-disabled': x.disabled ? 'true' : null, 'data-i': String(i) },
+          h('span', { class: `cb-tick${multi ? ' cb-box' : ''}`, 'aria-hidden': 'true', text: on ? '✓' : '' }), txt,
+          x.badge ? h('span', { class: 'badge cb-badge', text: T(CB_BADGE[x.badge] ? CB_BADGE[x.badge][0] : x.badge, CB_BADGE[x.badge] ? CB_BADGE[x.badge][1] : x.badge) }) : null);
+        (grpEl || list).appendChild(opt);
+      });
+      empty.hidden = items.length > 0; list.hidden = items.length === 0;
+      count.textContent = T(`${items.length} of ${all.length}`, `${items.length}/${all.length}`);
+      if (multi) { chosen.textContent = T(`${all.filter((x) => x.o.selected).length} chosen`, `已揀 ${all.filter((x) => x.o.selected).length} 個`); allB.disabled = !items.length; }
+      let start = prevVal != null ? items.findIndex((x) => x.value === prevVal) : -1;
+      if (start < 0 && !input.value.trim()) start = items.findIndex((x) => x.o.selected);
+      setActive(start < 0 ? 0 : start, !keep);
+      if (!keep && !input.value.trim()) { const c = list.querySelector('[data-active]'); if (c) c.scrollIntoView({ block: 'center' }); }
+    }
+    function place() {
+      if (sheet) return;
+      const r = st.field.getBoundingClientRect(); const vw = doc.documentElement.clientWidth; const vh = window.innerHeight;
+      const w = Math.min(Math.max(r.width, 300), vw - 16);
+      const left = Math.max(8, Math.min(r.left, vw - w - 8));
+      const below = vh - r.bottom - 8; const above = r.top - 8;
+      const down = below >= 240 || below >= above;
+      const maxH = Math.max(160, Math.min(360, down ? below : above));
+      panel.style.width = `${w}px`; panel.style.left = `${left}px`; panel.style.maxHeight = `${maxH}px`;
+      if (down) { panel.style.top = `${r.bottom + 4}px`; panel.style.bottom = 'auto'; } else { panel.style.bottom = `${vh - r.top + 4}px`; panel.style.top = 'auto'; }
+    }
+    place();
+    paint(false);
+    input.focus(); if (seed) input.setSelectionRange(seed.length, seed.length);
+    input.addEventListener('input', () => paint(false));
+    clearQ.addEventListener('click', () => { input.value = ''; paint(false); input.focus(); });
+    closeB.addEventListener('click', () => closeCb());
+    if (multi) {
+      allB.addEventListener('click', () => { for (const x of items) if (!x.disabled) x.o.selected = true; sel.dispatchEvent(new Event('input', { bubbles: true })); sel.dispatchEvent(new Event('change', { bubbles: true })); paint(true); input.focus(); });
+      noneB.addEventListener('click', () => { for (const x of all) x.o.selected = false; sel.dispatchEvent(new Event('input', { bubbles: true })); sel.dispatchEvent(new Event('change', { bubbles: true })); paint(true); input.focus(); });
+    }
+    list.addEventListener('mousedown', (e) => e.preventDefault());
+    list.addEventListener('click', (e) => { const o = e.target.closest('[role="option"]'); if (o) { const x = items[+o.dataset.i]; if (x) pick(x); } });
+    rx.addEventListener('click', () => {
+      away = true; panel.classList.add('cb-away'); if (back) back.classList.add('cb-away');
+      let seen = false;
+      const mo = new MutationObserver(() => { const ov = $('#ov'); if (ov) seen = true; else if (seen) { mo.disconnect(); away = false; panel.classList.remove('cb-away'); if (back) back.classList.remove('cb-away'); input.focus(); } });
+      mo.observe(body, { childList: true });
+      setTimeout(() => { if (!seen && !$('#ov')) { mo.disconnect(); away = false; panel.classList.remove('cb-away'); if (back) back.classList.remove('cb-away'); } }, 1500);
+    });
+    panel.addEventListener('keydown', (e) => {
+      const k = e.key;
+      if (k === 'Escape') { e.preventDefault(); e.stopPropagation(); closeCb(); return; }
+      if (k === 'Tab') {
+        if (!sheet) { closeCb(true); st.field.focus(); return; }
+        const f = $$('button,input', panel).filter((x) => !x.disabled && x.offsetParent !== null);
+        if (!f.length) return;
+        const first = f[0]; const last = f[f.length - 1];
+        if (e.shiftKey && doc.activeElement === first) { e.preventDefault(); last.focus(); } else if (!e.shiftKey && doc.activeElement === last) { e.preventDefault(); first.focus(); }
+        return;
+      }
+      if (e.target !== input) return;
+      const step = { ArrowDown: 1, ArrowUp: -1, PageDown: 8, PageUp: -8 }[k];
+      if (step) { e.preventDefault(); if (items.length) setActive(active + step); } else if (k === 'Home' || k === 'End') { e.preventDefault(); if (items.length) setActive(k === 'Home' ? 0 : items.length - 1); } else if (k === 'Enter') { e.preventDefault(); const x = items[active]; if (x) pick(x); }
+    });
+    const onDown = (e) => { if (away || panel.contains(e.target) || st.wrap.contains(e.target)) return; closeCb(true); };
+    const onMove = () => place();
+    doc.addEventListener('pointerdown', onDown, true);
+    window.addEventListener('resize', onMove); window.addEventListener('scroll', onMove, true);
+    st.cleanup = () => { doc.removeEventListener('pointerdown', onDown, true); window.removeEventListener('resize', onMove); window.removeEventListener('scroll', onMove, true); };
+    applyVocab(panel);
+  }
+  doc.addEventListener('site:sync', () => { for (const s of $$('select.cb-native')) if (s._cb) s._cb.refresh(); });
+  window.addEventListener('hamu-lang', () => { for (const s of $$('select.cb-native')) if (s._cb) s._cb.refresh(); });
+  upgradeAll(doc.body);
+  new MutationObserver((recs) => { for (const r of recs) for (const nd of r.addedNodes) if (nd.nodeType === 1) upgradeAll(nd); }).observe(doc.body, { childList: true, subtree: true });
 
   // ---------- Personal wording (local only) ----------
   const VL = { bytes: 262144, depth: 8, key: 160, value: 1000 };
@@ -722,35 +950,68 @@
         });
       }
     }
-    const changes = $$('details.change'); const groups = $$('.chg-group'); const chips = $$('.chg-chips .chip');
+    const changes = $$('details.change'); const groups = $$('.chg-group'); const bars = $$('.chg-bars .abar');
     const q = $('#chg-q'); const count = $('#chg-count'); const none = $('#chg-none');
-    let area = '';
+    const sortSel = $('#chg-sort'); const explSw = $('#chg-expl'); const clearB = $('#chg-clear');
+    changes.forEach((c, i) => { c._i = i; });
+    const fl = { areas: [], expl: false, sort: 'new' };
+    function readUrl() {
+      const p = new URLSearchParams(location.search);
+      fl.areas = (p.get('areas') || '').split(',').filter((a) => bars.some((b) => b.dataset.area === a));
+      fl.expl = p.get('expl') === '1'; fl.sort = p.get('sort') === 'old' ? 'old' : 'new';
+      if (q && p.get('q')) q.value = p.get('q');
+    }
+    function writeUrl() {
+      const p = new URLSearchParams();
+      if (q && q.value.trim()) p.set('q', q.value.trim());
+      if (fl.areas.length) p.set('areas', fl.areas.join(','));
+      if (fl.expl) p.set('expl', '1');
+      if (fl.sort === 'old') p.set('sort', 'old');
+      const s = p.toString();
+      try { history.replaceState(null, '', location.pathname + (s ? `?${s}` : '') + location.hash); } catch (e) { /* ignore */ }
+    }
+    const anyFilter = () => !!((q && q.value.trim()) || fl.areas.length || fl.expl || fl.sort !== 'new');
     function filter() {
       const mt = compile(q ? q.value : '');
       if (q) searchError(q, mt);
       let shown = 0;
       for (const c of changes) {
         if (c._t === undefined) c._t = c.textContent;
-        let ok = !area || (c.dataset.areas || '').split(' ').indexOf(area) >= 0;
+        let ok = !fl.areas.length || (c.dataset.areas || '').split(' ').some((a) => fl.areas.indexOf(a) >= 0);
+        if (ok && fl.expl) ok = c.dataset.expl === '1';
         if (ok && !mt.none) ok = mt.ok && mt.test(c._t);
         c.hidden = !ok; if (ok) shown += 1;
         const ct = $('.ct', c);
         if (ct) { if (ct._o === undefined) ct._o = ct.textContent; ct.textContent = ''; ct.appendChild(ok && !mt.none ? marked(ct._o, mt) : doc.createTextNode(ct._o)); }
       }
-      for (const g of groups) g.hidden = !$$('details.change', g).some((c) => !c.hidden);
-      count.textContent = shown === changes.length ? '' : T(`Showing ${shown} of ${changes.length} changes`, `顯示 ${shown}/${changes.length} 項更改`);
+      for (const g of groups) {
+        const list = $$('details.change', g);
+        list.sort((x, y) => { const d = String(y.dataset.date || '').localeCompare(String(x.dataset.date || '')); return (fl.sort === 'old' ? -d : d) || x._i - y._i; });
+        for (const c of list) g.appendChild(c);
+        g.hidden = !list.some((c) => !c.hidden);
+      }
+      for (const b of bars) b.setAttribute('aria-pressed', String(fl.areas.indexOf(b.dataset.area) >= 0));
+      count.textContent = T(`Showing ${shown} of ${changes.length} changes`, `顯示 ${shown}/${changes.length} 項更改`);
       none.hidden = shown !== 0;
+      if (clearB) clearB.disabled = !anyFilter();
       if (bulk.changes) bulk.changes.paint();
     }
-    if (q) q.addEventListener('input', filter);
-    for (const c of chips) c.addEventListener('click', () => { area = c.dataset.area; for (const o of chips) o.setAttribute('aria-pressed', String(o === c)); filter(); });
+    function resetAll() { if (q) q.value = ''; fl.areas = []; fl.expl = false; fl.sort = 'new'; if (sortSel) sortSel.value = 'new'; if (explSw) explSw.checked = false; filter(); writeUrl(); }
+    readUrl(); if (sortSel) sortSel.value = fl.sort; if (explSw) explSw.checked = fl.expl;
+    if (q) q.addEventListener('input', () => { filter(); writeUrl(); });
+    for (const b of bars) b.addEventListener('click', () => { const i = fl.areas.indexOf(b.dataset.area); if (i >= 0) fl.areas.splice(i, 1); else fl.areas.push(b.dataset.area); filter(); writeUrl(); });
+    if (sortSel) sortSel.addEventListener('change', () => { fl.sort = sortSel.value === 'old' ? 'old' : 'new'; filter(); writeUrl(); });
+    if (explSw) explSw.addEventListener('change', () => { fl.expl = explSw.checked; filter(); writeUrl(); });
+    if (clearB) clearB.addEventListener('click', resetAll);
+    const nc = $('#chg-none-clear'); if (nc) nc.addEventListener('click', resetAll);
     function openHash() {
       const id = decodeURIComponent(location.hash.slice(1)); if (id.indexOf('c-') !== 0) return;
       const el = doc.getElementById(id); if (!el) return;
-      if (el.hidden) { if (q) q.value = ''; area = ''; chips.forEach((o, i) => o.setAttribute('aria-pressed', String(i === 0))); filter(); }
+      if (el.hidden) { resetAll(); }
       el.open = true; el.scrollIntoView();
     }
     window.addEventListener('hashchange', openHash); window.addEventListener('hamu-lang', filter);
+    filter();
     const build = body.getAttribute('data-build');
     exporters.changes = (selectedOnly) => {
       const pick = selectedOnly ? bulk.changes.picked() : null;
@@ -768,17 +1029,26 @@
       const rel = data.releases.filter((r) => r.tag !== undefined).sort((a, b) => a.build - b.build);
       const byB = new Map(rel.map((r) => [r.build, r]));
       const fromSel = $('#cmp-from'); const toSel = $('#cmp-to');
-      for (const r of rel) { const label = `Build ${r.build}, ${fmtDay(parts(r.date).day)}`; fromSel.appendChild(h('option', { value: String(r.build), text: label })); toSel.appendChild(h('option', { value: String(r.build), text: label })); }
+      for (const r of rel) { const day = parts(r.date).day; const label = `Build ${r.build}, ${fmtDay(day)}`; const oa = { value: String(r.build), 'data-l1': `Build ${r.build}`, 'data-sub': `${fmtDay(day)}${r.changes && r.changes[0] ? ', ' + r.changes[0].title : ''}`, 'data-kw': `${r.build} ${r.core || ''} ${fmtDay(day)} ${day}`, 'data-group': monthLabel(day.slice(0, 7)), text: label }; fromSel.appendChild(h('option', oa)); toSel.appendChild(h('option', oa)); }
       const qs = new URLSearchParams(location.search); const newest = rel[rel.length - 1];
       let to = byB.has(+qs.get('to')) ? +qs.get('to') : newest.build;
       let from = byB.has(+qs.get('from')) ? +qs.get('from') : (byB.has(newest.previous_build) ? newest.previous_build : rel[0].build);
       fromSel.value = String(from); toSel.value = String(to);
-      let query = ''; let current = [];
+      let current = [];
+      const cf = { q: qs.get('q') || '', areas: (qs.get('areas') || '').split(',').filter((k) => AREAS[k]), builds: (qs.get('builds') || '').split(',').map(Number).filter((x) => byB.has(x)), expl: qs.get('expl') === '1', sort: qs.get('sort') === 'old' ? 'old' : 'new' };
+      function writeUrl() {
+        const p = new URLSearchParams(); p.set('from', String(from)); p.set('to', String(to));
+        if (cf.areas.length) p.set('areas', cf.areas.join(','));
+        if (cf.builds.length) p.set('builds', cf.builds.join(','));
+        if (cf.q) p.set('q', cf.q);
+        if (cf.expl) p.set('expl', '1');
+        if (cf.sort === 'old') p.set('sort', 'old');
+        try { history.replaceState(null, '', location.pathname + '?' + p.toString()); } catch (e) { /* ignore */ }
+      }
       function render() {
         from = +fromSel.value; to = +toSel.value;
-        try { history.replaceState(null, '', `${location.pathname}?from=${from}&to=${to}`); } catch (e) { /* ignore */ }
         out.textContent = '';
-        if (from === to) { current = []; out.appendChild(h('p', { class: 'note', text: T('Choose two different versions to compare.', '請揀兩個唔同嘅版本嚟比較。') })); return; }
+        if (from === to) { current = []; writeUrl(); out.appendChild(h('p', { class: 'note', text: T('Choose two different versions to compare.', '請揀兩個唔同嘅版本嚟比較。') })); return; }
         const lo = Math.min(from, to); const hi = Math.max(from, to); const a = byB.get(lo); const b = byB.get(hi);
         const between = rel.filter((r) => r.build > lo && r.build <= hi).sort((x, y) => y.build - x.build);
         const rows = [[T('Build', '建置'), (r) => String(r.build)], ['Home Assistant Core', (r) => r.core], ['Supervisor', (r) => r.supervisor], [T('Operating system', '作業系統'), (r) => r.os], [T('Date', '日期'), (r) => fmtLong(r.date)], [T('Source', '原始碼'), (r) => r.source], [T('Number of changes', '更改數目'), (r) => String(r.changes.length)]];
@@ -788,20 +1058,40 @@
         out.appendChild(h('div', { class: 'card stack' }, h('h2', { text: T('Side by side', '並排比較') }), h('div', { class: 'scroll-x' }, table)));
         const counts = {}; let total = 0;
         for (const r of between) for (const c of r.changes) { total += 1; for (const ar of c.areas || []) counts[ar] = (counts[ar] || 0) + 1; }
+        cf.builds = cf.builds.filter((x) => between.some((r) => r.build === x));
+        cf.areas = cf.areas.filter((k) => counts[k]);
+        writeUrl();
         out.appendChild(h('div', { class: 'cmp-hero', role: 'group', 'aria-label': T('From, number of changes, to', '由、更改數目、到') }, h('div', { class: 'cmp-b cmp-from' }, h('span', { class: 'small', text: T('From', '由') }), h('b', { text: String(lo) }), h('span', { class: 'small', text: fmtDay(parts(a.date).day) })), h('div', { class: 'cmp-b cmp-n' }, h('b', { text: String(total) }), h('span', { text: T(total === 1 ? 'change' : 'changes', '項更改') })), h('div', { class: 'cmp-b cmp-to' }, h('span', { class: 'small', text: T('To', '到') }), h('b', { text: String(hi) }), h('span', { class: 'small', text: fmtDay(parts(b.date).day) }))));
+        const bars = h('div', { class: 'abars', role: 'group', 'aria-label': T('Show only these parts of the product', '只睇呢啲產品部分') },
+          ...AREA_ORDER.filter((k) => counts[k]).map((k) => {
+            const bt = h('button', { type: 'button', class: 'abar', 'data-area': k, 'aria-pressed': String(cf.areas.indexOf(k) >= 0), style: `--w:${Math.max(4, Math.round((counts[k] / (total || 1)) * 100))}%` },
+              h('span', { class: 'abar-t' }, h('span', { class: 'abar-tick', 'aria-hidden': 'true' }), h('span', { text: T(AREAS[k], AREAS_YUE[k]) })), h('b', { text: String(counts[k]) }));
+            bt.addEventListener('click', () => { const i = cf.areas.indexOf(k); if (i >= 0) cf.areas.splice(i, 1); else cf.areas.push(k); bt.setAttribute('aria-pressed', String(i < 0)); paintList(); writeUrl(); });
+            return bt;
+          }));
         out.appendChild(h('div', { class: 'card stack' }, h('h2', { text: T('What changed between them', '兩者之間改咗乜') }),
-          h('p', { text: T(`${plural(total, 'change', 'changes')} in ${plural(between.length, 'version', 'versions')}, from the version after build ${lo} up to and including build ${hi}. A change that touches several parts is counted once in each part.`, `喺 ${between.length} 個版本入面共有 ${total} 項更改（由第 ${lo} 版之後，到第 ${hi} 版包括在內）。一項更改涉及幾個部分，每個部分都會計一次。`) }),
-          h('div', { class: 'cmp-areas' }, ...AREA_ORDER.filter((k) => counts[k]).map((k) => h('span', { class: 'badge', text: `${T(AREAS[k], AREAS_YUE[k])} ${counts[k]}` }))), h('div', { class: 'abars' }, ...AREA_ORDER.filter((k) => counts[k]).map((k) => h('div', { class: 'abar', style: `--w:${Math.max(4, Math.round((counts[k] / (total || 1)) * 100))}%` }, h('span', { text: T(AREAS[k], AREAS_YUE[k]) }), h('b', { text: String(counts[k]) }))))));
-        const mt0 = compile(query);
-        const search = h('input', { type: 'search', id: 'cmp-q', placeholder: T('Search these changes', '搜尋呢啲更改'), autocomplete: 'off', value: query });
-        const listBox = h('div', { class: 'stack' }); const count = h('p', { class: 'small muted', 'aria-live': 'polite' });
-        void mt0;
+          h('p', { text: T(`${plural(total, 'change', 'changes')} in ${plural(between.length, 'version', 'versions')}, from the version after build ${lo} up to and including build ${hi}. A change that touches several parts is counted once in each part. Press a part to show only its changes; press it again to undo.`, `喺 ${between.length} 個版本入面共有 ${total} 項更改（由第 ${lo} 版之後，到第 ${hi} 版包括在內）。一項更改涉及幾個部分，每個部分都會計一次。撳一個部分就只睇佢嘅更改，再撳一次就取消。`) }), bars));
+        const search = h('input', { type: 'search', id: 'cmp-q', placeholder: T('Search these changes', '搜尋呢啲更改'), autocomplete: 'off', value: cf.q });
+        const listBox = h('div', { class: 'stack' }); const count = h('p', { class: 'small muted', id: 'cmp-count', 'aria-live': 'polite' }); const hiddenB = h('p', { class: 'small muted', id: 'cmp-hidden-builds' });
+        const bsel = h('select', { id: 'cmp-builds', multiple: '', 'data-cb-multi': '', 'data-cb-all': 'All', 'data-cb-all-yue': '全部' },
+          ...between.map((r) => h('option', { value: String(r.build), 'data-l1': `Build ${r.build}`, 'data-sub': `${fmtDay(parts(r.date).day)}${r.changes[0] ? ', ' + r.changes[0].title : ''}`, 'data-kw': `${r.build} ${r.core || ''} ${fmtDay(parts(r.date).day)} ${parts(r.date).day}`, 'data-group': monthLabel(parts(r.date).day.slice(0, 7)), text: `Build ${r.build}` })));
+        for (const o of bsel.options) o.selected = cf.builds.indexOf(+o.value) >= 0;
+        const ssel = h('select', { id: 'cmp-sort' }, h('option', { value: 'new', text: T('Newest first', '新嘅先') }), h('option', { value: 'old', text: T('Oldest first', '舊嘅先') }));
+        ssel.value = cf.sort;
+        const expl = h('input', { type: 'checkbox', class: 'switch', role: 'switch', id: 'cmp-expl' }); expl.checked = cf.expl;
+        const clearB = h('button', { type: 'button', id: 'cmp-clear', text: T('Clear filters', '清除篩選') });
+        function anyFilter() { return !!(cf.q || cf.areas.length || cf.builds.length || cf.expl || cf.sort !== 'new'); }
+        function resetAll() { cf.q = ''; cf.areas = []; cf.builds = []; cf.expl = false; cf.sort = 'new'; search.value = ''; expl.checked = false; ssel.value = 'new'; for (const o of bsel.options) o.selected = false; bsel.dispatchEvent(new Event('site:sync')); for (const x of $$('.abar', bars)) x.setAttribute('aria-pressed', 'false'); paintList(); writeUrl(); }
         function paintList() {
-          const mt = compile(query); searchError(search, mt);
-          listBox.textContent = ''; let shown = 0; current = [];
-          for (const r of between) {
-            const items = r.changes.filter((c) => mt.none || (mt.ok && mt.test(`${c.title} ${c.detail || ''} ${c.detail_yue || ''} ${c.sha}`)));
-            if (!items.length) continue;
+          const mt = compile(cf.q); searchError(search, mt);
+          listBox.textContent = ''; let shown = 0; current = []; let empty = 0; let scope = 0;
+          const order = cf.sort === 'old' ? between.slice().reverse() : between;
+          for (const r of order) {
+            if (cf.builds.length && cf.builds.indexOf(r.build) < 0) continue;
+            scope += 1;
+            let items = r.changes.filter((c) => (!cf.areas.length || (c.areas || []).some((x) => cf.areas.indexOf(x) >= 0)) && (!cf.expl || !!(c.detail || c.detail_yue)) && (mt.none || (mt.ok && mt.test(`${c.title} ${c.detail || ''} ${c.detail_yue || ''} ${c.sha}`))));
+            if (cf.sort === 'old') items = items.slice().sort((x, y) => String(x.date).localeCompare(String(y.date)));
+            if (!items.length) { empty += 1; continue; }
             shown += items.length;
             const box = h('div', { class: 'cmp-ver' }, h('h3', null, h('a', { href: `${ROOT}releases/${r.build}/`, text: `Build ${r.build}` }), ` ${fmtLong(r.date)}`));
             for (const c of items) {
@@ -817,18 +1107,31 @@
             listBox.appendChild(box);
           }
           count.textContent = T(`Showing ${shown} of ${total} changes`, `顯示 ${shown}/${total} 項更改`);
-          if (!shown) listBox.appendChild(h('p', { class: 'note', text: T('No change matches the search.', '冇更改夾到搜尋。') }));
-          applyVocab(listBox);
+          hiddenB.textContent = empty && anyFilter() ? T(`${plural(empty, 'build has', 'builds have')} no matching change`, `有 ${empty} 個建置冇夾到嘅更改`) : '';
+          clearB.disabled = !anyFilter();
+          if (!shown) {
+            const clr = h('button', { type: 'button', class: 'text', id: 'cmp-empty-clear', text: T('Clear filters', '清除篩選') }); clr.addEventListener('click', resetAll);
+            listBox.appendChild(h('div', { class: 'note dashed', id: 'cmp-none' }, h('span', { text: T('No change matches the filters and the search.', '冇更改夾到篩選同搜尋。') }), ' ', clr));
+          }
+          void scope; applyVocab(listBox);
         }
-        search.addEventListener('input', () => { query = search.value.trim(); paintList(); });
+        search.addEventListener('input', () => { cf.q = search.value.trim(); paintList(); writeUrl(); });
+        bsel.addEventListener('change', () => { cf.builds = Array.prototype.filter.call(bsel.options, (o) => o.selected).map((o) => +o.value); paintList(); writeUrl(); });
+        ssel.addEventListener('change', () => { cf.sort = ssel.value === 'old' ? 'old' : 'new'; paintList(); writeUrl(); });
+        expl.addEventListener('change', () => { cf.expl = expl.checked; paintList(); writeUrl(); });
+        clearB.addEventListener('click', resetAll);
         paintList();
         const find = h('div', { class: 'find', role: 'search' }, h('label', { class: 'sr-only', for: 'cmp-q', text: T('Search these changes', '搜尋呢啲更改') }), search,
           h('button', { type: 'button', class: 'pill-icon regex-btn', 'data-regex': 'cmp-q', 'aria-label': T('Pattern builder for this search', '呢個搜尋嘅樣式建構器') }));
         $('.regex-btn', find).appendChild(doc.createRange().createContextualFragment('<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 17.5v.01M12 5v9M8 7.5l8 4M16 7.5l-8 4"/></svg>'));
+        const tools = h('div', { class: 'row filter-row chg-tools' },
+          h('label', { class: 'field grow' }, h('span', { text: T('Builds', '建置') }), bsel),
+          h('label', { class: 'field grow' }, h('span', { text: T('Order', '次序') }), ssel),
+          h('label', { class: 'chk' }, expl, h('span', { text: T('With an explanation only', '只顯示有說明嘅') })), clearB);
         out.appendChild(h('section', { class: 'stack', 'aria-label': T('Changes between the versions', '兩個版本之間嘅更改') },
-          h('div', { class: 'al-head' }, h('h2', { text: T('Every change', '每一項更改') }), h('div', { class: 'inline-search' }, find)), count, listBox));
+          h('div', { class: 'al-head' }, h('h2', { text: T('Every change', '每一項更改') }), h('div', { class: 'inline-search' }, find)), tools, count, hiddenB, listBox));
       }
-      exporters.compare = () => ({ title: `Home Assistant Material: changes between build ${Math.min(from, to)} and build ${Math.max(from, to)}`, cols: ['build', 'sha', 'date', 'title', 'areas', 'explanation'], rows: current });
+      exporters.compare =       exporters.compare = () => ({ title: `Home Assistant Material: changes between build ${Math.min(from, to)} and build ${Math.max(from, to)}`, cols: ['build', 'sha', 'date', 'title', 'areas', 'explanation'], rows: current });
       fromSel.addEventListener('change', render); toSel.addEventListener('change', render);
       window.addEventListener('hamu-lang', render);
       render();
@@ -1072,7 +1375,7 @@
     if (e.target.closest('#bell-btn')) openNotes();
     if (e.target.closest('#pal-btn')) openPalette();
   });
-  applyLang(doc); paintSwitches(); paintBell(); applyVocab(body);
+  applyLang(doc); paintSwitches(); paintBell(); applyVocab(body); doc.dispatchEvent(new Event('site:sync'));
   function initPage(p) {
     if (p === 'home') setupHome();
     else if (p === 'release') setupRelease();

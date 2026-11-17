@@ -27,6 +27,10 @@ The words for a version live in `content/<build>.json` and its demos in `demos/<
 - `data/changes.json` and `data/slices/*.json`: the product's public update feed, `https://raw.githubusercontent.com/Ding-Ding-Projects/home-assistant-material/channel/changes.json`, fetched at build time. Never edited by hand.
 - `features.mjs` and `docs/feature-inventory.md`: the list of features this site owes, each with its state. States are only changed after the feature has been run.
 
+## Components
+
+Every <select> on the site is upgraded in the browser to a searchable list box (`assets/site.js`, styles in `assets/extras.css`). The native select stays in the page for no-script use and form values; choosing sets its value and fires `input` and `change`, so other code is unaffected. Selects added later (dialogs, editors) are upgraded automatically. A multi-select form is used where a list can grow (`data-cb-multi`). The change lists on a version page and on the compare page are filtered by area bars (toggle buttons), a build list (compare only), an explanation-only switch, a sort and a search, and keep that state in the page address.
+
 ## Privacy
 
 The site sets no cookies and has no analytics. In the browser it reads only its own files, plus two public GitHub API addresses for the "Update coming soon" strip (the recent runs of the release workflow and the jobs of the active run). Choices (language for the visit, theme, text size, an optional wording file you load yourself, and notifications) are kept only in your browser's storage. The personal wording control ships empty and no wording file is bundled.
