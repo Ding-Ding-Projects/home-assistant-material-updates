@@ -388,7 +388,7 @@ await check('settings: wording file valid, invalid and clear', async (page, pr) 
 
 await check('settings search with a pattern', async (page, pr) => {
   await GO(page, '/settings/index.html');
-  await page.fill('#set-q', '/contrast|motion/i'); await page.waitForTimeout(200);
+  await page.fill('#set-q', '/more contrast|reduce motion/i'); await page.waitForTimeout(200);
   const n = await page.$$eval('.setting:not([hidden])', (r) => r.length);
   if (n !== 2) pr.push(`pattern search showed ${n} settings, expected 2`);
   await page.click('[data-info="contrast"]');
@@ -400,7 +400,7 @@ await check('features page filter and article', async (page, pr) => {
   await page.click('[data-state="built"]'); await page.waitForTimeout(100);
   const shown = await page.$$eval('.ft-row:not([hidden])', (r) => r.length);
   if (!shown || shown === (await page.$$eval('.ft-row', (r) => r.length))) pr.push('state filter did not narrow the list');
-  await page.click('.ft-row:not([hidden])');
+  await page.click('.ft-row:not([hidden]) .ft-link');
   await page.waitForSelector('article h1');
 });
 

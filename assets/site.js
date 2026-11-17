@@ -7,7 +7,7 @@
   const doc = document;
   const html = doc.documentElement;
   const body = doc.body;
-  const ROOT = body.getAttribute('data-root') || '';
+  const ROOT = new URL(body.getAttribute('data-root') || './', location.href).href;
   const PAGE = body.getAttribute('data-page') || '';
   html.classList.add('js');
 
@@ -60,7 +60,7 @@
   // ---------- Language ----------
   let lang = html.getAttribute('data-lang') || 'en';
   /** A message in the chosen language. */
-  const T = (en, yue) => (lang === 'yue' ? yue : lang === 'both' ? `${en} / ${yue}` : en);
+  const T = (en, yue) => { if (window.HX_TONE) { const r = window.HX_TONE(en, yue); en = r[0]; yue = r[1]; } return lang === 'yue' ? yue : lang === 'both' ? `${en} / ${yue}` : en; };
   const LANGS = [['en', 'English'], ['yue', 'Cantonese'], ['both', 'English and Cantonese']];
   const LANG_LABEL_YUE = { en: '英文', yue: '廣東話', both: '兩種語言' };
   function applyLang(root) {
@@ -105,7 +105,7 @@
   const SET_DEF = { theme: 'system', ts: 1, contrast: false, targets: false, motion: false, vocab: null };
   let SET = Object.assign({}, SET_DEF);
   try { Object.assign(SET, JSON.parse(store.get('localStorage', SET_KEY) || '{}')); } catch (e) { /* ignore */ }
-  const saveSet = () => store.set('localStorage', SET_KEY, JSON.stringify(SET));
+  const saveSet = () => { store.set('localStorage', SET_KEY, JSON.stringify(SET)); if (window.HX_REC) window.HX_REC('Settings'); };
   function applySet() {
     if (SET.theme === 'light' || SET.theme === 'dark') html.setAttribute('data-theme', SET.theme); else html.removeAttribute('data-theme');
     if (SET.ts > 1) html.style.setProperty('--ts', String(SET.ts)); else html.style.removeProperty('--ts');
@@ -144,6 +144,7 @@
   }
   function toast(text, opts) {
     opts = opts || {};
+    if (window.HX_TOAST) { text = window.HX_TOAST(text, opts); if (!text) return; }
     const box = $('#toasts');
     if (box) {
       const el = h('div', { class: 'toast', role: 'status' }, h('span', { text }), h('button', { type: 'button', class: 'icon', 'aria-label': T('Dismiss', '關閉'), text: '×' }));
@@ -166,7 +167,7 @@
     closeDialog();
     dlgOrigin = doc.activeElement;
     const box = h('div', { class: 'dialog', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'dlg-t', tabindex: '-1' },
-      h('header', null, h('h2', { id: 'dlg-t', text: title }), h('button', { type: 'button', class: 'icon', 'data-close': '1', 'aria-label': T('Close', '閂'), text: '×' })));
+      h('header', null, h('h2', { id: 'dlg-t', text: window.HX_DLG ? window.HX_DLG(title) : title }), h('button', { type: 'button', class: 'icon', 'data-close': '1', 'aria-label': T('Close', '閂'), text: '×' })));
     box.appendChild(content);
     const ov = h('div', { class: 'overlay', id: 'ov' }, box);
     ov.addEventListener('mousedown', (e) => { if (e.target === ov) closeDialog(); });
@@ -640,7 +641,7 @@
       const mk = (tag, a) => { const e = doc.createElementNS(NS, tag); for (const k of Object.keys(a)) e.setAttribute(k, a[k]); return e; };
       svg.appendChild(mk('line', { x1: P.l, y1: H - P.b, x2: W - P.r, y2: H - P.b, class: 'ax' }));
       svg.appendChild(mk('path', { d: `${d} L${pts[pts.length - 1][0]},${H - P.b} L${pts[0][0]},${H - P.b} Z`, class: 'area' }));
-      svg.appendChild(mk('path', { d, class: 'line' }));
+      svg.appendChild(mk('path', { d, class: 'line', pathLength: '1' }));
       ds.forEach((dd, i) => { const t = mk('text', { x: x(i), y: H - 10, class: 'tick', 'text-anchor': 'middle' }); t.textContent = dd.slice(8); svg.appendChild(t); });
       const t0 = mk('text', { x: 4, y: P.t + 8, class: 'tick' }); t0.textContent = String(max); svg.appendChild(t0);
       const dot = mk('circle', { r: 7, class: 'dot', cx: pts[0][0], cy: pts[0][1] }); const rule = mk('line', { class: 'rule', y1: P.t, y2: H - P.b, x1: pts[0][0], x2: pts[0][0] });
@@ -787,9 +788,10 @@
         out.appendChild(h('div', { class: 'card stack' }, h('h2', { text: T('Side by side', '並排比較') }), h('div', { class: 'scroll-x' }, table)));
         const counts = {}; let total = 0;
         for (const r of between) for (const c of r.changes) { total += 1; for (const ar of c.areas || []) counts[ar] = (counts[ar] || 0) + 1; }
+        out.appendChild(h('div', { class: 'cmp-hero', role: 'group', 'aria-label': T('From, number of changes, to', '由、更改數目、到') }, h('div', { class: 'cmp-b cmp-from' }, h('span', { class: 'small', text: T('From', '由') }), h('b', { text: String(lo) }), h('span', { class: 'small', text: fmtDay(parts(a.date).day) })), h('div', { class: 'cmp-b cmp-n' }, h('b', { text: String(total) }), h('span', { text: T(total === 1 ? 'change' : 'changes', '項更改') })), h('div', { class: 'cmp-b cmp-to' }, h('span', { class: 'small', text: T('To', '到') }), h('b', { text: String(hi) }), h('span', { class: 'small', text: fmtDay(parts(b.date).day) }))));
         out.appendChild(h('div', { class: 'card stack' }, h('h2', { text: T('What changed between them', '兩者之間改咗乜') }),
           h('p', { text: T(`${plural(total, 'change', 'changes')} in ${plural(between.length, 'version', 'versions')}, from the version after build ${lo} up to and including build ${hi}. A change that touches several parts is counted once in each part.`, `喺 ${between.length} 個版本入面共有 ${total} 項更改（由第 ${lo} 版之後，到第 ${hi} 版包括在內）。一項更改涉及幾個部分，每個部分都會計一次。`) }),
-          h('div', { class: 'cmp-areas' }, ...AREA_ORDER.filter((k) => counts[k]).map((k) => h('span', { class: 'badge', text: `${T(AREAS[k], AREAS_YUE[k])} ${counts[k]}` })))));
+          h('div', { class: 'cmp-areas' }, ...AREA_ORDER.filter((k) => counts[k]).map((k) => h('span', { class: 'badge', text: `${T(AREAS[k], AREAS_YUE[k])} ${counts[k]}` }))), h('div', { class: 'abars' }, ...AREA_ORDER.filter((k) => counts[k]).map((k) => h('div', { class: 'abar', style: `--w:${Math.max(4, Math.round((counts[k] / (total || 1)) * 100))}%` }, h('span', { text: T(AREAS[k], AREAS_YUE[k]) }), h('b', { text: String(counts[k]) }))))));
         const mt0 = compile(query);
         const search = h('input', { type: 'search', id: 'cmp-q', placeholder: T('Search these changes', '搜尋呢啲更改'), autocomplete: 'off', value: query });
         const listBox = h('div', { class: 'stack' }); const count = h('p', { class: 'small muted', 'aria-live': 'polite' });
@@ -911,7 +913,7 @@
     $('#notes-open').addEventListener('click', openNotes);
     $('#notes-clear').addEventListener('click', () => { notes = []; store.set('localStorage', NOTE_KEY, '[]'); paintBell(); toast(T('Notifications cleared.', '已清除通知。'), { silent: true }); });
     $('#reset-all').addEventListener('click', () => superConfirm(T('Reset everything', '全部還原'), [T('Every choice on this site goes back to its default.', '呢個網站所有選擇都返到預設值。'), T('Your wording file is removed.', '你嘅用字檔案會被移除。'), T('Every notification is removed.', '所有通知會被移除。')], () => {
-      SET = Object.assign({}, SET_DEF); saveSet(); store.set('localStorage', NOTE_KEY, '[]'); notes = []; buildReplacer(); applySet(); setLang('en', true); paintBell(); paintVocab();
+      SET = Object.assign({}, SET_DEF); saveSet(); window.dispatchEvent(new CustomEvent('hamu-reset')); store.set('localStorage', NOTE_KEY, '[]'); notes = []; buildReplacer(); applySet(); setLang('en', true); paintBell(); paintVocab();
       toast(T('Everything is back to its default.', '全部已經還原預設值。'), { silent: true });
     }));
     window.addEventListener('hamu-lang', () => { paintVocab(); filter(); paintBell(); });
@@ -940,8 +942,9 @@
     const listEl = h('ul', { class: 'cmd-list', role: 'listbox', id: 'pal-list', 'aria-label': T('Results', '結果') });
     const msg = h('p', { class: 'small muted', text: T('Arrow keys move, Enter goes, Escape closes.', '方向鍵移動，Enter 前往，Escape 關閉。') });
     let items = []; let sel = 0; let shown = [];
-    function act(it) {
+    function act(it, inTab) {
       closeDialog();
+      if (it.href && inTab && window.HAMU && window.HAMU.openTab) { window.HAMU.openTab(ROOT + it.href); return; }
       if (it.href) { location.href = ROOT + it.href; return; }
       if (it.act === 'theme') { SET.theme = THEMES[(THEMES.findIndex((t) => t[0] === SET.theme) + 1) % 3][0]; saveSet(); applySet(); }
       if (it.act === 'lang') setLang(LANGS[(LANGS.findIndex((l) => l[0] === lang) + 1) % 3][0]);
@@ -957,14 +960,14 @@
       listEl.textContent = '';
       shown.forEach((i, n) => {
         const li = h('li', { role: 'option', id: `pal-${n}`, 'aria-selected': String(n === sel), class: n === sel ? 'sel' : '' }, h('b', { text: lang === 'yue' && i.yue ? i.yue : i.label }), ' ', h('span', { class: 'small muted', text: T(i.kind, { Page: '頁面', Version: '版本', Feature: '功能', Setting: '設定', Action: '動作' }[i.kind] || i.kind) }));
-        li.addEventListener('click', () => act(i)); listEl.appendChild(li);
+        li.addEventListener('click', () => act(i)); if (i.href && window.HAMU && window.HAMU.openTab) { const tb = h('button', { type: 'button', class: 'text tab-open', 'aria-label': T('Open in a tab', '用分頁打開'), text: T('Tab', '分頁') }); tb.addEventListener('click', (ev) => { ev.stopPropagation(); act(i, true); }); li.appendChild(tb); } listEl.appendChild(li);
       });
       if (!shown.length) listEl.appendChild(h('li', { class: 'muted', text: T('Nothing matches.', '冇嘢夾到。') }));
       input.setAttribute('aria-activedescendant', shown.length ? `pal-${sel}` : '');
     }
     input.addEventListener('input', () => { sel = 0; draw(); });
     input.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowDown') { e.preventDefault(); sel = Math.min(shown.length - 1, sel + 1); draw(); } else if (e.key === 'ArrowUp') { e.preventDefault(); sel = Math.max(0, sel - 1); draw(); } else if (e.key === 'Enter' && shown[sel]) { e.preventDefault(); act(shown[sel]); }
+      if (e.key === 'ArrowDown') { e.preventDefault(); sel = Math.min(shown.length - 1, sel + 1); draw(); } else if (e.key === 'ArrowUp') { e.preventDefault(); sel = Math.max(0, sel - 1); draw(); } else if (e.key === 'Enter' && shown[sel]) { e.preventDefault(); act(shown[sel], e.ctrlKey || e.metaKey); }
     });
     dialog(T('Search everything', '搜尋全部'), h('div', { class: 'stack' }, h('div', { class: 'find' }, input, regexBtn), listEl, msg), { focus: '#pal-q' });
     loadPalette().then((p) => { items = p.concat([
@@ -1070,10 +1073,15 @@
     if (e.target.closest('#pal-btn')) openPalette();
   });
   applyLang(doc); paintSwitches(); paintBell(); applyVocab(body);
-  if (PAGE === 'home') setupHome();
-  else if (PAGE === 'release') setupRelease();
-  else if (PAGE === 'compare') setupCompare();
-  else if (PAGE === 'features') setupFeatures();
-  else if (PAGE === 'settings') setupSettings();
-  setupStrip();
+  function initPage(p) {
+    if (p === 'home') setupHome();
+    else if (p === 'release') setupRelease();
+    else if (p === 'compare') setupCompare();
+    else if (p === 'features') setupFeatures();
+    else if (p === 'settings') setupSettings();
+    setupStrip();
+  }
+  window.HAMU = { T, toast, dialog, closeDialog, h, $, $$, store, esc, ROOT, PAGE, compile, plural, pad, getLang: () => lang, setLang, SET: () => SET, saveSet, applySet, applyLang, applyVocab, superConfirm, download, printHtml, toFormat, openNotes, openWorkbench, initPage, getJson };
+  initPage(PAGE);
+  window.dispatchEvent(new CustomEvent('hamu-ready'));
 })();

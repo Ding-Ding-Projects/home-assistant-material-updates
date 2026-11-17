@@ -117,26 +117,31 @@ function layout({ title, description, root, page, main, search = true, path = ''
 <link rel="icon" href="${root}assets/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="${root}assets/demo.css">
 <link rel="stylesheet" href="${root}assets/site.css">
+<link rel="stylesheet" href="${root}assets/extras.css">
+<noscript><style>@media (max-width:719px){.hh{display:flex!important}.menu-btn{display:none!important}}</style></noscript>
 <script>${PREPAINT}</script>
 </head>
 <body data-root="${root}" data-page="${page}">
 <a class="skip" href="#main" data-yue="跳到內容">Skip to the content</a>
 <header class="site-header">
 <div class="wrap head-row">
-<a class="brand" href="${root}index.html"><span class="mark" aria-hidden="true">HA</span><span class="brand-t" data-yue="Home Assistant Material 更新">Home Assistant Material updates</span></a>
-<nav class="head-nav" aria-label="Main" data-yue-aria="主導覽">
+<a class="brand" href="${root}index.html"><span class="mark" aria-hidden="true">HA</span><span class="brand-t brand-long" data-yue="Home Assistant Material 更新">Home Assistant Material updates</span><span class="brand-t brand-short" data-yue="HA Material 更新">HA Material</span></a>
+<nav class="head-nav hh" aria-label="Main" data-yue-aria="主導覽">
 <a href="${root}index.html#versions" data-yue="所有版本">All versions</a>
 <a href="${root}index.html#calendar" data-yue="日曆">Calendar</a>
 <a href="${root}compare/index.html" data-yue="比較">Compare</a>
 <a href="${root}features/index.html" data-yue="功能">Features</a>
+<a href="${root}tools/index.html" data-yue="工具">Tools</a>
 <a href="${root}settings/index.html" data-yue="設定">Settings</a>
 </nav>
-${searchForm}
+<div class="hh head-search-wrap">${searchForm}</div>
 <button type="button" id="pal-btn" class="pill" aria-label="Search everything, Ctrl Shift F" data-yue-aria="搜尋全部，Ctrl Shift F">${ICON.search}<span class="opt" data-yue="搜尋全部">Search everything</span></button>
-<button type="button" id="lang-btn" class="pill" aria-label="Language: English. Change language">English</button>
-<button type="button" id="theme-btn" class="pill" aria-label="Colours: follow the system. Change">System colours</button>
-<button type="button" id="bell-btn" class="pill-icon bell" aria-label="Notifications" data-yue-aria="通知">${ICON.bell}<span class="badge-n" id="bell-n" hidden>0</span></button>
+<button type="button" id="lang-btn" class="pill hh" aria-label="Language: English. Change language">English</button>
+<button type="button" id="theme-btn" class="pill hh" aria-label="Colours: follow the system. Change">System colours</button>
+<button type="button" id="bell-btn" class="pill-icon bell hh" aria-label="Notifications" data-yue-aria="通知">${ICON.bell}<span class="badge-n" id="bell-n" hidden>0</span></button>
+<button type="button" id="menu-btn" class="pill-icon menu-btn" aria-haspopup="dialog" aria-expanded="false" aria-label="Menu" data-yue-aria="選單"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
 </div>
+<div id="tabstrip" class="tabstrip" hidden></div>
 </header>
 <main id="main" class="wrap main">
 <noscript><p class="note warn">The search, filters, calendar, comparison, settings and demo tools need JavaScript. The version pages and their full lists of changes are readable without it.</p></noscript>
@@ -145,6 +150,9 @@ ${main}
 <footer class="site-footer"><p><span data-yue="網站版本">Site version</span> ${esc(PKG.version)}. <span data-yue="建立於">Built from the public change list on</span> ${esc(BUILT)}. <span data-yue="呢個網站唔使用 cookie。">This site sets no cookies.</span></p></footer>
 <div class="toasts" id="toasts" aria-live="polite"></div>
 <script src="${root}assets/site.js" defer></script>
+<script src="${root}assets/x-core.js" defer></script>
+<script src="${root}assets/x-ui.js" defer></script>
+<script src="${root}assets/tools.js" defer></script>
 </body>
 </html>
 `;
@@ -205,7 +213,7 @@ function versionCard(r) {
   const areas = AREAS.filter((a) => r.areaCounts[a]);
   const summary = r.summary ? pair(r.summary, r.summary_yue, 'vsum') : '';
   return `<li class="vcard card" data-build="${r.build}" data-day="${r.day}" data-areas="${areas.join(' ')}" data-feat="${r.feat}" data-changes="${r.changes.length}">
-<div class="vtop"><label class="selbox"><input type="checkbox" class="sel" data-sel="versions" value="${r.build}" aria-label="Select build ${r.build}"></label><div class="vmeta">${isNewest ? '<span class="badge primary" data-yue="最新">Newest</span>' : ''}<span class="small muted">${esc(fmtLong(r.date))}</span><span class="small muted mono">${esc(r.core)}</span></div><div class="bignum" aria-label="${r.changes.length} changes"><b>${r.changes.length}</b><span data-yue="項更改">${r.changes.length === 1 ? 'change' : 'changes'}</span></div></div>
+<div class="vtop"><label class="selbox"><input type="checkbox" class="sel" data-sel="versions" value="${r.build}" aria-label="Select build ${r.build}"></label><div class="vbuild" aria-hidden="true">${r.build}</div><div class="vmeta">${isNewest ? '<span class="badge primary" data-yue="最新">Newest</span>' : ''}<span class="small muted">${esc(fmtLong(r.date))}</span><span class="small muted mono">${esc(r.core)}</span></div><div class="bignum" aria-label="${r.changes.length} changes"><b>${r.changes.length}</b><span data-yue="項更改">${r.changes.length === 1 ? 'change' : 'changes'}</span></div></div>
 <h3 class="vtitle"><a href="releases/${r.build}/"><span class="vt">${esc(title)}</span></a></h3>
 ${summary}
 <div class="vbadges">${r.demos ? `<span class="badge good">${r.demos === 1 ? 'Feature with a working demo' : `${r.demos} features with a working demo`}</span>` : ''}${areas.map((a) => `<span class="badge outline" data-yue="${esc(areaYue(a))}">${esc(areaLabel(a))}</span>`).join('')}</div>
@@ -220,7 +228,7 @@ function homePage() {
   const oldest = releases[releases.length - 1];
   const areaCountsVersions = {};
   for (const r of releases) for (const a of AREAS) if (r.areaCounts[a]) areaCountsVersions[a] = (areaCountsVersions[a] || 0) + 1;
-  const chips = AREAS.filter((a) => areaCountsVersions[a]).map((a) => `<button type="button" class="chip" aria-pressed="false" data-area="${a}"><span data-yue="${esc(areaYue(a))}">${esc(areaLabel(a))}</span> <span class="count">${areaCountsVersions[a]}</span></button>`).join('');
+  const chips = AREAS.filter((a) => areaCountsVersions[a]).map((a) => `<button type="button" class="chip" style="--w:${Math.max(4, Math.round((areaCountsVersions[a] / releases.length) * 100))}%" aria-pressed="false" data-area="${a}"><span data-yue="${esc(areaYue(a))}">${esc(areaLabel(a))}</span> <span class="count">${areaCountsVersions[a]}</span></button>`).join('');
   const builds = releases.map((r) => r.build).sort((a, b) => a - b);
   const fromOpts = builds.map((b, i) => `<option value="${b}">${b}${i === 0 ? ', oldest' : ''}</option>`).join('');
   const toOpts = builds.map((b, i) => `<option value="${b}">${b}${i === builds.length - 1 ? ', newest' : ''}</option>`).join('');
@@ -379,11 +387,14 @@ ${list.map(changeHtml).join('\n')}</div>`).join('\n')}
 
   const update = `<section id="update" class="card" aria-labelledby="up-h">
 <h2 id="up-h" data-yue="點樣更新到第 ${r.build} 版">How to update to build ${r.build}</h2>
-<ol class="steps">
+<ol class="steps" id="plain-steps">
+<li data-yue="更新到 Core ${esc(r.core)}（第 ${r.build} 版）。">Before you start, know the target: Core ${esc(r.core)}, build ${r.build}.</li>
 <li data-yue="喺你嘅 Home Assistant Material 開啟「設定」，跟住「系統」，再「更新」。">In your Home Assistant Material, open Settings, then System, then Updates.</li>
 <li data-yue="撳「立即檢查」，Core ${esc(r.core)} 就會出現喺清單。">Press Check now. Core ${esc(r.core)} appears in the list.</li>
 <li data-yue="揀「更新」。如果呢次更新支援，會先問你要唔要備份。">Choose Update. A backup is offered first when the update supports it.</li>
+<li data-yue="更新完成後，檢查更新頁面顯示嘅版本係 Core ${esc(r.core)}。">When it finishes, check that the Updates page shows Core ${esc(r.core)}.</li>
 </ol>
+<div id="wiz" class="wiz" data-total="5" hidden></div>
 <p class="small muted" data-yue="Core、Supervisor 同作業系統永遠唔會自動更新，幾時更新由你決定。">Core, Supervisor and the operating system are never updated automatically. You choose when.</p>
 </section>`;
 
@@ -395,7 +406,7 @@ ${newerR ? `<a class="card small-r navcard tonal" href="../${newerR.build}/"><sp
   const main = `
 <section class="hero" aria-labelledby="rp-h">
 <div class="row tight">${isNewest ? '<span class="badge hero-badge strong" data-yue="最新版本">Newest version</span>' : ''}<span class="badge hero-badge" data-yue="已發佈">Published release</span></div>
-<h1 id="rp-h">Build ${r.build}</h1>
+<h1 id="rp-h" class="bigbuild">Build ${r.build}</h1>
 <p class="hero-line">Home Assistant Material <span class="mono">${esc(r.core)}</span>, ${esc(fmtLong(r.date))}</p>
 ${r.headline ? `<p class="hero-headline">${esc(r.headline)}</p>` : ''}
 <p>${esc(sinceLine)}</p>
@@ -469,7 +480,7 @@ ${['built', 'partly', 'none', 'na'].map((s) => `<button type="button" class="chi
 </section>
 <section class="stack" id="ft-list">
 ${GROUPS.map((g) => `<div class="ft-group" data-group="${esc(g)}"><h2 data-yue="${esc(GROUP_YUE[g] || g)}">${esc(g)}</h2>
-${FEATURES.filter((f) => f.group === g).map((f) => `<a class="card small-r ft-row" href="${esc(f.id)}/" data-state="${f.state}" data-text="${esc((f.name + ' ' + f.what + ' ' + f.id).toLowerCase())}"><span class="ft-name"><b data-yue="${esc(f.yue)}">${esc(f.name)}</b> ${stateTag(f.state)}</span><span class="muted small">${esc(f.what)}</span></a>`).join('\n')}</div>`).join('\n')}
+${FEATURES.filter((f) => f.group === g).map((f) => `<div class="card small-r ft-row" data-state="${f.state}" data-text="${esc((f.name + ' ' + f.what + ' ' + f.id).toLowerCase())}"><a class="ft-link" href="${esc(f.id)}/"><span class="ft-name"><b data-yue="${esc(f.yue)}">${esc(f.name)}</b> ${stateTag(f.state)}</span><span class="muted small">${esc(f.what)}</span></a><button type="button" class="text tab-open" data-tabhref="${esc(f.id)}/" data-yue="用分頁打開">Open in a tab</button></div>`).join('\n')}</div>`).join('\n')}
 </section>`;
   return layout({ title: 'Features - Home Assistant Material updates', description: 'Every feature this site owes, with its honest state.', root: '../', page: 'features', main, path: 'features/' });
 }
@@ -490,6 +501,7 @@ function featurePage(f) {
     'regex-search': [['../../index.html', 'Beside the home search', '主頁搜尋旁邊'], ['../../settings/index.html', 'Beside the settings search', '設定搜尋旁邊']],
     changelog: [['../../index.html', 'Home', '主頁']],
     'live-charts': [['../../index.html#chart', 'Changes per day', '每日更改數目']],
+    'funny-emoji': [['../../settings/index.html#s-play', 'Settings, Playfulness', '設定：趣味程度']], 'school-mode': [['../../settings/index.html#s-school', 'Settings, School mode', '設定：學校模式']], narration: [['../../settings/index.html#s-narr', 'Settings, Spoken narrator', '設定：朗讀']], 'scheduled-settings': [['../../settings/index.html#s-sched', 'Settings, Scheduled settings', '設定：定時設定']], 'adhd-modes': [['../../settings/index.html#s-aids', 'Settings, Reading aids', '設定：閱讀輔助']], 'dim-sum': [['../../settings/index.html#s-dimsum', 'Settings, Dim sum surprise', '設定：點心驚喜']], 'appearance-editor': [['../../settings/index.html#s-appear', 'Settings, Appearance editor', '設定：外觀編輯器']], 'color-picker': [['../../settings/index.html#s-picker', 'Settings, Colour picker', '設定：色彩選擇器']], 'logo-customization': [['../../settings/index.html#s-logo', 'Settings, Your logo', '設定：你嘅標誌']], tabs: [['../../index.html#versions', 'Versions, Open in a tab', '版本：用分頁打開']], 'local-history': [['../../settings/index.html#s-hist', 'Settings, History', '設定：紀錄']], 'animation-editor': [['../../settings/index.html#s-anim', 'Settings, Animation', '設定：動畫']], 'element-locks': [['../../settings/index.html#s-locks', 'Settings, Toy locks', '設定：玩具鎖']], 'base64-tools': [['../../tools/base64/index.html', 'Base64 toolkit', 'Base64 工具']], 'file-converter': [['../../tools/convert/index.html', 'File converter', '檔案轉換器']], 'guided-forms': [['../../releases/457/index.html#update', 'Build 457, How to update', '第 457 版：點樣更新']],
   }[f.id] || [];
   const main = `
 <article class="article stack" aria-labelledby="fa-h">
@@ -534,6 +546,27 @@ function settingsPage() {
       setRow('notes', 'Notifications', '通知', 'Messages from this site are kept in the bell until you clear them.', '網站嘅訊息會留喺鐘入面，直到你清除。', 'Kept for this browser', 'The bell in the header', `<span class="small" id="notes-n">0 kept</span><button type="button" id="notes-open" data-yue="打開通知">Open notifications</button><button type="button" id="notes-clear" data-yue="清除通知">Clear notifications</button>`, false),
       setRow('export', 'Export your settings', '匯出你嘅設定', 'Your choices on this site as JSON, CSV, Markdown, plain text or HTML.', '你喺呢個網站嘅選擇，可匯出成 JSON、CSV、Markdown、純文字或 HTML。', '', 'A file you save', FORMATS.filter(([k]) => k !== 'print').map(([k, l]) => `<button type="button" data-export="${k}" data-scope="settings">${l}</button>`).join(''), false),
     ]],
+    ['Voice and tone', '聲音同語氣', [
+      setRow('play', 'Playfulness', '趣味程度', 'Two sliders, one per language, level 1 to 5, change the tone of this site\'s own wording. Facts and numbers never change.', '兩條滑桿（每種語言一條），1 至 5 級，改變網站自己用字嘅語氣。事實同數字永遠唔變。', 'Level 3 in both languages', 'Headings, buttons, empty states and toasts', '<div class="xctl" data-x="play"></div>', true),
+      setRow('emoji', 'Emoji in dialogs and toasts', '對話框同提示表情符號', 'Adds a small emoji to dialog titles and toasts.', '喺對話框標題同提示加細細個表情符號。', 'Off', 'Dialogs and toasts', '<div class="xctl" data-x="emoji"></div>', true),
+      setRow('narr', 'Spoken narrator', '朗讀', 'Reads the page aloud with this device\'s voices. Pick a voice per language, the speed and the pitch.', '用你部機嘅聲音朗讀頁面。可以每種語言揀聲音、速度同音高。', 'Off; speed 1, pitch 1', 'The page you are on', '<div class="xctl" data-x="narr"></div>', true),
+    ]],
+    ['Reading aids and modes', '閱讀輔助同模式', [
+      setRow('aids', 'Focus, Calm and Reading aids', '專注、平靜同閱讀輔助', 'Focus hides everything but the main column. Calm stops motion and quiets colours and toasts. Reading widens line spacing and adds a reading ruler. Use them alone or together.', '專注隱藏主欄以外嘅嘢；平靜停止動態、減淡顏色同提示；閱讀加闊行距並加閱讀尺。可以單獨或者一齊用。', 'All off', 'Every page', '<div class="xctl" data-x="aids"></div>', true),
+      setRow('school', 'School mode', '學校模式', 'Replaces the product name in the site chrome with a neutral name, sets playfulness to 1, and turns off emoji, the dim sum surprise and narration autoplay.', '將網站介面嘅產品名換成中性名稱、趣味程度設為 1，並關閉表情符號、點心驚喜同自動朗讀。', 'Off; neutral name "Home app"', 'Site chrome and extras', '<div class="xctl" data-x="school"></div>', true),
+      setRow('dimsum', 'Dim sum surprise', '點心驚喜', 'Once in a while, at most once per visit, a small card names a dim sum dish. It never shows during a task.', '間唔時（每次瀏覽最多一次）會有張細卡介紹一款點心。做嘢途中唔會出現。', 'On', 'Anywhere except forms, dialogs and demos', '<div class="xctl" data-x="dimsum"></div>', true),
+      setRow('sched', 'Scheduled settings', '定時設定', 'Rules that switch language, colours or playfulness between two times on chosen weekdays. Ranges may cross midnight.', '喺指定時間同星期自動轉語言、顏色或趣味程度。時段可以跨越午夜。', 'No rules', 'Language, colours and playfulness', '<div class="xctl" data-x="sched"></div>', true),
+    ]],
+    ['Look, logo, motion and locks', '外觀、標誌、動態同鎖', [
+      setRow('appear', 'Appearance editor', '外觀編輯器', 'Change colours, shape, spacing and type of a kind of element, with undo and redo. Also opens from the context menu.', '改變某類元素嘅顏色、形狀、間距同字體，可還原同重做。亦可以喺右鍵選單打開。', 'No overrides', 'Every page', '<div class="xctl" data-x="appear"></div>', true),
+      setRow('picker', 'Colour picker', '色彩選擇器', 'Pick a colour with sliders or typed values, translate between hex, RGB and HSL, and check its contrast.', '用滑桿或者輸入數值揀顏色，喺十六進制、RGB 同 HSL 之間轉換，並檢查對比度。', '', 'A tool; it changes nothing by itself', '<div class="xctl" data-x="picker"></div>', false),
+      setRow('logo', 'Your logo', '你嘅標誌', 'Replace the logo in the header with your own image. It is converted in your browser and never uploaded.', '用你自己嘅圖片取代標題列嘅標誌。喺你嘅瀏覽器轉換，唔會上傳。', 'The shipped logo', 'The header', '<div class="xctl" data-x="logo"></div>', true),
+      setRow('anim', 'Animation and transitions', '動畫同轉場', 'Tune each kind of motion: on or off, duration, delay, stagger, easing and distance. Reduced motion always wins.', '調整每類動態：開關、時長、延遲、錯開、緩動同距離。減少動態永遠優先。', 'The Standard profile', 'Every page', '<div class="xctl" data-x="anim"></div>', true),
+      setRow('locks', 'Toy locks', '玩具鎖', 'Locks you put on page elements with a 4-digit PIN. A speed bump for fun, not security.', '你用 4 位 PIN 鎖住嘅頁面元素。純粹玩玩減速，唔係保安。', 'No locks', 'The elements you locked', '<div class="xctl" data-x="locks"></div>', true),
+    ]],
+    ['Local history', '本機紀錄', [
+      setRow('hist', 'History of your changes', '你嘅更改紀錄', 'Every change to settings, appearance, schedules and the logo is kept here, last 100, with the time. Restore any entry.', '每次更改設定、外觀、定時規則同標誌都會記錄喺度（最近 100 項），附時間。可以還原任何一項。', 'Recording', 'This browser only', '<div class="xctl" data-x="hist"></div>', false),
+    ]],
     ['Start again', '重新開始', [
       setRow('reset', 'Reset everything', '全部還原', 'Every choice, kept wording file and notification on this site goes back to the start. This needs two keys and a slider.', '呢個網站所有選擇、用字檔案同通知都會返到起點。需要兩把鑰匙同一個滑桿確認。', '', 'Everything this site keeps in this browser', '<button type="button" class="danger" id="reset-all" data-yue="全部還原">Reset everything</button>', false),
     ]],
@@ -548,6 +581,98 @@ ${findField('set-q', 'Search settings', '搜尋設定')}
 ${groups.map(([t, y, rows], i) => `<section class="card setting-group" aria-labelledby="sg-${i}"><h2 id="sg-${i}" data-yue="${esc(y)}">${esc(t)}</h2>${rows.join('')}</section>`).join('\n')}
 <p class="note" id="set-none" hidden data-yue="冇設定夾到。">No setting matches.</p>`;
   return layout({ title: 'Settings - Home Assistant Material updates', description: 'Settings for this site: language, appearance, accessibility, notifications and your own wording file.', root: '../', page: 'settings', main, path: 'settings/' });
+}
+
+// ---------- Tools ----------
+const btn = (id, label, yue, cls = '') => `<button type="button" id="${id}"${cls ? ` class="${cls}"` : ''} data-yue="${esc(yue)}">${esc(label)}</button>`;
+const area = (id, label, yue, extra = '') => `<label class="field"><span data-yue="${esc(yue)}">${esc(label)}</span><textarea id="${id}" rows="6" spellcheck="false" autocomplete="off"${extra}></textarea></label>`;
+function toolsIndex() {
+  const main = `
+<section class="intro" aria-labelledby="tl-h">
+<h1 id="tl-h" class="mega" data-yue="工具">Tools</h1>
+<p class="muted lead" data-yue="喺瀏覽器入面行嘅細工具。所有嘢都喺你部機處理，咩都唔會上傳。">Small tools that run in your browser. Everything is handled on your device and nothing is uploaded.</p>
+</section>
+<section class="hl-grid">
+<a class="card tool-card" href="base64/index.html"><h2 data-yue="Base64 工具">Base64 toolkit</h2><p class="muted" data-yue="編碼同解碼文字（UTF-8），網址安全版本，檔案同 Base64 互轉。">Encode and decode text (UTF-8), the URL-safe variant, and convert files to and from Base64.</p></a>
+<a class="card tool-card" href="convert/index.html"><h2 data-yue="檔案轉換器">File converter</h2><p class="muted" data-yue="圖片 PNG、JPEG、WebP 互轉，文字同 Base64，JSON 同 CSV，JSON 排版。">Convert images between PNG, JPEG and WebP, text and Base64, JSON and CSV, and pretty-print or minify JSON.</p></a>
+</section>`;
+  return layout({ title: 'Tools - Home Assistant Material updates', description: 'Small tools that run in your browser: Base64 and a file converter.', root: '../', page: 'tools', main, path: 'tools/' });
+}
+function base64Page() {
+  const main = `
+<section class="intro" aria-labelledby="b6-h">
+<h1 id="b6-h" class="mega" data-yue="Base64 工具">Base64 toolkit</h1>
+<p class="muted lead" data-yue="編碼同解碼文字、檔案。全部喺你部機行，咩都唔會上傳。">Encode and decode text and files. It all runs on your device and nothing is uploaded.</p>
+</section>
+<section class="card stack tool" aria-labelledby="b6-t">
+<h2 id="b6-t" data-yue="文字">Text</h2>
+${area('b64-in', 'Text, or Base64 to decode', '文字，或者要解碼嘅 Base64')}
+<div class="row">${btn('b64-enc', 'Encode to Base64', '編碼成 Base64', 'filled')}${btn('b64-dec', 'Decode from Base64', '由 Base64 解碼')}
+<label class="check"><input type="checkbox" id="b64-url"> <span data-yue="網址安全（- 同 _）">URL-safe (- and _)</span></label>
+<label class="check"><input type="checkbox" id="b64-pad" checked> <span data-yue="保留 = 補位">Keep = padding</span></label></div>
+<p id="b64-valid" class="small" role="status" aria-live="polite"></p>
+${area('b64-out', 'Result', '結果', ' readonly')}
+<p id="b64-size" class="small muted"></p>
+<div class="row">${btn('b64-copy', 'Copy result', '複製結果')}${btn('b64-dl', 'Download result as a text file', '下載結果做文字檔')}${btn('b64-swap', 'Use the result as input', '將結果當輸入')}${btn('b64-clear', 'Clear', '清除', 'text')}</div>
+</section>
+<section class="card stack tool" aria-labelledby="b6-f">
+<h2 id="b6-f" data-yue="檔案轉 Base64">File to Base64</h2>
+<label class="field"><span data-yue="揀一個檔案（最大 8 MB）">Choose a file (up to 8 MB)</span><input type="file" id="b64-file"></label>
+<p id="b64-file-info" class="small muted" role="status"></p>
+${area('b64-file-out', 'Base64 of the file', '檔案嘅 Base64', ' readonly')}
+<div class="row">${btn('b64-file-copy', 'Copy', '複製')}${btn('b64-file-dl', 'Download as a text file', '下載做文字檔')}</div>
+</section>
+<section class="card stack tool" aria-labelledby="b6-g">
+<h2 id="b6-g" data-yue="Base64 轉檔案">Base64 to file</h2>
+${area('b64-tofile-in', 'Base64 to turn into a file', '要變成檔案嘅 Base64')}
+<div class="row"><label class="field grow"><span data-yue="檔案名稱">File name</span><input type="text" id="b64-tofile-name" value="decoded.bin"></label></div>
+<p id="b64-tofile-valid" class="small" role="status" aria-live="polite"></p>
+<div class="row">${btn('b64-tofile-dl', 'Download the file', '下載檔案', 'filled')}</div>
+</section>`;
+  return layout({ title: 'Base64 toolkit - Home Assistant Material updates', description: 'Encode and decode Base64 text and files in your browser.', root: '../../', page: 'tool-base64', main, path: 'tools/base64/' });
+}
+function convertPage() {
+  const main = `
+<section class="intro" aria-labelledby="cv-h">
+<h1 id="cv-h" class="mega" data-yue="檔案轉換器">File converter</h1>
+<p class="muted lead" data-yue="只做瀏覽器真正做得到嘅轉換。每個轉換都會講明限制，咩都唔會上傳。">Only the conversions a browser can honestly do. Each one states its limits, and nothing is uploaded.</p>
+</section>
+<section class="card stack tool" aria-labelledby="cv-t">
+<h2 id="cv-t" data-yue="揀轉換">Choose a conversion</h2>
+<label class="field"><span data-yue="轉換">Conversion</span><select id="cv-mode"><option value="image">Image: PNG, JPEG or WebP</option><option value="text64">Text: UTF-8 and Base64</option><option value="j2c">JSON to CSV</option><option value="c2j">CSV to JSON</option><option value="jfmt">JSON: pretty-print or minify</option></select></label>
+<p id="cv-limit" class="note"></p>
+<div id="cv-image" class="stack" data-mode="image">
+<label class="field"><span data-yue="圖片檔案">Image file</span><input type="file" id="cv-img-file" accept="image/png,image/jpeg,image/webp"></label>
+<div class="row"><label class="field"><span data-yue="輸出格式">Output format</span><select id="cv-img-fmt"><option value="image/png">PNG</option><option value="image/jpeg">JPEG</option><option value="image/webp">WebP</option></select></label>
+<label class="field grow"><span data-yue="品質">Quality <output id="cv-q-out">0.9</output></span><input type="range" id="cv-img-q" min="0.1" max="1" step="0.05" value="0.9"></label></div>
+${btn('cv-img-go', 'Convert', '轉換', 'filled')}
+<p id="cv-img-info" class="small" role="status" aria-live="polite"></p>
+<div id="cv-img-prev" class="cv-prev"></div>
+</div>
+<div id="cv-text64" class="stack" data-mode="text64" hidden>
+${area('cv-t-in', 'Input', '輸入')}
+<div class="row">${btn('cv-t-enc', 'UTF-8 text to Base64', 'UTF-8 文字轉 Base64', 'filled')}${btn('cv-t-dec', 'Base64 to UTF-8 text', 'Base64 轉 UTF-8 文字')}</div>
+${area('cv-t-out', 'Output', '輸出', ' readonly')}
+</div>
+<div id="cv-j2c" class="stack" data-mode="j2c" hidden>
+${area('cv-j-in', 'JSON: a list of objects', 'JSON：物件清單', ' placeholder="[{&quot;name&quot;:&quot;a&quot;,&quot;n&quot;:1}]"')}
+${btn('cv-j-go', 'Convert to CSV', '轉成 CSV', 'filled')}
+${area('cv-j-out', 'CSV', 'CSV', ' readonly')}
+</div>
+<div id="cv-c2j" class="stack" data-mode="c2j" hidden>
+${area('cv-c-in', 'CSV with a header row', '有標題行嘅 CSV')}
+${btn('cv-c-go', 'Convert to JSON', '轉成 JSON', 'filled')}
+${area('cv-c-out', 'JSON', 'JSON', ' readonly')}
+</div>
+<div id="cv-jfmt" class="stack" data-mode="jfmt" hidden>
+${area('cv-f-in', 'JSON', 'JSON')}
+<div class="row">${btn('cv-f-pretty', 'Pretty-print', '排版', 'filled')}${btn('cv-f-min', 'Minify', '壓縮')}<label class="field"><span data-yue="縮排">Indent</span><select id="cv-f-ind"><option>2</option><option>4</option><option value="tab">Tab</option></select></label></div>
+${area('cv-f-out', 'Result', '結果', ' readonly')}
+</div>
+<p id="cv-msg" class="small" role="status" aria-live="polite"></p>
+<div class="row">${btn('cv-copy', 'Copy the text result', '複製文字結果')}${btn('cv-dl', 'Download the result', '下載結果')}</div>
+</section>`;
+  return layout({ title: 'File converter - Home Assistant Material updates', description: 'Convert images, text, JSON and CSV in your browser.', root: '../../', page: 'tool-convert', main, path: 'tools/convert/' });
 }
 
 function notFoundPage() {
@@ -575,11 +700,11 @@ function paletteItems() {
   const items = [
     { kind: 'Page', label: 'All versions', yue: '所有版本', href: 'index.html#versions' }, { kind: 'Page', label: 'Calendar', yue: '日曆', href: 'index.html#calendar' },
     { kind: 'Page', label: 'Compare versions', yue: '比較版本', href: 'compare/index.html' }, { kind: 'Page', label: 'Features and their state', yue: '功能同狀態', href: 'features/index.html' },
-    { kind: 'Page', label: 'Settings', yue: '設定', href: 'settings/index.html' },
+    { kind: 'Page', label: 'Settings', yue: '設定', href: 'settings/index.html' }, { kind: 'Page', label: 'Tools', yue: '工具', href: 'tools/index.html' }, { kind: 'Page', label: 'Base64 toolkit', yue: 'Base64 工具', href: 'tools/base64/index.html' }, { kind: 'Page', label: 'File converter', yue: '檔案轉換器', href: 'tools/convert/index.html' },
   ];
   for (const r of releases) items.push({ kind: 'Version', label: `Build ${r.build}${r.headline ? ': ' + r.headline : ''}`, yue: `第 ${r.build} 版`, href: `releases/${r.build}/`, sub: r.core });
   for (const f of FEATURES) items.push({ kind: 'Feature', label: f.name, yue: f.yue, href: `features/${f.id}/`, sub: f.what });
-  for (const [id, label, yue] of [['lang', 'Language mode', '語言模式'], ['vocab', 'Your wording file', '你嘅用字檔案'], ['theme', 'Theme', '主題'], ['ts', 'Text size', '字體大細'], ['contrast', 'More contrast', '加強對比'], ['targets', 'Larger targets', '放大掣'], ['motion', 'Reduce motion', '減少動態'], ['notes', 'Notifications', '通知'], ['export', 'Export your settings', '匯出你嘅設定'], ['reset', 'Reset everything', '全部還原']]) items.push({ kind: 'Setting', label, yue, href: `settings/index.html#s-${id}` });
+  for (const [id, label, yue] of [['lang', 'Language mode', '語言模式'], ['vocab', 'Your wording file', '你嘅用字檔案'], ['theme', 'Theme', '主題'], ['ts', 'Text size', '字體大細'], ['contrast', 'More contrast', '加強對比'], ['targets', 'Larger targets', '放大掣'], ['motion', 'Reduce motion', '減少動態'], ['notes', 'Notifications', '通知'], ['export', 'Export your settings', '匯出你嘅設定'], ['play', 'Playfulness', '趣味程度'], ['emoji', 'Emoji in dialogs and toasts', '表情符號'], ['narr', 'Spoken narrator', '朗讀'], ['aids', 'Focus, Calm and Reading aids', '專注、平靜同閱讀輔助'], ['school', 'School mode', '學校模式'], ['dimsum', 'Dim sum surprise', '點心驚喜'], ['sched', 'Scheduled settings', '定時設定'], ['appear', 'Appearance editor', '外觀編輯器'], ['picker', 'Colour picker', '色彩選擇器'], ['logo', 'Your logo', '你嘅標誌'], ['anim', 'Animation and transitions', '動畫同轉場'], ['locks', 'Toy locks', '玩具鎖'], ['hist', 'History of your changes', '更改紀錄'], ['reset', 'Reset everything', '全部還原']]) items.push({ kind: 'Setting', label, yue, href: `settings/index.html#s-${id}` });
   return items;
 }
 
@@ -599,6 +724,9 @@ write('compare/index.html', comparePage());
 write('features/index.html', featuresIndex());
 FEATURES.forEach((f) => write(`features/${f.id}/index.html`, featurePage(f)));
 write('settings/index.html', settingsPage());
+write('tools/index.html', toolsIndex());
+write('tools/base64/index.html', base64Page());
+write('tools/convert/index.html', convertPage());
 write('404.html', notFoundPage());
 writeFileSync(join(OUT, '.nojekyll'), '');
 

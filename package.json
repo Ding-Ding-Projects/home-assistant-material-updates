@@ -4,12 +4,15 @@
   "private": true,
   "type": "module",
   "description": "Release notes site for Home Assistant Material: one page per version, with a working demo of each new feature.",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "fetch": "node fetch-data.mjs",
     "build": "node build.mjs",
     "check": "node check.mjs",
-    "test": "node test-demos.mjs",
-    "serve": "node serve.mjs"
+    "test": "node test-demos.mjs && node test-site.mjs",
+    "serve": "node serve.mjs",
+    "test:site": "node test-site.mjs"
   }
 }
