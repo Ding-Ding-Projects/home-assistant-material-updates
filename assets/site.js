@@ -40,6 +40,7 @@
   const store = {
     get(area, k) { try { return window[area].getItem(k); } catch (e) { return null; } },
     set(area, k, v) { try { window[area].setItem(k, v); } catch (e) { /* storage may be blocked */ } },
+    del(area, k) { try { window[area].removeItem(k); } catch (e) { /* storage may be blocked */ } },
   };
   const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
   function parts(iso) {

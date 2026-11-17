@@ -172,7 +172,7 @@
         try {
           const cv = doc.createElement('canvas'); cv.width = 96; cv.height = 96; const g = cv.getContext('2d');
           const w = img.naturalWidth || 96; const hgt = img.naturalHeight || 96; const s = Math.min(96 / w, 96 / hgt); g.drawImage(img, (96 - w * s) / 2, (96 - hgt * s) / 2, w * s, hgt * s);
-          const out = cv.toDataURL('image/png'); localStorage.setItem(LOGO_KEY, out); applyLogo(); paint(); sv('Logo changed', true);
+          const out = cv.toDataURL('image/png'); store.set('localStorage', LOGO_KEY, out); applyLogo(); paint(); sv('Logo changed', true);
           msg.textContent = T('Your logo is in use. It stays in this browser only.', '用緊你嘅標誌。只會留喺呢個瀏覽器。'); toast(T('Your logo is in use.', '用緊你嘅標誌。'));
         } catch (e) { msg.textContent = T('The image could not be converted or stored.', '轉換唔到或者儲存唔到呢張圖片。'); }
         URL.revokeObjectURL(url);
@@ -180,7 +180,7 @@
       img.onerror = () => { URL.revokeObjectURL(url); msg.textContent = T('That image could not be read.', '讀唔到呢張圖片。'); };
       img.src = url;
     });
-    reset.addEventListener('click', () => { try { localStorage.removeItem(LOGO_KEY); } catch (e) { /* ignore */ } applyLogo(); paint(); sv('Logo reset', true); msg.textContent = T('The shipped logo is back.', '已用返原本標誌。'); });
+    reset.addEventListener('click', () => { store.del('localStorage', LOGO_KEY); applyLogo(); paint(); sv('Logo reset', true); msg.textContent = T('The shipped logo is back.', '已用返原本標誌。'); });
     c.append(h('div', { class: 'row' }, pick, reset, prev), h('p', { class: 'small muted', text: T('PNG, JPEG, WebP or SVG, up to 2 MB. SVG is only accepted because it is drawn through an image onto a canvas, so no script in it runs. The result is 96 px and never uploaded.', 'PNG、JPEG、WebP 或 SVG，最大 2 MB。SVG 只係經圖片畫落畫布先接受，所以入面嘅 script 唔會執行。結果係 96 px，絕不上傳。') }), msg);
   }
 

@@ -44,7 +44,7 @@
     X = Object.assign(d, e.snap.x, { locks: keepLocks, recent: keepRecent });
     X.play = Object.assign(d.play, X.play); X.narr = Object.assign(defaults().narr, X.narr); X.aids = Object.assign(defaults().aids, X.aids); X.school = Object.assign(defaults().school, X.school);
     const s = A.SET(); Object.assign(s, e.snap.set);
-    if (e.snap.logo !== undefined) { if (e.snap.logo) store.set('localStorage', 'hamu-logo', e.snap.logo); else { try { localStorage.removeItem('hamu-logo'); } catch (er) { /* ignore */ } } }
+    if (e.snap.logo !== undefined) { if (e.snap.logo) store.set('localStorage', 'hamu-logo', e.snap.logo); else { try { store.del('localStorage', 'hamu-logo'); } catch (er) { /* ignore */ } } }
     A.saveSet(); A.applySet(); store.set('localStorage', KEY, JSON.stringify(X));
     quietHist = false; applyAll(); window.dispatchEvent(new CustomEvent('hx-restored'));
     record('Restored the entry from ' + new Date(e.t).toLocaleString('en-CA', { hour12: false }), e.snap.logo !== undefined);
@@ -420,7 +420,7 @@
     const exp = h('button', { type: 'button', id: 'hist-export', text: T('Export history', '匯出紀錄') });
     exp.addEventListener('click', () => A.download('history.json', 'application/json', JSON.stringify(hist.map((e) => ({ time: new Date(e.t).toISOString(), what: e.what })), null, 2)));
     const clr = h('button', { type: 'button', id: 'hist-clear', class: 'danger', text: T('Clear history', '清除紀錄') });
-    clr.addEventListener('click', () => A.superConfirm(T('Clear history', '清除紀錄'), [T('Every entry in the history list is deleted.', '紀錄清單入面所有項目都會刪除。'), T('Your current settings stay as they are.', '你而家嘅設定唔會變。')], () => { hist = []; try { localStorage.setItem(HKEY, '[]'); } catch (e) { /* ignore */ } paint(); toast(T('History cleared.', '已清除紀錄。')); }));
+    clr.addEventListener('click', () => A.superConfirm(T('Clear history', '清除紀錄'), [T('Every entry in the history list is deleted.', '紀錄清單入面所有項目都會刪除。'), T('Your current settings stay as they are.', '你而家嘅設定唔會變。')], () => { hist = []; try { store.set('localStorage', HKEY, '[]'); } catch (e) { /* ignore */ } paint(); toast(T('History cleared.', '已清除紀錄。')); }));
     function paint() {
       list.textContent = '';
       if (!hist.length) list.appendChild(h('li', { class: 'muted', text: T('No changes recorded yet. Change a setting and it will appear here.', '未有紀錄。改一個設定，就會喺度出現。') }));
@@ -437,11 +437,11 @@
   doc.addEventListener('click', (e) => {
     const r = e.target.closest('[data-reset]'); if (!r) return; const k = r.dataset.reset;
     const d = defaults();
-    const map = { play: () => { X.play = d.play; }, emoji: () => { X.emoji = false; }, narr: () => { X.narr = d.narr; stopRead(); }, aids: () => { X.aids = d.aids; }, school: () => { X.school = d.school; }, dimsum: () => { X.dim = true; }, sched: () => { X.rules = []; }, appear: () => { X.ap = {}; }, logo: () => { try { localStorage.removeItem('hamu-logo'); } catch (er) { /* ignore */ } }, anim: () => { X.anim = null; }, locks: () => { /* handled in part 2 */ } };
+    const map = { play: () => { X.play = d.play; }, emoji: () => { X.emoji = false; }, narr: () => { X.narr = d.narr; stopRead(); }, aids: () => { X.aids = d.aids; }, school: () => { X.school = d.school; }, dimsum: () => { X.dim = true; }, sched: () => { X.rules = []; }, appear: () => { X.ap = {}; }, logo: () => { try { store.del('localStorage', 'hamu-logo'); } catch (er) { /* ignore */ } }, anim: () => { X.anim = null; }, locks: () => { /* handled in part 2 */ } };
     if (!map[k]) return; if (k === 'locks') return;
     map[k](); save('Reset: ' + k, k === 'logo'); applyAll(); buildSettings(); if (window.HX_APPLY_MORE) window.HX_APPLY_MORE();
   });
-  window.addEventListener('hamu-reset', () => { X = Object.assign(defaults(), { locks: X.locks }); try { localStorage.removeItem('hamu-logo'); } catch (e) { /* ignore */ } store.set('localStorage', KEY, JSON.stringify(X)); applyAll(); buildSettings(); });
+  window.addEventListener('hamu-reset', () => { X = Object.assign(defaults(), { locks: X.locks }); store.del('localStorage', 'hamu-logo'); store.set('localStorage', KEY, JSON.stringify(X)); applyAll(); buildSettings(); });
   window.addEventListener('hamu-lang', () => { retone(); applySchedule(); });
 
   // ---------- Phone menu sheet ----------
