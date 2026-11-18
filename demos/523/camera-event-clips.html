@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: camera events play only with a real clip</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.events { width: 100%; max-width: 390px; margin: 0 auto; }
+.events li { align-items: flex-start; flex-wrap: wrap; }
+.events .info { flex: 1; min-width: 0; }
+.events button { min-height: 44px; padding: 0 14px; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="camera-event-clips">
+  <h1>Camera events play only with a real clip</h1>
+  <p class="muted">Press Next event to move through the state of the pretend events.</p>
+
+  <div class="row"><button type="button" class="tonal" id="next">Next event</button></div>
+  <p class="small" id="state-text" aria-live="polite">Doorbell, 08:14: a clip is saved.</p>
+
+  <ul class="list events" aria-label="Pretend camera events">
+    <li>
+      <div class="info"><strong>Front door</strong><div class="small muted" id="ev-a-state">Clip saved. Ten seconds before, thirty after.</div></div>
+      <button type="button" class="tonal" id="ev-a-play">Play</button>
+    </li>
+    <li>
+      <div class="info"><strong>Garden</strong><div class="small muted" id="ev-b-state">Not kept: the service was busy, so no clip was saved.</div></div>
+      <button type="button" class="tonal" id="ev-b-play" disabled>Play</button>
+    </li>
+  </ul>
+
+  <p class="small">The home keeps about forty seconds of live video around each event, at most twelve clips an hour per camera.</p>
+  <p class="demo-pretend">This is a demonstration with pretend data. No camera or clip is real.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var steps = [
+    { text: 'Doorbell, 08:14: a clip is saved.', a: 'Clip saved. Ten seconds before, thirty after.', aOk: true, b: 'Not kept: the service was busy, so no clip was saved.', bOk: false },
+    { text: 'Doorbell, 08:14: the Garden event is being saved.', a: 'Clip saved. Ten seconds before, thirty after.', aOk: true, b: 'Being saved now. Play appears only once the file is there.', bOk: false },
+    { text: 'Doorbell, 08:14: the hourly budget is used up.', a: 'Clip saved. Ten seconds before, thirty after.', aOk: true, b: 'Not kept: the hourly budget of twelve clips is used up.', bOk: false }
+  ];
+  var i = 0;
+  var next = document.getElementById('next');
+  var stateText = document.getElementById('state-text');
+  var aState = document.getElementById('ev-a-state');
+  var bState = document.getElementById('ev-b-state');
+  var aPlay = document.getElementById('ev-a-play');
+  var bPlay = document.getElementById('ev-b-play');
+  function render() {
+    var s = steps[i];
+    stateText.textContent = s.text;
+    aState.textContent = s.a;
+    bState.textContent = s.b;
+    aPlay.disabled = !s.aOk;
+    bPlay.disabled = !s.bOk;
+  }
+  next.addEventListener('click', function () { i = (i + 1) % steps.length; render(); });
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () { i = 0; render(); });
+  render();
+})();
+</script>
+</body>
+</html>

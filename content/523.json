@@ -1,0 +1,88 @@
+{
+  "build": 523,
+  "headline": "Search from the top bar on every page, camera clips around each event, and a courtesy wait that is obeyed",
+  "summary": "Build 523 moves the search button into the top bar, so the search field no longer scrolls away on long pages. It now reaches release notes, notifications, support, extensions, logs, scenes, tags, the app pages, sidebar labels and the integrations page. A camera that streams only through its service is now recorded by the home itself: about forty seconds of live video is kept each time something is seen, and a camera event offers Play only when a clip is really on disk, otherwise it says why. Heat Defender now switches a cooling unit over to heat below its floor, and its courtesy wait is obeyed and can be set from 0 to 30 minutes. The camera recording was proven only against a pretend camera service, not a real camera. The defender fixes were checked with unit tests and a browser, and the commit notes do not claim a real air conditioner or heater was used.",
+  "summary_yue": "523 版將搜尋掣放入頂欄，長頁都唔使捲返上面先搵到搜尋欄。而家搜尋可以用喺版本說明、通知、支援、擴充功能、記錄、場景、標籤、應用程式頁同整合頁。只可以經供應商串流嘅鏡頭，而家由屋企喺每次見到嘢嗰陣自己錄低大約四十秒直播；鏡頭事件真係有片先會有播放掣，冇片就講原因。Heat Defender 而家房間低過佢嘅底線，會將開緊冷氣嘅部機轉做暖氣，禮貌等候亦會照做，可以喺 0 至 30 分鐘之間調。鏡頭錄影只係用假鏡頭服務證實過，未對住真鏡頭；守護嘅修正亦冇聲稱用過真正嘅冷氣或者暖氣。",
+  "highlights": [
+    {
+      "id": "entity-sheets-fit",
+      "title": "Entity sheets fit their content, with compact switches and visible buttons",
+      "areas": ["interface"],
+      "what": "On a phone a detail sheet is now only as tall as what is inside it, instead of renting the whole screen for a single switch. Switches, input booleans, sirens and plain fans use a compact 56 px switch. Valve, cover and script buttons are properly visible in the light theme, and disabled buttons on a sheet get a thin outline so they still read as buttons. A script sheet's Run button has its label again, and a sheet keeps its height when you leave the Details tab. The sheets, their tabs and headings speak Cantonese for this project's own wording. A test now covers fifteen helper kinds and fails when one of them is removed. Also in this build, a restored pause keeps its reason code, so its line is no longer stuck in English, and a threshold trigger whose first unit choice is none now picks a real unit. The camera recording page now follows the language mode. These fixes were seen in a browser; most sheets were not yet seen in both-language mode.",
+      "what_yue": "喺手機上面，詳情面板而家幾高就係幾高，唔再為咗一個開關就霸晒成個螢幕。開關、輔助開關、警報器同普通風扇用 56 像素嘅矮身開關。閥門、窗簾同腳本嘅掣喺淺色主題都睇得清楚，停用咗嘅掣亦有幼邊，唔會似一塊空白。腳本面板嘅「執行」掣重有字，離開「詳情」分頁時面板唔會縮埋。面板、分頁同標題用廣東話講本項目自己嘅字句。測試覆蓋十五種輔助類型，拎走其中一種，測試就會紅。另外，還原返嚟嘅暫停會保留原因代碼，嗰行字唔會再係英文；門檻觸發嘅第一個單位如果係「冇」，而家會揀返一個真單位；鏡頭錄影頁亦跟住語言模式走。以上修正喺瀏覽器睇過；大部分面板嘅雙語模式仲未睇過。",
+      "why": "A sheet should show only the controls its device needs, and a button that cannot be read or found is no use on a small screen.",
+      "try": [
+        "Press the switch sheet example and compare its height with the light sheet.",
+        "Turn on the light theme and look at the valve, cover and script buttons.",
+        "Press Run on the script example and read its label."
+      ],
+      "sha": ["17fce491f", "ecc3e18ef"],
+      "demo": "demos/523/entity-sheets-fit.html"
+    },
+    {
+      "id": "search-top-bar",
+      "title": "Search from the top bar on every page, and a backup choice you can find",
+      "areas": ["interface"],
+      "what": "The search field used to sit at the top of the content, which on a long page is out of reach. A search button now lives in the top bar, the one thing that never scrolls away. On Personal settings it opens in the bar, leaves the page where it is, marks the matches and steps between them. On list pages at wide width it filters in place and shows a count. The same button now also reaches release notes, notifications, support, extensions, logs, scenes, tags, the app pages, sidebar labels and the integrations page. At wide width the bar stays on one row with a fixed 360 px field, the pattern builder opens holding the words already typed, and a reload with a search in the address shows the button as holding it. On the Updates page, the Custom backup choice was a disabled button, so the per-app choice was hidden. Custom now opens the list, and a plain row says which apps get a backup first. Seen in a browser for most pages at phone width. Not yet seen: stepping with Enter, the app pages with a Supervisor, and the zone map. Developer tools and a few other pages still keep their own field.",
+      "what_yue": "搜尋欄以前擺喺內容最頂，頁面一長就搵唔到。而家搜尋掣搬上頂欄，成頁得頂欄唔會捲走。喺個人設定，搜尋會喺頂欄打開，頁面留喺原位，標出搵到嘅地方，仲可以逐個跳。闊螢幕嘅清單頁就原地篩選，有數顯示。搜尋掣而家仲去到版本說明、通知、支援、擴充功能、記錄、場景、標籤、應用程式頁、側欄標籤同整合頁，每頁都唔再要嗰個會跟住內容捲走嘅舊搜尋欄。闊螢幕時頂欄保持一行，搜尋欄固定 360 像素，打開樣式建立器會帶埋已經打咗嘅字，重新載入時地址有搜尋字眼，個掣會顯示有嘢搜緊。更新頁入面「自訂」備份選項以前係撳唔到嘅掣，逐個應用程式揀備份嘅設定就藏咗。而家「自訂」撳得，仲多咗一行寫住「應用程式：揀邊啲更新前先備份」嘅字。大部分頁面喺手機闊度睇過。未睇：撳 Enter 逐個跳、有監督程式嗰陣嘅應用程式頁、區域地圖。開發者工具同少數頁面仲用緊自己嘅搜尋欄。",
+      "why": "The search box should be within reach on any page, and a feature hidden behind a disabled button is the same as no feature.",
+      "try": [
+        "Press the search button in the top bar and type a word to filter the pages.",
+        "Clear the search and read how the count of matching pages changes.",
+        "Look at how the list of pages changes when a word matches nothing."
+      ],
+      "sha": ["19767b529", "02dd3f9b4"],
+      "demo": "demos/523/search-top-bar.html"
+    },
+    {
+      "id": "camera-event-clips",
+      "title": "Camera events keep a real clip, and a streaming-only camera is recorded around each event",
+      "areas": ["core", "interface"],
+      "what": "A camera that streams only through its service could not be recorded at all, which is a strange thing to say about a doorbell. The home now records about forty seconds of its live video each time something is seen. The bundled streaming program is handed only the connection handshake, through a one-time address that works once, for thirty seconds, from this machine only, so the sign-in never leaves the part that holds it. Each camera runs one live session at a time, the home keeps a budget of twelve clips an hour, and after the service says too many requests nothing asks again until the wait is over. Each camera event now has its own record: saved, being saved, or not kept with the reason in one line. Play appears only when a file is really there. A failed save is logged once with a reason code, counted, and shown as the camera's last problem, without the service's own error text. The clip the service already keeps is copied in through the integration that holds the sign-in, and whichever copy arrives first is used. A first saved clip that crashed on a missing key is fixed too. The live recording was proven end to end only in a container against a pretend camera service: 10.3 seconds from event to a saved 10.00 second clip, with the temporary stream removed and no handshake text in the log. It is not yet proven on a real camera, and not yet seen in a browser.",
+      "what_yue": "只可以經供應商串流嘅鏡頭，以前係完全錄唔到，講緊嘅仲要係門鐘，有啲講唔通。而家每次見到嘢，屋企會自己錄低大約四十秒直播。內置嘅串流程式只會收到連線握手，行一條用一次、三十秒內、只限本機嘅一次性地址，登入資料原地不動。每部鏡頭同一時間只開一個直播，每個鐘最多十二段，供應商一話「太多要求」，等夠時間先會再問。每個鏡頭事件而家有自己嘅記錄：儲咗、儲緊，或者冇留低，兼用一行字講原因。真係有檔案先有播放掣。儲唔到片會記低一次，寫明原因代碼，計數，仲會顯示做鏡頭最近一次問題，唔抄供應商嘅錯誤原文。供應商本身留低嘅短片會經揸住登入嗰個整合抄入嚟，邊個先到用邊個。第一段片儲好嗰下會因為少咗個鍵而出事，而家都修好咗。直播錄影只係喺容器入面對住假嘅鏡頭服務由頭行到尾試過：事件到儲好一段 10.00 秒嘅片用咗 10.3 秒，臨時串流事後清走，記錄入面冇握手內容。未對住真鏡頭試過，亦未喺瀏覽器睇過。",
+      "why": "A doorbell event that promises a clip and then has nothing to play is worse than no button, and a camera that cannot be recorded directly should still be recorded through its own service.",
+      "try": [
+        "Press Next event and read which events have a clip to play.",
+        "Find an event marked Not kept and read the one-line reason.",
+        "Read how many clips the hour budget allows in the demo."
+      ],
+      "sha": ["7115ff26f", "02856a9e3"],
+      "demo": "demos/523/camera-event-clips.html"
+    },
+    {
+      "id": "defenders-courtesy-wait",
+      "title": "Heat Defender switches cooling to heat below its floor, and the courtesy wait is obeyed",
+      "areas": ["core", "interface"],
+      "what": "Each of the 51 guards now has a one-line description that says what it actually does. The reason line is worded in English and Cantonese from a reason code, and a test fails when a code has no wording. The sibling row has an Open link. The courtesy wait is now a setting from 0 to 30 minutes, with a default of 10, and it is the only wait: before this fix a mode guard's own short pause could turn heating off after about half a minute, whatever the courtesy wait said. Zero means at once, and in a browser the heating went off within two seconds. Setup now waits for the climate entity to exist, and entities go unavailable together with the unit. A walk through a whole day with both defenders on one unit found two faults, both fixed: Heat Defender did not switch a cooling unit over to heat when the room fell below her floor, and the shared log said AC Defender had stopped when it was not running. The commit notes check these changes with unit tests and a browser, and do not claim a real air conditioner or heater was used.",
+      "what_yue": "五十一條守則而家每條都有一句說明，講清楚佢實際做乜，唔使睇個名估。原因嗰行由頁面按代碼出英文同廣東話，邊個代碼冇字句，測試就唔過。兩位守護嘅兄妹行，阿妹嗰行多咗「開啟」連結。阿妹嘅禮貌等候變成設定，由 0 至 30 分鐘，預設 10 分鐘，而家只等呢個時間。以前守則自己嗰個短暫暫停，可能大約半分鐘就熄暖氣，唔理禮貌等候點設。設成零就即刻熄，喺瀏覽器睇過，兩秒內已經熄咗。設定會等冷暖氣實體出現先開工，部機離線，實體都跟住顯示離線。一齊睇住一部機行足一日，搵到兩個真問題，兩個都修好：室溫跌穿阿妹條底線嗰陣，部機開緊冷氣佢唔會轉去暖氣；阿哥根本冇開工，共用記錄卻話佢停咗。以上嘅改動用單元測試同瀏覽器睇過，冇聲稱用過真正嘅冷氣或者暖氣。",
+      "why": "Two defenders that share one room should agree, and a setting the owner changes should be the wait that really happens.",
+      "try": [
+        "Press Turn heating on by hand and read the courtesy wait it starts.",
+        "Move the courtesy wait to 0 and read what happens at once.",
+        "Move the courtesy wait to 30 and read the new time."
+      ],
+      "sha": ["7cd4d5189", "090bf8e62"],
+      "demo": "demos/523/defenders-courtesy-wait.html"
+    },
+    {
+      "id": "automation-editor-picker",
+      "title": "The automation editor finds its event type and shows zone maps, and the updates card folds",
+      "areas": ["interface", "core"],
+      "what": "In the automation editor, the event type is now a searchable picker. Zone triggers and conditions show a small map, and a timer trigger that wrote its duration as text, which the server would refuse, now writes it in the right form. A new test reads the server's own trigger and condition descriptions and checks each editor against them. Also in this build, the automatic updates card on the Updates page folds into one summary row instead of taking most of a phone screen, and a page opened in the middle of an update corrects its start time once the real start arrives. An offline camera's sheet says when it was last seen, and Light recording gets a picker for what counts as something seen. A second browser look also fixed three editor faults, listed under the Heat Defender entry: a tap on the first field of the bottom sheet landed nowhere, the list called new trigger types Unknown trigger, and a power threshold defaulted to milliwatts. Written and unit-tested only; the automation editor and the updates card were not yet seen in a browser.",
+      "what_yue": "自動化編輯器入面，事件類型而家係一個可以搜尋嘅揀選器。區域觸發同條件會顯示一幅細地圖，計時器觸發之前將時間寫成文字，伺服器會拒收，而家已經寫返啱格式。新測試會讀伺服器自己嘅觸發同條件說明，逐個編輯器對返。另外，更新頁入面嘅自動更新卡而家摺埋做一行摘要，唔會霸住手機大半個螢幕。更新中途先開嘅頁面，收到真正開始時間會自己改返。離線鏡頭嘅面板會講上次幾點見到，輕量錄影多咗個揀選器，可以揀邊啲嘢算係「見到嘢」。第二次開瀏覽器睇，仲修好三個編輯器問題，列喺守護嗰節：底部面板第一個欄位撳極都冇反應、清單將新式觸發叫做「未知觸發」、功率門檻預設單位係毫瓦。只係寫咗同做咗單元測試，自動化編輯器同更新卡未喺瀏覽器睇過。",
+      "why": "An editor that cannot find the right trigger or unit writes automations the server refuses, and a folded card keeps the Updates page usable on a phone.",
+      "try": [
+        "Pick an event type from the picker and read the explanation.",
+        "Pick a zone trigger and read the note about its map.",
+        "Pick the power trigger and read the unit it uses."
+      ],
+      "sha": ["23225de03"],
+      "demo": "demos/523/automation-editor-picker.html"
+    }
+  ],
+  "other": [
+    { "title": "Design board: search from the top bar, canvas 40", "sha": ["a5e08cb1a"] },
+    { "title": "Design board: camera events, with Play only when a real clip exists", "sha": ["62c70ce1c"] },
+    { "title": "Documentation: handoff, roadmap and feature pages up to the defenders", "sha": ["0d3d85d8a"] }
+  ]
+}

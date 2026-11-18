@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: the courtesy wait is obeyed</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.wait { width: 100%; max-width: 390px; margin: 0 auto; background: var(--sl1); border-radius: 24px; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.wait button { min-height: 48px; }
+.wait label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.wait input[type="range"] { width: 100%; min-height: 48px; accent-color: var(--p); }
+.reason { font-size: 14px; background: var(--sl2); border-radius: 12px; padding: 10px 12px; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="defenders-courtesy-wait">
+  <h1>The courtesy wait is obeyed</h1>
+  <p class="muted">Turn heating on by hand, then move the courtesy wait. Heat Defender waits that long before it turns heating off again.</p>
+
+  <section class="wait" aria-label="Pretend Heat Defender">
+    <button type="button" class="tonal" id="by-hand" aria-pressed="false">Turn heating on by hand</button>
+    <label for="wait-range">Courtesy wait: <strong id="wait-value">10 minutes</strong>
+      <input type="range" id="wait-range" min="0" max="30" step="1" value="10" aria-describedby="wait-text">
+    </label>
+    <p class="small" id="wait-text" aria-live="polite">Heating is off. Heat Defender waits for a hand turn-on first.</p>
+    <p class="reason" id="reason">Reason: a person turned heating on by hand. 原因：有人用手開咗暖氣。</p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. No heating is switched.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var byHand = document.getElementById('by-hand');
+  var range = document.getElementById('wait-range');
+  var value = document.getElementById('wait-value');
+  var text = document.getElementById('wait-text');
+  var reason = document.getElementById('reason');
+  var on = false;
+  function minutes() { return Number(range.value); }
+  function render() {
+    value.textContent = minutes() === 0 ? 'at once' : minutes() + (minutes() === 1 ? ' minute' : ' minutes');
+    byHand.setAttribute('aria-pressed', String(on));
+    byHand.textContent = on ? 'Heating is on by hand' : 'Turn heating on by hand';
+    if (!on) {
+      text.textContent = 'Heating is off. Heat Defender waits for a hand turn-on first.';
+    } else if (minutes() === 0) {
+      text.textContent = 'Heating goes off at once, because the courtesy wait is zero.';
+    } else {
+      text.textContent = 'Heating goes off after ' + minutes() + (minutes() === 1 ? ' minute' : ' minutes') + ', the courtesy wait you set.';
+    }
+  }
+  byHand.addEventListener('click', function () { on = !on; render(); });
+  range.addEventListener('input', render);
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    on = false; range.value = 10; render();
+  });
+  render();
+})();
+</script>
+</body>
+</html>

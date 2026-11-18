@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: search from the top bar</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.bar { display: flex; align-items: center; gap: 8px; min-height: 56px; background: var(--sl2); border-radius: 28px; padding: 6px 8px; width: 100%; max-width: 390px; margin: 0 auto; }
+.bar .title { flex: 1; font-weight: 500; overflow-wrap: anywhere; }
+.bar button { min-height: 48px; }
+.bar .field { flex: 1; min-width: 0; max-width: 360px; }
+.bar input { min-height: 44px; }
+.pages { width: 100%; max-width: 390px; margin: 0 auto; }
+.pages li[hidden] { display: none; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="search-top-bar">
+  <h1>Search from the top bar</h1>
+  <p class="muted">Press the search button in the top bar, then type a word. The list filters in place.</p>
+
+  <div class="bar" aria-label="Top bar">
+    <span class="title" id="page-title">Settings</span>
+    <div class="field" id="field" hidden>
+      <label class="sr-only" for="q">Search this list</label>
+      <input type="search" id="q" placeholder="Search" autocomplete="off">
+    </div>
+    <button type="button" class="tonal" id="search-btn" aria-expanded="false" aria-controls="field">Search</button>
+  </div>
+  <p class="small" id="count" aria-live="polite">9 of 9 pages shown.</p>
+
+  <ul class="list pages" id="pages" aria-label="Pages">
+    <li data-name="release notes">Release notes</li>
+    <li data-name="notifications">Notifications</li>
+    <li data-name="support">Support</li>
+    <li data-name="extensions">Extensions</li>
+    <li data-name="logs">Logs</li>
+    <li data-name="scenes">Scenes</li>
+    <li data-name="tags">Tags</li>
+    <li data-name="apps">Apps</li>
+    <li data-name="integrations">Integrations</li>
+  </ul>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. The pages listed are not real.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var btn = document.getElementById('search-btn');
+  var field = document.getElementById('field');
+  var input = document.getElementById('q');
+  var count = document.getElementById('count');
+  var items = document.querySelectorAll('#pages li');
+  var title = document.getElementById('page-title');
+  function show(open) {
+    field.hidden = !open;
+    btn.setAttribute('aria-expanded', String(open));
+    title.hidden = open;
+    if (open) input.focus();
+  }
+  function filter() {
+    var typed = input.value.trim();
+    var q = typed.toLowerCase();
+    var n = 0;
+    items.forEach(function (li) {
+      var hit = !q || li.getAttribute('data-name').indexOf(q) !== -1;
+      li.hidden = !hit;
+      if (hit) n++;
+    });
+    if (!q) count.textContent = '9 of 9 pages shown.';
+    else if (n === 0) count.textContent = 'No page matches "' + typed + '".';
+    else count.textContent = n + ' of 9 pages match "' + typed + '".';
+  }
+  btn.addEventListener('click', function () { show(field.hidden); });
+  input.addEventListener('input', filter);
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    input.value = ''; filter(); show(false);
+  });
+})();
+</script>
+</body>
+</html>

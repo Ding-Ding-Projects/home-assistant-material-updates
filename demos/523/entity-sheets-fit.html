@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: entity sheets fit their content</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.kinds { display: flex; flex-wrap: wrap; gap: 8px; }
+.kinds button { min-height: 48px; }
+.kinds button[aria-pressed="true"] { font-weight: 700; outline: 2px solid currentColor; }
+.sheet { width: 100%; max-width: 390px; margin: 0 auto; background: var(--sl1); border-radius: 24px; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.sw { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 56px; }
+.sw input { width: 56px; height: 32px; min-height: 32px; accent-color: var(--p); }
+.lvl { display: flex; gap: 6px; }
+.lvl span { flex: 1; min-height: 44px; border-radius: 10px; background: var(--sl3); display: flex; align-items: center; justify-content: center; font-size: 13px; }
+.lvl span.on { background: var(--p); color: var(--on-p); }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="entity-sheets-fit">
+  <h1>Entity sheets fit their content</h1>
+  <p class="muted">Press a kind of device. The sheet gets only as tall as its controls need.</p>
+
+  <div class="kinds" role="group" aria-label="Kind of device">
+    <button type="button" class="tonal" data-kind="fan" aria-pressed="false">Fan</button>
+    <button type="button" class="tonal" data-kind="valve" aria-pressed="false">Valve</button>
+    <button type="button" class="tonal" data-kind="switch" aria-pressed="true">Switch</button>
+  </div>
+
+  <section class="sheet" aria-label="Pretend entity sheet">
+    <h2 class="small" id="title">Hall light</h2>
+    <div id="body" class="stack"></div>
+  </section>
+
+  <p class="small" id="note" aria-live="polite">A switch gets one compact 56 px switch, and nothing else is shown.</p>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is switched.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var body = document.getElementById('body');
+  var title = document.getElementById('title');
+  var note = document.getElementById('note');
+  var buttons = document.querySelectorAll('[data-kind]');
+  var kinds = {
+    switch: {
+      name: 'Hall light',
+      html: '<label class="sw"><span>Light is on</span><input type="checkbox" checked aria-label="Light is on"></label>',
+      text: 'A switch gets one compact 56 px switch, and nothing else is shown.'
+    },
+    fan: {
+      name: 'Bedroom fan',
+      html: '<div class="lvl" role="group" aria-label="Fan level"><span>1</span><span class="on">2</span><span>3</span><span>4</span></div>',
+      text: 'A fan shows a row of levels, and the chosen level is filled.'
+    },
+    valve: {
+      name: 'Garden valve',
+      html: '<button type="button" class="tonal" id="valve-btn" aria-pressed="false">Open the valve</button>',
+      text: 'A valve shows one large button that says what it will do.'
+    }
+  };
+  function pick(k) {
+    var d = kinds[k];
+    buttons.forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-kind') === k)); });
+    title.textContent = d.name;
+    body.innerHTML = d.html;
+    note.textContent = d.text;
+    var v = document.getElementById('valve-btn');
+    if (v) v.addEventListener('click', function () {
+      var open = v.getAttribute('aria-pressed') !== 'true';
+      v.setAttribute('aria-pressed', String(open));
+      v.textContent = open ? 'Close the valve' : 'Open the valve';
+      note.textContent = open ? 'The valve is open in this pretend sheet.' : 'The valve is closed in this pretend sheet.';
+    });
+  }
+  buttons.forEach(function (b) { b.addEventListener('click', function () { pick(b.getAttribute('data-kind')); }); });
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () { pick('switch'); });
+  pick('switch');
+})();
+</script>
+</body>
+</html>

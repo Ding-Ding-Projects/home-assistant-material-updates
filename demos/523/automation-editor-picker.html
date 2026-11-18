@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: the automation editor finds its event type</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.editor { width: 100%; max-width: 390px; margin: 0 auto; background: var(--sl1); border-radius: 24px; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.kinds { display: flex; flex-wrap: wrap; gap: 8px; }
+.kinds button { min-height: 48px; }
+.kinds button[aria-pressed="true"] { font-weight: 700; outline: 2px solid currentColor; }
+.editor label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.editor input[type="number"] { min-height: 48px; }
+.map { height: 64px; border-radius: 12px; background: var(--sl3); display: flex; align-items: center; justify-content: center; font-size: 13px; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="automation-editor-picker">
+  <h1>The automation editor finds its event type</h1>
+  <p class="muted">Pick an event type. The editor shows the fields that trigger needs.</p>
+
+  <section class="editor" aria-label="Pretend automation trigger">
+    <div class="kinds" role="group" aria-label="Trigger type">
+      <button type="button" class="tonal" data-kind="zone" aria-pressed="false">Zone</button>
+      <button type="button" class="tonal" data-kind="power" aria-pressed="false">Power</button>
+      <button type="button" class="tonal" data-kind="event" aria-pressed="true">Event</button>
+    </div>
+    <p class="small" id="kind-text" aria-live="polite">An event trigger fires when a named event happens, such as a button press.</p>
+    <div id="fields" class="stack"></div>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. No automation is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var buttons = document.querySelectorAll('[data-kind]');
+  var text = document.getElementById('kind-text');
+  var fields = document.getElementById('fields');
+  var kinds = {
+    event: {
+      text: 'An event trigger fires when a named event happens, such as a button press.',
+      html: '<label>Event type <select><option>Button pressed</option><option>Door opened</option><option>Light changed</option></select></label>'
+    },
+    zone: {
+      text: 'A zone trigger fires when something enters or leaves a zone. The zone shows a small map.',
+      html: '<label>Zone <select><option>Home</option><option>Garden</option></select></label><div class="map" aria-label="Pretend zone map">Map of the Home zone</div>'
+    },
+    power: {
+      text: 'A power trigger fires above a threshold. The unit is watts, not milliwatts.',
+      html: '<label>Power above <input type="number" value="1500" min="0" aria-describedby="unit"> <span id="unit">W</span></label>'
+    }
+  };
+  function pick(k) {
+    var d = kinds[k];
+    buttons.forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-kind') === k)); });
+    text.textContent = d.text;
+    fields.innerHTML = d.html;
+  }
+  buttons.forEach(function (b) { b.addEventListener('click', function () { pick(b.getAttribute('data-kind')); }); });
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () { pick('event'); });
+  pick('event');
+})();
+</script>
+</body>
+</html>
