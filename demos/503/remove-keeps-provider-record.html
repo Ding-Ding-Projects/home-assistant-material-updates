@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: remove the cloud host</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="remove-keeps-provider-record">
+  <h1>Remove clears this home, but the address record at the provider may remain</h1>
+  <p class="muted">Press Remove. Read what is cleared here and what may still be kept at the provider.</p>
+
+  <section class="card stack" aria-labelledby="rm-h">
+    <h2 id="rm-h" class="small">Cloud host</h2>
+    <p><span id="rm-badge" class="badge good">Running (pretend)</span></p>
+    <div class="row">
+      <button type="button" class="filled" id="rm-remove">Remove the cloud host</button>
+    </div>
+    <div id="rm-out" class="note" aria-live="polite">Cleared here: the tunnel is stopped and its settings are removed from this home.</div>
+    <p id="rm-kept" class="small muted" hidden>The address record at the provider may remain. Remove it at the provider if you no longer need it.</p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<style>[hidden] { display: none !important; }</style>
+<script>
+(function () {
+  var badge = document.getElementById('rm-badge');
+  var remove = document.getElementById('rm-remove');
+  var out = document.getElementById('rm-out');
+  var kept = document.getElementById('rm-kept');
+
+  function reset() {
+    badge.textContent = 'Running (pretend)';
+    badge.className = 'badge good';
+    out.textContent = 'Cleared here: the tunnel is stopped and its settings are removed from this home.';
+    kept.hidden = true;
+    remove.disabled = false;
+  }
+
+  remove.addEventListener('click', function () {
+    badge.textContent = 'Not set up';
+    badge.className = 'badge';
+    out.textContent = 'Removed here. This page shows Not set up.';
+    kept.hidden = false;
+    remove.disabled = true;
+  });
+  document.querySelector('[data-demo-reset]').addEventListener('click', reset);
+})();
+</script>
+</body>
+</html>

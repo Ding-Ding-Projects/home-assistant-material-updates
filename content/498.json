@@ -1,0 +1,53 @@
+{
+  "build": 498,
+  "headline": "A two-key confirmation on one screen, a go-back line that tells the truth, and eleven fixes",
+  "summary": "Build 498 makes the two-key confirmation fit on one screen. The explanation sits above the keys, so there is no extra Continue step. The line that follows going back to an earlier build now says only what the evidence shows. The queue card shows a calm Checking the update state after a reload, instead of red. Eleven small faults found by clicking through the new features are fixed too, including Escape closing the room setup wizard without losing the draft.",
+  "summary_yue": "498 版令雙鑰匙確認可以喺一個畫面度完成，說明放喺鑰匙上面，所以唔會再多一步「繼續」。返去舊版本之後嗰行提示，而家只講證據支持嘅嘢。重新載入之後，隊列卡會平靜咁顯示「檢查緊更新」，唔會轉紅。今版仲修正咗十一個細問題，都係喺新功能度撳撳下搵到嘅，包括撳 Escape 會閂房間設定精靈，而草稿照留。",
+  "highlights": [
+    {
+      "id": "two-key-one-screen",
+      "title": "The two-key confirmation is one screen, and the go-back line tells the truth",
+      "areas": ["interface"],
+      "what": "A risky change needs a slider turned to the end and two keys pressed, and it now fits on one screen with its explanation above the keys. After going back to an earlier build, the line that follows says the go-back finished only when there is proof, and says nothing when the evidence does not decide it. After a reload, the queue card shows a neutral Checking the update until real data arrives. The backups list also gets a header for its self-check column.",
+      "what_yue": "一樣有風險嘅改動要將滑桿撳到盡，再撳兩粒鑰匙，而家全部喺一個畫面度完成，說明放喺鑰匙上面。返去舊版本之後，嗰行提示只會喺有證據嗰陣先講完成；證據唔夠嘅話就唔出聲。重新載入之後，隊列卡會顯示中性嘅「檢查緊更新」，等到有真數據先判斷。備份清單亦都有咗自我檢查嗰欄嘅標題。",
+      "why": "The old confirmation took two screens, and the line after going back could say an update had not finished when it had.",
+      "try": [
+        "Read the explanation above the keys, then move the slider to the end.",
+        "Press both keys, and see the delete button unlock.",
+        "Move the slider back, and see the keys reset."
+      ],
+      "sha": ["55c0ed5bd"],
+      "demo": "demos/498/two-key-one-screen.html",
+      "more_demos": [
+        {
+          "title": "After going back, the line says only what the evidence shows",
+          "demo": "demos/498/go-back-line.html",
+          "try": ["Press each piece of evidence in turn.", "See which ones say the go-back finished, which one says it did not, and which one says nothing."]
+        },
+        {
+          "title": "After a reload, the queue card says Checking the update, not red",
+          "demo": "demos/498/queue-checking.html",
+          "try": ["Reload onto the new build and see the calm checking state.", "Press Real data arrives and see the card say Done."]
+        }
+      ]
+    },
+    {
+      "id": "eleven-faults-fixed",
+      "title": "Eleven faults found by clicking through the new features are fixed",
+      "areas": ["interface"],
+      "what": "Escape closes the room setup wizard and keeps the draft, and the Start over button stays on one line. The automation sentence no longer repeats its first word. Name fields stay plain until someone types in them. Toasts sit above the editor's bottom bar on a phone. List footers count the rows that are actually shown, and the Updates page shows its title once.",
+      "what_yue": "撳 Escape 會閂房間設定精靈，而草稿照留；「Start over」掣唔會斷行。自動化句子唔會再重複第一個字。名稱欄位未打字之前唔會變紅。手機上面提示訊息會排喺編輯器底部列上面。清單頁尾會數真正顯示緊嘅行數，更新頁亦只會顯示一次標題。",
+      "why": "Each of these was seen broken on a real build and seen fixed on a real build, but each one made the new features look less finished than they were.",
+      "try": [
+        "Open the room setup wizard, type a name, then press Escape.",
+        "Open it again and see the name is still there.",
+        "Press Start over to clear the draft."
+      ],
+      "sha": ["093dccafb"],
+      "demo": "demos/498/room-wizard-escape.html"
+    }
+  ],
+  "other": [
+    { "title": "Record of the polish, the new features and what a real run proved, including the limits that are still open", "sha": ["520ed7588"] }
+  ]
+}

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: list density</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="list-density">
+  <h1>Lists are compact by default, and a density setting makes them roomier</h1>
+  <p class="muted">Choose a density. The rows change height, so more or fewer fit on a phone screen.</p>
+
+  <section class="card stack" aria-labelledby="ld-h">
+    <h2 id="ld-h" class="small">Density</h2>
+    <div class="row" role="group" aria-label="List density">
+      <button type="button" class="chip" data-density="compact" aria-pressed="true">Compact</button>
+      <button type="button" class="chip" data-density="comfortable" aria-pressed="false">Comfortable</button>
+      <button type="button" class="chip" data-density="cosy" aria-pressed="false">Cosy</button>
+    </div>
+    <p id="ld-out" class="small" aria-live="polite">Compact is the default. Press a density to see its row height.</p>
+    <ul class="list" id="ld-list" aria-label="Sample rows">
+      <li class="ld-row"><b>Hall light</b><span class="small muted">On</span></li>
+      <li class="ld-row"><b>Garden sensor</b><span class="small muted">Battery 18 percent</span></li>
+      <li class="ld-row"><b>Front door lock</b><span class="small muted">Locked</span></li>
+      <li class="ld-row"><b>Kitchen plug</b><span class="small muted">Off</span></li>
+    </ul>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<style>
+.ld-row { display: flex; flex-direction: column; justify-content: center; gap: 2px; }
+#ld-list[data-density="compact"] .ld-row { min-height: 52px; }
+#ld-list[data-density="comfortable"] .ld-row { min-height: 60px; }
+#ld-list[data-density="cosy"] .ld-row { min-height: 72px; }
+</style>
+<script>
+(function () {
+  var list = document.getElementById('ld-list');
+  var out = document.getElementById('ld-out');
+  var chips = Array.prototype.slice.call(document.querySelectorAll('[data-density]'));
+  var TEXT = {
+    compact: 'Compact: rows are 52 pixels tall.',
+    comfortable: 'Comfortable: rows are 60 pixels tall.',
+    cosy: 'Cosy: rows are 72 pixels tall.'
+  };
+
+  function choose(key) {
+    list.setAttribute('data-density', key);
+    chips.forEach(function (c) { c.setAttribute('aria-pressed', String(c.getAttribute('data-density') === key)); });
+    out.textContent = TEXT[key];
+  }
+
+  chips.forEach(function (c) {
+    c.addEventListener('click', function () { choose(c.getAttribute('data-density')); });
+  });
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    list.setAttribute('data-density', 'compact');
+    chips.forEach(function (c) { c.setAttribute('aria-pressed', String(c.getAttribute('data-density') === 'compact')); });
+    out.textContent = 'Compact is the default. Press a density to see its row height.';
+  });
+  list.setAttribute('data-density', 'compact');
+})();
+</script>
+</body>
+</html>

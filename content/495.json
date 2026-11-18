@@ -1,0 +1,57 @@
+{
+  "build": 495,
+  "headline": "The update queue stops calling a finished update failed, and new pages for cloud access, backups and offline updates",
+  "summary": "Build 495 fixes a false failure in Update everything. After Core restarts, a step that had finished could still be shown as failed, and that stopped the queue. The room setup wizard now saves when the optional floor and icon are left empty. The same build adds a Cloud host page under Settings, System, a backup self-check that reads each new backup to the end, working demos of the helper kinds, and an offline update pack section on the Updates page.",
+  "summary_yue": "495 版修正「Update everything」嘅假失敗。Core 重新啟動之後，一個已經完成嘅步驟有機會仲被標示為失敗，結果隊列就停晒。房間設定精靈而家可以喺樓層同圖示留空嘅情況下儲存。今版仲加咗設定入面系統度嘅雲端主機頁面、會將每個新備份讀到尾嘅備份自我檢查、輔助項目嘅即場示範，同埋更新頁嘅離線更新包部分。",
+  "highlights": [
+    {
+      "id": "queue-card-heals",
+      "title": "The update queue no longer calls a finished update failed",
+      "areas": ["interface"],
+      "what": "A Core update restarts the device, and the install call is cut off on the way. Before this build, the queue card could then say the update did not happen, while the list said the device was current. Now the card looks at the result. Once the update reaches its target version, a wrong failure is set back to done, even after the page reloads onto the new build. Update everything also asks for the two-key confirmation first.",
+      "what_yue": "更新 Core 會令裝置重新啟動，安裝指令途中會被截斷。以前隊列卡可能因此話更新唔成功，但清單又顯示裝置已經係最新版本。而家卡片會睇結果。更新去到目標版本之後，錯誤嘅失敗會改返做完成，連頁面重新載入去新版本之後都會。「Update everything」亦都要先過雙鑰匙確認。",
+      "why": "A false failure stopped the queue from reaching the steps after it, even though the update itself had finished correctly.",
+      "try": [
+        "Press Start Core update and watch the card show Installing.",
+        "Press Simulate a not-running moment, and see the card say did not update.",
+        "Press Core update is seen at its target, and see the card change to Done."
+      ],
+      "sha": ["9ad470a94"],
+      "demo": "demos/495/queue-card-healing.html"
+    },
+    {
+      "id": "cloud-host-and-backup-checks",
+      "title": "A Cloud host page, a backup self-check, helper demos and an offline update pack",
+      "areas": ["core", "interface"],
+      "what": "The Cloud host page sits under Settings, then System. It states the risk first, then offers one Set up step behind the two-key confirmation, with a live list of five steps. Sign-in happens at the provider in a new tab and is never stored. After a backup, a background check reads the archive to the end, compares it with the record and tries the backup key. The result shows on the backup overview, in the list and on the details page. Making a helper now shows a working demo of its kind, and the USB section of the Updates page lists the parts of an offline pack and says which ones need a network.",
+      "what_yue": "雲端主機頁面喺設定、系統入面。佢先講風險，之後先有一個「設定」掣，要過雙鑰匙確認，仲有一個即時更新嘅五步清單。登入會喺供應商嗰邊開新分頁，唔會儲低。每次備份完之後，背景檢查會將封存讀到尾、同紀錄對一對，再試下備份鑰匙。結果會顯示喺備份總覽、清單同詳情頁。新增輔助項目而家會有一個可以操作嘅示範。更新頁嘅 USB 部分會逐件列出離線更新包嘅部分，並且講清楚邊啲要有網絡先裝到。",
+      "why": "Settings for remote access and backups were hard to trust without a way to see what they did, and an offline pack needed to say which parts it could install.",
+      "try": [
+        "Read the risks on the Cloud host page, then turn the cloud host on and read the steps.",
+        "Open the backup self-check, run it, then tick the box to make one copy disagree and run it again.",
+        "Choose a kind of helper, change its demo, and see its state follow.",
+        "Tick the box that pretends there is no network, then install the offline pack and read which parts installed."
+      ],
+      "sha": ["23c7f5d99"],
+      "demo": "demos/495/cloud-host-steps.html",
+      "more_demos": [
+        {
+          "title": "Backup self-check proves a backup opens, not that a restore would succeed",
+          "demo": "demos/495/backup-self-check.html",
+          "try": ["Run the self-check on the demo backup.", "Tick the box to make one copy disagree, then run it again to see a failed check."]
+        },
+        {
+          "title": "Making a helper shows a working demo of its kind",
+          "demo": "demos/495/helper-demos.html",
+          "try": ["Change the switch, the slider, the counter or the timer.", "See the state follow each change."]
+        },
+        {
+          "title": "An offline update pack installs what it can and says what needs a network",
+          "demo": "demos/495/offline-pack-parts.html",
+          "try": ["Tick the box to pretend there is no network.", "Install the pack and read which parts installed."]
+        }
+      ]
+    }
+  ],
+  "other": []
+}

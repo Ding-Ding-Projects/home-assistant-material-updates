@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: cloud host set up steps</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="cloud-tunnel-sign-in">
+  <h1>Full hosting mode can start the tunnel client, step by step</h1>
+  <p class="muted">Press Set up, then Next step. The provider's sign-in is the only address this page would open, and nothing is stored.</p>
+
+  <section class="card stack" aria-labelledby="ct-h">
+    <h2 id="ct-h" class="small">Cloud host: set up</h2>
+    <p class="note">Read the risks first. Anyone with the provider's sign-in can reach this home from outside.</p>
+    <div class="row">
+      <button type="button" class="filled" id="ct-setup">Set up</button>
+      <button type="button" class="tonal" id="ct-next" disabled>Next step</button>
+    </div>
+    <ol class="list" id="ct-steps" aria-label="Set up steps">
+      <li>Start the provider's sign-in</li>
+      <li>Sign in at the provider in a new tab</li>
+      <li>Create the tunnel</li>
+      <li>Route the address to the tunnel</li>
+      <li>Run the tunnel against Core's internal address</li>
+    </ol>
+    <p id="ct-res" class="note" aria-live="polite">Not set up yet.</p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var setup = document.getElementById('ct-setup');
+  var next = document.getElementById('ct-next');
+  var res = document.getElementById('ct-res');
+  var items = Array.prototype.slice.call(document.querySelectorAll('#ct-steps li'));
+  var step = -1;
+
+  function render() {
+    items.forEach(function (li, i) {
+      li.textContent = (i < step ? 'Done: ' : i === step ? 'Now: ' : 'Waiting: ') + li.getAttribute('data-label');
+      li.style.fontWeight = i === step ? '500' : '400';
+    });
+    setup.disabled = step >= 0;
+    next.disabled = step < 0 || step >= items.length - 1;
+    if (step < 0) res.textContent = 'Not set up yet.';
+    else if (step < items.length - 1) res.textContent = 'Step ' + (step + 1) + ' of ' + items.length + '. This is a pretend run.';
+    else res.textContent = 'The tunnel runs. This is pretend data; the real tunnel was not started.';
+  }
+
+  items.forEach(function (li) { li.setAttribute('data-label', li.textContent); });
+  setup.addEventListener('click', function () { step = 0; render(); });
+  next.addEventListener('click', function () { if (step < items.length - 1) { step += 1; render(); } });
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () { step = -1; render(); });
+  render();
+})();
+</script>
+</body>
+</html>

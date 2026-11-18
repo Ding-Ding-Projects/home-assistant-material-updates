@@ -50,6 +50,7 @@ Rules:
 - A highlight is something a person using the product can see or do: a new page, control, setting,
   behaviour or fix they would notice. Record-keeping, documentation, build and design-file commits
   go to `other`.
+- A highlight may also list `more_demos`: extra working demos for the same feature. Each entry has a `title`, a `demo` path inside that version's `demos/<build>/` folder, and a `try` list. Each extra demo gets its own tab. Use it when one commit shows several demos, because each commit can belong to only one highlight. Every demo file in a version's folder must be named by its content file (`check` reports any that are not).
 - Say only what the commit titles and explanations in the slice support. Do not invent features,
   numbers, screens or settings. If a commit is unclear, describe it only as far as its text goes.
 - Plain words, sentence case, no jargon, no exclamation marks, no "simply" or "just". Write for

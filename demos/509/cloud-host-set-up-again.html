@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: cloud host set up on a fresh instance</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="cloud-host-set-up-again">
+  <h1>Cloud host set up no longer fails when no tunnel exists yet</h1>
+  <p class="muted">Press Set up on this fresh pretend instance. A missing tunnel container counts as stopped, and Remove always ends at Not set up.</p>
+
+  <section class="card stack" aria-labelledby="sa-h">
+    <h2 id="sa-h" class="small">Cloud host</h2>
+    <p><span id="sa-badge" class="badge">Not set up</span></p>
+    <div class="row">
+      <button type="button" class="filled" id="sa-setup">Set up</button>
+      <button type="button" class="tonal" id="sa-remove">Remove</button>
+    </div>
+    <ol class="stack" id="sa-log" aria-live="polite"></ol>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var badge = document.getElementById('sa-badge');
+  var setup = document.getElementById('sa-setup');
+  var remove = document.getElementById('sa-remove');
+  var log = document.getElementById('sa-log');
+  var state = 'none';
+
+  function add(text) {
+    var li = document.createElement('li');
+    li.textContent = text;
+    log.appendChild(li);
+  }
+
+  function render() {
+    if (state === 'none') { badge.textContent = 'Not set up'; badge.className = 'badge'; }
+    if (state === 'waiting') { badge.textContent = 'Waiting for sign-in'; badge.className = 'badge primary'; }
+    setup.disabled = state === 'waiting';
+  }
+
+  setup.addEventListener('click', function () {
+    log.innerHTML = '';
+    add('Clearing any old sign-in container: none found, so it counts as stopped.');
+    add('Starting the provider sign-in. Sign in at the provider in a new tab.');
+    state = 'waiting';
+    render();
+  });
+
+  remove.addEventListener('click', function () {
+    log.innerHTML = '';
+    add('Anything that cannot be cleared is noted briefly, not shown as an error.');
+    state = 'none';
+    render();
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    log.innerHTML = '';
+    state = 'none';
+    render();
+  });
+  render();
+})();
+</script>
+</body>
+</html>

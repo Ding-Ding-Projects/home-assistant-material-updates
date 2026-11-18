@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: two-key confirmation on one screen</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="two-key-one-screen">
+  <h1>The two-key confirmation fits on one screen</h1>
+  <p class="muted">Turn the slider to the end. Then press both keys to unlock the delete button. Moving the slider back clears the keys.</p>
+
+  <section class="card stack" aria-labelledby="tk-h">
+    <h2 id="tk-h" class="small">Delete the kitchen helper?</h2>
+    <p class="note">The explanation sits here, above the keys, on this one screen. Deleting a helper removes it from every automation that uses it.</p>
+    <label class="field" for="tk-sl">Slider: turn it to 100 to unlock the keys</label>
+    <input type="range" id="tk-sl" min="0" max="100" value="0" aria-describedby="tk-note">
+    <p id="tk-note" class="small muted">Slider at 0.</p>
+    <div class="row">
+      <button type="button" class="tonal" id="tk-k1" aria-pressed="false">Key one</button>
+      <button type="button" class="tonal" id="tk-k2" aria-pressed="false">Key two</button>
+    </div>
+    <div class="row">
+      <button type="button" class="filled" id="tk-go" disabled>Delete the helper</button>
+    </div>
+    <p id="tk-res" class="note" aria-live="polite">Nothing has been deleted.</p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var sl = document.getElementById('tk-sl');
+  var note = document.getElementById('tk-note');
+  var k1 = document.getElementById('tk-k1');
+  var k2 = document.getElementById('tk-k2');
+  var go = document.getElementById('tk-go');
+  var res = document.getElementById('tk-res');
+  var pressed1 = false;
+  var pressed2 = false;
+  var deleted = false;
+
+  function render() {
+    var full = Number(sl.value) === 100;
+    note.textContent = full ? 'Slider at 100. The keys are unlocked.' : 'Slider at ' + sl.value + '. Turn it to 100 to unlock the keys.';
+    k1.disabled = deleted;
+    k2.disabled = deleted;
+    k1.setAttribute('aria-pressed', String(pressed1));
+    k2.setAttribute('aria-pressed', String(pressed2));
+    k1.textContent = pressed1 ? 'Key one: pressed' : 'Key one';
+    k2.textContent = pressed2 ? 'Key two: pressed' : 'Key two';
+    go.disabled = !(full && pressed1 && pressed2) || deleted;
+  }
+
+  sl.addEventListener('input', function () {
+    if (Number(sl.value) < 100) { pressed1 = false; pressed2 = false; }
+    render();
+  });
+  function press(which) {
+    if (Number(sl.value) < 100) { note.textContent = 'Turn the slider to 100 first. The keys stay locked until then.'; return; }
+    if (which === 1) pressed1 = !pressed1; else pressed2 = !pressed2;
+    render();
+  }
+  k1.addEventListener('click', function () { press(1); });
+  k2.addEventListener('click', function () { press(2); });
+  go.addEventListener('click', function () {
+    deleted = true;
+    res.textContent = 'The helper is deleted. This is pretend data.';
+    render();
+  });
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    sl.value = 0; pressed1 = false; pressed2 = false; deleted = false;
+    res.textContent = 'Nothing has been deleted.';
+    render();
+  });
+  render();
+})();
+</script>
+</body>
+</html>

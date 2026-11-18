@@ -1,11 +1,12 @@
 // Validates content files, demo pages and the generated site. Exit code 1 when problems are found,
 // unless --warn-only is given.
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join, dirname, resolve, relative, sep } from 'node:path';
 import { ROOT, AREAS, loadChanges, loadContent, walk, shaEq, fileExists, asArray } from './lib.mjs';
 
 const warnOnly = process.argv.includes('--warn-only');
 const problems = [];
+const linkedDemos = new Set(); // demo files named by some content file
 const add = (where, msg) => problems.push(`${where}: ${msg}`);
 
 const data = loadChanges();
@@ -41,6 +42,17 @@ for (const [build, c] of contents) {
     if (!Array.isArray(h.sha) || !h.sha.length) add(where, `${label}: "sha" must be a non-empty list`); else h.sha.forEach((s) => useSha(s, label));
     if (typeof h.demo !== 'string' || !h.demo) add(where, `${label}: "demo" is missing`);
     else if (!fileExists(join(ROOT, h.demo))) add(where, `${label}: demo file ${h.demo} does not exist`);
+    else linkedDemos.add(h.demo);
+    if (h.more_demos !== undefined && !Array.isArray(h.more_demos)) add(where, `${label}: "more_demos" must be a list`);
+    asArray(h.more_demos).forEach((d, k) => {
+      const dl = `${label}, more_demos ${k + 1}`;
+      if (!d || typeof d !== 'object' || typeof d.title !== 'string' || !d.title.trim()) add(where, `${dl}: "title" is missing`);
+      if (!d || typeof d.demo !== 'string' || !d.demo) { add(where, `${dl}: "demo" is missing`); return; }
+      if (!d.demo.startsWith(`demos/${build}/`)) add(where, `${dl}: demo ${d.demo} must sit in demos/${build}/`);
+      if (!fileExists(join(ROOT, d.demo))) add(where, `${dl}: demo file ${d.demo} does not exist`);
+      else linkedDemos.add(d.demo);
+      if (d.try !== undefined && (!Array.isArray(d.try) || !d.try.length)) add(where, `${dl}: "try" must be a non-empty list`);
+    });
   });
   asArray(c.other).forEach((o, i) => {
     const label = `other ${i + 1}`;
@@ -50,6 +62,16 @@ for (const [build, c] of contents) {
   if (Array.isArray(c.highlights) && c.highlights.length === 0 && !(typeof c.no_feature_note === 'string' && c.no_feature_note.trim())) add(where, '"no_feature_note" is required when there are no highlights');
   if (Array.isArray(c.highlights) && c.highlights.length === 0 && existsSync(join(ROOT, 'demos', String(build)))) add(where, `version has no highlights but demos/${build}/ exists`);
   for (const ch of rel.changes) if (!used.has(ch.sha)) add(where, `commit ${ch.sha} ("${ch.title.slice(0, 50)}") is not used in highlights or other`);
+}
+
+// Every demo of a version that has content must be linked from that content.
+for (const build of contents.keys()) {
+  const dir = join(ROOT, "demos", String(build));
+  if (!existsSync(dir)) continue;
+  for (const f of readdirSync(dir).filter((n) => n.endsWith(".html"))) {
+    const rel2 = `demos/${build}/${f}`;
+    if (!linkedDemos.has(rel2)) add(rel2, "not linked from content/" + build + ".json");
+  }
 }
 
 // ---------- Demo pages ----------

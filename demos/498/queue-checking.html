@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: queue card while checking</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="queue-checking">
+  <h1>After a reload, the queue card says Checking the update, not red</h1>
+  <p class="muted">Reload the page onto the new build. The card waits calmly until real data arrives, then shows the result.</p>
+
+  <section class="card stack" aria-labelledby="qk-h">
+    <h2 id="qk-h" class="small">Update everything: Core step</h2>
+    <p><span id="qk-badge" class="badge">Not started</span></p>
+    <p id="qk-msg" class="note" aria-live="polite">The queue has not started.</p>
+    <div class="row">
+      <button type="button" class="filled" id="qk-reload">Reload onto the new build</button>
+      <button type="button" class="tonal" id="qk-data" disabled>Real data arrives</button>
+    </div>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var badge = document.getElementById('qk-badge');
+  var msg = document.getElementById('qk-msg');
+  var reload = document.getElementById('qk-reload');
+  var data = document.getElementById('qk-data');
+  var phase = 'idle';
+  var MAP = {
+    idle: ['Not started', 'The queue has not started.', ''],
+    checking: ['Checking the update', 'Waiting for real data. Nothing is wrong yet.', ''],
+    done: ['Done', 'The Core update is installed. The queue carries on.', 'good']
+  };
+
+  function render() {
+    badge.textContent = MAP[phase][0];
+    badge.className = 'badge' + (MAP[phase][2] ? ' ' + MAP[phase][2] : '');
+    msg.textContent = MAP[phase][1];
+    reload.disabled = phase !== 'idle';
+    data.disabled = phase !== 'checking';
+  }
+
+  reload.addEventListener('click', function () { phase = 'checking'; render(); });
+  data.addEventListener('click', function () { phase = 'done'; render(); });
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () { phase = 'idle'; render(); });
+  render();
+})();
+</script>
+</body>
+</html>

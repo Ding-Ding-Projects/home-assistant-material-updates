@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: room wizard closes with Escape and keeps the draft</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>[hidden] { display: none !important; }</style>
+</head>
+<body>
+<main class="demo" data-demo="room-wizard-escape">
+  <h1>Escape closes the room setup wizard and keeps the draft</h1>
+  <p class="muted">Open the wizard, type a room name, then press Escape. Open it again and the name is still there.</p>
+
+  <section class="card stack" aria-labelledby="rw-h">
+    <h2 id="rw-h" class="small">Room setup</h2>
+    <div class="row">
+      <button type="button" class="filled" id="rw-open" aria-expanded="false" aria-controls="rw-dialog">Open the room wizard</button>
+      <button type="button" class="tonal" id="rw-over">Start over</button>
+    </div>
+    <div id="rw-dialog" class="card stack" role="dialog" aria-modal="false" aria-labelledby="rw-dh" hidden>
+      <h3 id="rw-dh" class="small">Step 1 of 2: name the room</h3>
+      <label class="field" for="rw-name">Room name</label>
+      <input type="text" id="rw-name" autocomplete="off">
+      <div class="row">
+        <button type="button" class="tonal" id="rw-close">Close</button>
+      </div>
+    </div>
+    <p id="rw-res" class="small" aria-live="polite">No room yet.</p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var open = document.getElementById('rw-open');
+  var over = document.getElementById('rw-over');
+  var dialog = document.getElementById('rw-dialog');
+  var name = document.getElementById('rw-name');
+  var close = document.getElementById('rw-close');
+  var res = document.getElementById('rw-res');
+  var draft = '';
+
+  function show(on) {
+    dialog.hidden = !on;
+    open.setAttribute('aria-expanded', String(on));
+    if (on) { name.value = draft; name.focus(); } else { open.focus(); }
+  }
+
+  function closeKeepDraft() {
+    if (!dialog.hidden) { draft = name.value; show(false); res.textContent = 'Closed. The draft is kept.'; }
+  }
+
+  open.addEventListener('click', function () { show(true); });
+  close.addEventListener('click', closeKeepDraft);
+  dialog.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { e.preventDefault(); closeKeepDraft(); }
+  });
+  over.addEventListener('click', function () {
+    draft = ''; res.textContent = 'Start over: the draft is cleared.';
+    if (!dialog.hidden) name.value = '';
+  });
+  name.addEventListener('input', function () { draft = name.value; });
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    draft = ''; name.value = ''; show(false); res.textContent = 'No room yet.';
+  });
+})();
+</script>
+</body>
+</html>

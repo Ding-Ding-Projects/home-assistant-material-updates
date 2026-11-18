@@ -1,0 +1,66 @@
+{
+  "build": 509,
+  "headline": "A visual editor for every kind of entity, a phone sizing pass, automatic update switches, a Cloud host fix and an Updates page fix",
+  "summary": "Build 509 gives every kind of entity a visual editor, with a colour picker for colours and a duration picker for time spans. Lists are compact by default, with a density setting for Compact, Comfortable or Cosy. The interface is sized for a phone. It also adds three switches for automatic updates of Core, the Supervisor and the operating system, all off until turned on. The switches do not save yet in this build, and that is fixed in the next build. Set up and Remove on the Cloud host page no longer fail when no tunnel container exists yet (a real sign-in has not been run yet), and the Updates page no longer sits on a blank spinner after an update.",
+  "summary_yue": "509 版為每一種實體都提供視覺編輯器，顏色用顏色選擇器，時長用時長選擇器。清單預設係精簡嘅，個人設定可以揀精簡、寬鬆或者緊湊。介面按手機尺寸整過。今版亦加咗三個開關，分別係 Core、Supervisor 同作業系統嘅自動更新，三個預設都係關閉。喺呢版呢三個開關仲未能儲存，會喺下一版修正。雲端主機嘅「設定」同「移除」喺未有隧道容器時唔會再失敗（真正登入仲未試過），更新之後更新頁亦唔會再卡喺空白轉圈。",
+  "highlights": [
+    {
+      "id": "rich-entity-editors",
+      "title": "A visual editor for every kind of entity, list density, and automatic update switches",
+      "areas": ["core", "interface"],
+      "what": "Every entity kind now has a visual editor made for it: 62 domains and 247 actions, where earlier there were 28 domains. The kind of value decides the control. A colour uses a colour wheel, a duration uses a duration picker, and a long list uses a searchable list box. Controls a device cannot act on are not drawn. Lists are compact by default, and the personal settings have a List density choice of Compact, Comfortable or Cosy. Three switches turn on automatic updates for Core, the Supervisor and the operating system. Each switch starts off and is turned on behind the two-key confirmation. The work runs in a time window (03:00 to 05:00 by default) after a wait of 0 to 14 days, with a backup first. USB install, USB recovery and going back to an earlier build stay manual. In this build the switches do not save yet.",
+      "what_yue": "而家每一種實體都有度身訂造嘅視覺編輯器，由之前嘅 28 個網域增加到 62 個網域同 247 個動作。數值係乜類型就用乜控制：顏色用色輪，時長用時長選擇器，長清單用可搜尋嘅清單框。裝置做唔到嘅控制唔會畫出嚟。清單預設係精簡，個人設定入面有「清單密度」，可以揀精簡、寬鬆或者緊湊。三個開關分別控制 Core、Supervisor 同作業系統嘅自動更新，三個預設都係關閉，開啟要過雙鑰匙確認。更新會喺時間窗（預設 03:00 至 05:00）之內，等過 0 至 14 日之後先做，做之前會先備份。USB 安裝、USB 復原同返去舊版本仍然要人手做。喺呢版，呢三個開關仲未能儲存。",
+      "why": "Editing most actions meant typing into a code box, and the old lists and dialogs were too large for a phone.",
+      "try": [
+        "Choose a colour and a fade time in the light action demo, and read the summary line.",
+        "Change the list density, and see the rows grow or shrink.",
+        "Turn a switch on, change the wait in days, and read when the update would run."
+      ],
+      "sha": ["a1312548c"],
+      "demo": "demos/509/colour-and-duration-editors.html",
+      "more_demos": [
+        {
+          "title": "Lists are compact by default, and a density setting makes them roomier",
+          "demo": "demos/509/list-density.html",
+          "try": ["Press Comfortable, then Cosy.", "See the row height change each time."]
+        },
+        {
+          "title": "Automatic updates start off, and each one is switched on by hand",
+          "demo": "demos/509/auto-update-switches.html",
+          "try": ["Switch on one or more parts.", "Read the order and the wait in the summary line. Note that the switches do not save yet in this build."]
+        }
+      ]
+    },
+    {
+      "id": "cloud-host-set-up-again",
+      "title": "Cloud host set up no longer fails when no tunnel exists yet",
+      "areas": ["supervisor"],
+      "what": "On a fresh instance there is no tunnel container yet, so Set up failed after five seconds with a could not stop the tunnel message. A missing container now counts as stopped. Remove always ends at Not set up, and anything it cannot clean up is noted in a short line instead of shown as an error. Resuming after an error before sign-in starts the sign-in again. A real sign-in and tunnel have not been run yet.",
+      "what_yue": "全新嘅機未有隧道容器，所以「設定」五秒內就失敗，並且顯示「停唔到隧道」。而家唔存在嘅容器當作已經停咗。「移除」一定會返去「未設定」，清唔到嘅嘢會用一句短說明交代，唔會當作錯誤。登入之前出錯嘅話，「繼續」會重新開始登入。",
+      "why": "A check that treated a missing container as an error made the whole one-click path impossible on a new home.",
+      "try": [
+        "Press Set up on this fresh pretend instance.",
+        "Read the first log line: no old container, so it counts as stopped.",
+        "Press Remove and see the page return to Not set up."
+      ],
+      "sha": ["bd80ca4bb"],
+      "demo": "demos/509/cloud-host-set-up-again.html"
+    },
+    {
+      "id": "updates-page-after-update",
+      "title": "The Updates page no longer sits on a blank spinner after an update",
+      "areas": ["interface"],
+      "what": "After an update reloads the Updates page onto the new build, the page used to wait for a backup status message that does not arrive while the system is starting. It now shows itself after two seconds at most. Each block loads on its own, times out, and retries when the connection returns. A queue that has just finished is kept for an hour, so Updates finished survives the reload. Across the phone pass, toolbar buttons are 44 to 48 pixels, and the tiny labels on 129 pages are gone.",
+      "what_yue": "更新完成、頁面重新載入去新版本之後，更新頁以前會等一個啟動期間唔會嚟嘅備份狀態訊息。而家最多等兩秒就會顯示頁面；每一塊自己載入、有時限，連線返嚟會重試。啱啱完成嘅隊列會保留一個鐘，等「更新完成」唔會跟住重新載入一齊消失。手機上面工具掣由 40 px 變做 44 至 48 px，129 頁嘅細字標籤亦都冇咗。",
+      "why": "After an update, the page could show a spinner that never ended, which made a successful update look stuck.",
+      "try": [
+        "Press Open the Updates page and watch the page appear within two seconds.",
+        "Read the backup block, which still says it is loading.",
+        "Press Retry the backup status to see that block answer."
+      ],
+      "sha": ["465bb72ba"],
+      "demo": "demos/509/updates-page-timeout.html"
+    }
+  ],
+  "other": []
+}

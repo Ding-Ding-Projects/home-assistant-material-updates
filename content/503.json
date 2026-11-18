@@ -1,0 +1,48 @@
+{
+  "build": 503,
+  "headline": "Full hosting mode can run the tunnel client, and the Cloud host page shows the proxy lines to add",
+  "summary": "Build 503 lets the Supervisor run the tunnel client for full hosting mode, so Set up can start the provider's own sign-in and then create the tunnel. Once the tunnel runs, the Cloud host page shows the exact proxy lines to add, with a Copy button. Home Assistant still has to be restarted by hand, and the page does not edit the configuration. Set up did not work in a real run, because a missing tunnel container was treated as an error. That is fixed in build 509, so Set up does not work on this build.",
+  "summary_yue": "503 版俾 Supervisor 運行隧道程式，完整託管模式嘅「設定」而家可以啟動供應商自己嘅登入，登入之後先建立隧道。隧道運行緊嘅時候，雲端主機頁面會顯示要加入嘅代理設定，有複製掣。Home Assistant 仍然要人手重新啟動，頁面亦唔會改設定。真機運行時「設定」失敗，原因係隧道容器未存在時被當作錯誤；呢個問題已經喺 509 版修正，所以呢版嘅「設定」唔會成功。",
+  "highlights": [
+    {
+      "id": "cloud-tunnel-runner",
+      "title": "Full hosting mode can start the tunnel client, not only explain it",
+      "areas": ["supervisor"],
+      "what": "Until this build, the Cloud host page could only explain full hosting mode, because nothing started the tunnel. The Supervisor now runs the tunnel client as a managed container with a pinned official image and no published ports. Set up starts the provider's own sign-in, shows only the sign-in address, and refuses any address that is not on the provider's login domain. After sign-in, the tunnel is created and runs against Core's internal address. Errors are short fixed reasons. Set up did not work in a real run and is fixed in build 509.",
+      "what_yue": "直到呢版之前，雲端主機頁面淨係可以解釋完整託管模式，因為冇嘢會真係啟動隧道。而家 Supervisor 會以一個鎖定版本嘅官方映像運行隧道程式，唔開任何連接埠。「設定」會啟動供應商自己嘅登入，淨係顯示登入網址，唔係供應商登入網域嘅網址一律拒絕。登入完成之後先會建立隧道，並且對住 Core 嘅內部位址運行。真機運行時「設定」失敗，已經喺 509 版修正。",
+      "why": "A page that promised remote access in one click had no working part behind the button.",
+      "try": [
+        "Read the risk note at the top of the Cloud host page.",
+        "Press Set up, then Next step to move through the five steps.",
+        "See that sign-in happens at the provider, and nothing is stored here."
+      ],
+      "sha": ["fc18b0d04"],
+      "demo": "demos/503/cloud-tunnel-sign-in.html"
+    },
+    {
+      "id": "proxy-lines-to-add",
+      "title": "The Cloud host page shows the exact proxy lines to add",
+      "areas": ["interface"],
+      "what": "While the tunnel runs, the page shows the three lines to add to the Home Assistant configuration, with a Copy button and a plain sentence that Home Assistant must be restarted. The page does not edit the configuration itself. The sign-in step now says what really happens: sign in at the provider and the page moves on by itself. Remove says that the address record at the provider may remain.",
+      "what_yue": "隧道運行緊嗰陣，頁面會顯示要加入 Home Assistant 設定嘅三行字，有複製掣，同埋一句講明要重新啟動 Home Assistant 嘅說明。頁面唔會自己改設定。登入嗰一步而家講明真正會發生乜嘢：喺供應商度登入之後，頁面會自己行落去。移除就會講明供應商嗰邊嘅位址紀錄可能仲喺度。",
+      "why": "The old page waved vaguely at a tunnel address, which left the owner to work out the lines alone.",
+      "try": [
+        "Press Start the tunnel and read the three lines that appear.",
+        "Press Copy the lines and read the restart note under them.",
+        "Press Stop the tunnel and see the lines go away."
+      ],
+      "sha": ["e0034b7c4"],
+      "demo": "demos/503/proxy-lines-copy.html",
+      "more_demos": [
+        {
+          "title": "Remove clears this home, but the address record at the provider may remain",
+          "demo": "demos/503/remove-keeps-provider-record.html",
+          "try": ["Press Remove the cloud host.", "Read what is cleared here, and what may still be kept at the provider."]
+        }
+      ]
+    }
+  ],
+  "other": [
+    { "title": "Design canvas 36: references for the rich editors, with no product page changed", "sha": ["ba18c19f9"] }
+  ]
+}

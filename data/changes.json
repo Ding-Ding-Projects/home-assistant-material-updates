@@ -1,9 +1,223 @@
 {
  "format": 1,
- "generated": "2026-11-17T14:47:07Z",
+ "generated": "2026-11-17T23:05:52Z",
  "repository": "Ding-Ding-Projects/home-assistant-material",
- "newest_build": 495,
+ "newest_build": 517,
  "releases": [
+  {
+   "build": 512,
+   "core": "2026.11.1.512",
+   "supervisor": "2026.11.0.512",
+   "os": "18.5.512",
+   "tag": "v2026.11.1.512",
+   "source": "a6886fe92",
+   "date": "2026-11-17T15:16:45-05:00",
+   "previous_build": 509,
+   "changes": [
+    {
+     "sha": "a6886fe92",
+     "date": "2026-11-17T15:16:45-05:00",
+     "title": "Automatic system updates: the switch that could not be switched",
+     "areas": [
+      "interface"
+     ],
+     "detail": "A real run on build 509 found that turning on any of the three automatic system update switches asked for the two keys, looked on, and then failed to save: the server was sent a list-like object instead of the word \"core\". The switch carried its name in a property called `part`, which every element already owns (it is the list of shadow parts), so the browser handed back that list. Nothing was saved, so nothing could update by itself; it failed closed.\n\nThe property is now `systemPart`. The time control in the more-info dialog used the same name for its hour and minute buttons and gets the same fix (`timePart`).\n\nChecks: types at the two known gallery errors, 8504 tests pass with the three known build-script failures. Not yet seen saving on a real build.",
+     "detail_yue": "系統自動更新：開唔到嘅開關\n\n喺 509 版本真實行一次先發現：三個系統自動更新開關，開任何一個都 會問兩條鎖匙、睇落開咗，跟住儲存失敗：伺服器收到嘅唔係「core」 呢個字，而係一個似清單嘅物件。開關將自己個名放喺一個叫 `part` 嘅屬性度，但每個元素本身已經有呢個屬性（即係陰影部件清單），所以 瀏覽器交返嗰張清單出嚟。因為乜都冇儲存到，所以乜都唔會自己更新； 係安全咁失敗。\n\n屬性而家叫 `systemPart`。詳細資料對話框入面嘅時間控制，小時同分鐘 掣用咗同一個名，一齊改成 `timePart`。\n\n檢查：型別維持兩個已知錯誤，8504 個測試通過（三個已知失敗）。 未喺真實版本上面睇過成功儲存。"
+    },
+    {
+     "sha": "6b6ac0e92",
+     "date": "2026-11-17T14:51:11-05:00",
+     "title": "Scrolling: stop restyling every row each time one row arrives",
+     "areas": [
+      "interface"
+     ],
+     "detail": "A long list on a phone was doing two kinds of busywork per scroll step.\n\n- Three selector shapes in the data table (a sibling selector for the row divider, nth-child for the entry stagger, and :has() for group headers) made the browser restyle every rendered row whenever the virtualizer added or removed one. They are now plain attribute and class selectors. Elements restyled per scroll on a 1500-row list fell from 4015 to 1344. - Every checkbox re-applied its six validity states on every update, changed or not, and each call asked for a restyle. With a checkbox in every row this was about 340 ms of roughly 800 ms of script time in the profile. The states are now applied only when they differ.\n\nMeasured at 390 px with the processor slowed four times, on lists stressed with 1500 and 200 injected rows: style time roughly halved, main-thread cost of a fixed scroll down 26% on Entities and 16% on Automations. The share of slow frames only moved from about 18% to about 16%, so this is a real but modest gain; the rest is the per-row cost of icons and custom elements. Not measured: Devices, dashboards, Logbook (too little data in the check config), touch gestures, and a real phone.\n\nChecks",
+     "detail_yue": "捲動：唔好再為咗一行入嚟就成版行重新計樣式\n\n手機上面一條長清單，每捲一步都做緊兩種無謂功夫。\n\n- 資料表有三種選擇器寫法（行分隔線用兄弟選擇器、入場錯開用 nth-child、分組標題用 :has()），搞到虛擬清單每加一行或者減一行， 瀏覽器就要將所有已畫嘅行重新計樣式。而家改用普通屬性同類別 選擇器。1500 行清單每次捲動要重計嘅元素由 4015 個減到 1344 個。 - 每個剔格每次更新都重新套用六個驗證狀態，有冇變都照做，每次都 叫瀏覽器重計樣式。每行一個剔格，喺效能紀錄入面大約 800 毫秒 程式時間佔咗 340。而家只喺狀態真係唔同先套用。\n\n喺 390 像素、處理器拖慢四倍、清單塞入 1500 同 200 行嘅情況下量度： 樣式時間大約減半，固定捲動嘅主線程成本實體清單減 26%、自動化清單 減 16%。慢格比例只係由大約 18% 跌到 16%，所以係真改善但唔算大； 剩低嘅係每行圖示同自訂元素嘅成本。未量度：裝置、儀表板、日誌 （檢查設定資料太少）、觸控手勢、真手機。\n\n檢查：型別維持兩個已知錯誤，8504 個測試通過（三個已知失敗）。"
+    },
+    {
+     "sha": "e27b2bff8",
+     "date": "2026-11-17T13:51:56-05:00",
+     "title": "Handoff: the afternoon nobody wrote down until now",
+     "areas": [
+      "docs"
+     ],
+     "detail": "The handoff still believed build 495 was the newest thing in the house. It now records 498 on the home instance, why 503 stayed on the shelf (Cloud host tripped over a container that was not there), what is waiting to be built, the owner's decision to allow automatic system updates, the phone sizing rule, the scroll measurements so far, and the list of things nobody has watched happen for real.",
+     "detail_yue": "交接文件：補返成個下晝冇人記低嘅嘢\n\n交接文件仲以為 495 係屋企最新嗰個版本。而家寫返清楚：屋企用緊 498；503 點解留喺架上（雲端主機畀一個根本唔存在嘅容器絆親）； 有乜嘢等緊建置；屋主決定容許系統自動更新；手機尺寸規則；到目前 為止嘅捲動量度；同埋仲未有人親眼睇過發生嘅事項。"
+    },
+    {
+     "sha": "a7f6196c6",
+     "date": "2026-11-17T13:48:47-05:00",
+     "title": "Calmer editors, tidier pages, motion for real moments, first scroll fixes",
+     "areas": [
+      "interface"
+     ],
+     "detail": "Scrolling - Measured on a phone-sized window with the processor slowed four times. On the Entities list one function re-measured every group header on every frame; it now reads positions it already has. The problem-badge overlay stops doing any work during a scroll when there are no badges. Worst frame on Entities 100 to 67 ms, on Devices 117 to 50 ms. The share of slow frames on those two lists did not move: the remaining cost is the list's own per-step work, which is the next job.\n\nEditors - Simple / Advanced / YAML is one pill control under the title on a phone. The top row of add buttons is gone; the dashed add buttons inside each numbered block already did the same thing. - Search is an icon that opens the field. Step rows are tonal, rounded and six pixels apart. The six starter tiles of an empty automation fit on one phone screen instead of hiding in a sideways strip. - The scene editor has the same numbered blocks and compact rows.\n\nPages - Home information groups its fields in tonal cards with the info and reset buttons beside their field. Network cards are tonal blocks. Areas on a phone are compact rows, and the area page has a shorter hero.\n\nMotion, only where something h",
+     "detail_yue": "編輯器收斂啲、頁面企理啲、真有事先郁、捲動先修第一批\n\n捲動 - 喺手機大細視窗、將處理器拖慢四倍嚟量度。實體清單有個函數每一格 畫面都重新量度每個分組標題，而家改用佢本身已經有嘅位置。冇問題 徽章嗰陣，覆蓋層捲動期間乜都唔做。實體清單最差一格由 100 毫秒 減到 67，裝置清單由 117 減到 50。但呢兩個清單慢格嘅比例冇變： 剩低嘅成本係清單本身每一步嘅工作，係下一樣要做嘅嘢。\n\n編輯器 - 「簡單／進階／YAML」喺手機變成標題下面一條藥丸控制。頂部嗰行 新增掣拎走咗；每個編號方塊入面嘅虛線新增掣本身做緊同一樣嘢。 - 搜尋變成一粒圖示，撳咗先開欄位。步驟行有色塊、圓角、相隔六像素。 空白自動化嘅六塊入門磚一個手機畫面睇晒，唔使橫向捲。 - 場景編輯器用返同一套編號方塊同精簡行。\n\n頁面 - 屋企資料將欄位分組放入色塊卡，說明同重設掣跟返自己個欄位。網絡 卡變成色塊。手機上面分區係精簡行，分區頁個頭圖矮咗。\n\n真有事先郁 - 刪除步驟會收合，下面啲步驟補上。手機上面儲存會出一下畫出嚟嘅 剔號。更新隊列有個會填滿嘅圈，完成閃一下，失敗震一下。全部跟 動態偏好，減少動態時唔郁。\n\n未喺瀏覽器驗證：行編輯面板新頭部、儲存剔號、隊列個圈。檢查： 型別維持兩個已知錯誤，8504 個測試通過（三個已知失敗）。"
+    }
+   ]
+  },
+  {
+   "build": 509,
+   "core": "2026.11.1.509",
+   "supervisor": "2026.11.0.509",
+   "os": "18.5.509",
+   "tag": "v2026.11.1.509",
+   "source": "465bb72ba",
+   "date": "2026-11-17T13:12:32-05:00",
+   "previous_build": 503,
+   "changes": [
+    {
+     "sha": "465bb72ba",
+     "date": "2026-11-17T13:12:32-05:00",
+     "title": "Phone sweep: no more blank Updates page after an update, and smaller everything",
+     "areas": [
+      "interface"
+     ],
+     "detail": "Found by real runs - After an update reloaded the Updates page onto the new build, the page sat on a blank spinner: it waited for a backup status message that does not come while the system is still starting, and the Supervisor call beside it had no time limit. The page now shows itself after two seconds at most; each block loads on its own, times out, and retries when the connection returns. A queue that has just finished is kept for an hour so \"Updates finished\" survives the reload instead of vanishing with it.\n\nKnown leftovers, each seen fixed at 390 px - The Updates page says \"Updates\" once. - An action, trigger or condition editor opens nearly full height on a phone instead of in the bottom half. - The Check result in the editor is a line, not a tall empty block. - The Media page keeps search and its menu in the top bar on a phone; Upload moved into the menu. - List pages on a phone have one header row: back, title, search, menu.\n\nFrom opening all 143 pages at 390 px in dark and light - Toolbar buttons that were 40 px are 44 to 48 px on 118 more pages; the tiny 10 px labels and badges are gone from 129 pages. - Settings: the Review and Fix buttons are no longer cut at the righ",
+     "detail_yue": "手機巡查：更新之後更新頁唔再空白，樣樣都細返啲\n\n真機運行搵到嘅 - 更新完重新載入去新版本之後，更新頁淨係得個空白轉圈：佢等緊一個 系統啟動期間唔會嚟嘅備份狀態訊息，隔籬嗰個 Supervisor 呼叫又冇 時限。而家最多等兩秒就顯示頁面；每一塊自己載入、有時限、連線返嚟 會重試。啱啱完成嘅隊列會保留一個鐘，等「更新完成」唔會跟住重新 載入一齊消失。\n\n已知未完成嘅，全部喺 390 px 見到修好 - 更新頁個「更新」得返一個。 - 手機上面動作、觸發同條件嘅編輯器差唔多全高打開，唔再縮喺下半。 - 編輯器嘅「檢查」結果係一行字，唔再係一大嚿空白。 - 媒體頁手機頂欄留返搜尋同選單，「上載」搬入選單。 - 手機清單頁頭得一行：返回、標題、搜尋、選單。\n\n將 143 頁全部喺 390 px、光暗兩款打開一次之後 - 多咗 118 頁嘅工具掣由 40 px 變成 44 至 48 px；129 頁嗰啲 10 px 細字同徽章冇晒。 - 設定頁：「檢視」同「修正」掣唔再喺右邊斬咗。 - 輔助項目：「建立輔助項目」卡顯示三種，其餘收入「睇晒」。媒體磚 矮咗，兩個一行。\n\n留返下一輪，老實講：編輯器自己嘅切換掣、搜尋框同新增掣仲係原廠樣； 屋企資料、網絡同分區嘅卡都係；今輪冇加新動畫。\n\n檢查：型別維持兩個已知錯誤，8504 個測試通過（三個已知失敗）。 轉圈嘅修正用瀏覽器扣起同拒絕呼叫嚟證實，另外有單元測試，但未經 真正重啟驗證。"
+    },
+    {
+     "sha": "bd80ca4bb",
+     "date": "2026-11-17T12:56:48-05:00",
+     "title": "Cloud host: a container that is not there counts as stopped",
+     "areas": [
+      "docs",
+      "supervisor"
+     ],
+     "detail": "The first real run of the tunnel runner failed in five seconds. Set up begins by clearing away any old sign-in container; on a fresh instance there is none, the stop raised \"not found\", and a handler one line too early turned that into \"could not stop the tunnel\" before the code meant to ignore it ever saw it. Remove hit the same wall, so the error could not be cleared from the page. The test stand-in had been too polite to raise it.\n\nNow a missing container counts as stopped. Remove always ends in \"not set up\" and reports anything it could not clean as a short note instead of an error. Resume from an error before sign-in starts the sign-in again. The stand-in raises what the real interface raises, and a test replays the exact sequence from the real run.\n\nChecks: 87 tests pass in a Linux container. Still not run by anyone: a real sign-in, tunnel creation, the DNS route, reachability from outside.",
+     "detail_yue": "雲端主機：唔存在嘅容器當作已經停咗\n\n隧道執行器第一次真機運行五秒就失敗。「設定」一開始會清走舊嘅登入 容器；全新嘅機冇呢個容器，停止嗰下掟出「搵唔到」，而早咗一行嘅 處理將佢變成「停唔到隧道」，本來打算忽略佢嗰段程式連見都未見過。 「移除」撞正同一幅牆，所以個錯誤喺頁面度清唔走。測試替身之前太 客氣，冇掟呢個錯誤出嚟。\n\n而家唔存在嘅容器當作已停。「移除」一定會返去「未設定」，清唔到 嘅嘢用一句短註解交代，唔係當錯誤。登入之前出錯嘅話，「繼續」會 重新開始登入。替身而家會掟返真介面會掟嘅錯誤，仲有個測試照住 真機嘅次序重演一次。\n\n檢查：Linux 容器入面 87 個測試通過。仍然冇人行過：真正登入、 建立隧道、DNS 指向、由外面連入嚟。"
+    },
+    {
+     "sha": "a1312548c",
+     "date": "2026-11-17T12:02:39-05:00",
+     "title": "Rich editors for every entity, phone-sized interface, automatic system updates",
+     "areas": [
+      "core",
+      "interface"
+     ],
+     "detail": "Every entity kind has a visual editor - 62 of 62 domains and 247 of 247 actions now have an editor made for them; it was 28 domains. The Speak action, which used to offer two empty boxes and a dictionary with nothing in it, has speaker tiles, a counted message with insert chips, the engine's own languages and options, and a test button that only fires when pressed and says it really speaks. - The kind of value decides the control: a colour uses the colour wheel, white temperature the gradient slider, a duration the duration picker, a long list a searchable list box. Controls a device cannot act on are not drawn. - Three tests hold the line: one fails when a domain or action has no editor, one when a colour, time, duration, icon or entity is drawn by the wrong control, one when the list drifts from the real action definitions.\n\nSized for a phone - The first pass at modern read as large. On a narrow screen titles are now about 22 px, numerals 32 to 40 px, tiles short and two across, pills 48 px, with tighter padding; wide windows keep their look. - List rows are compact by default (52 to 60 px) with a \"List density\" choice in Personal settings: Compact, Comfortable or Cosy. - A rule ",
+     "detail_yue": "每種實體都有豐富編輯器、手機尺寸嘅介面、系統自動更新\n\n每種實體都有視覺編輯器 - 62 個網域同 247 個動作全部有度身訂造嘅編輯器，之前得 28 個網域。 「朗讀」以前係兩格空白加一個空字典，而家有喇叭磚、有字數嘅訊息同 插入掣、引擎自己嘅語言同選項，仲有一粒撳咗先會行、講明「真係會 讀出嚟」嘅測試掣。 - 數值類型決定控制：顏色用色輪，色溫用漸變滑桿，時長用時長選擇器， 長清單用可搜尋嘅清單框。裝置做唔到嘅控制唔會畫出嚟。 - 三個測試守住：有網域或者動作冇編輯器就紅燈；顏色、時間、時長、 圖示、實體用錯控制就紅燈；清單同真實動作定義對唔上都紅燈。\n\n為手機而設嘅尺寸 - 第一輪「現代化」做到變咗「好大」。而家窄螢幕上面標題約 22 px， 數字 32 至 40 px，磚矮咗兼兩個一行，藥丸掣 48 px，留白收窄； 闊螢幕維持原樣。 - 清單行預設精簡（52 至 60 px），個人設定多咗「清單密度」：精簡、 寬鬆或者緊湊。 - 設定頁磚嘅手機規則之前因為喺樣式表嘅位置而冇生效，而家生效。\n\n更多頁面翻新 - 大約 55 個設定頁共用嘅卡片、設定行、展開面板同表格版面：標題粗啲 兼識換行、每行係色塊磚、說明文字唔細過 13 px。 - 頂層頁面（活動、歷史、媒體、地圖等）用返共用頁首；活動同歷史嘅 摺疊篩選欄變成一行藥丸，手機就係一粒「篩選」加底部面板。佢哋嘅 空白狀態而家真係會顯示圖示同動作。\n\nCore、Supervisor 同作業系統自動更新 - 按主人決定，呢三樣而家可以自動更新。三個開關，各自預設關閉， 開啟要過雙鑰匙確認。由伺服器負責，次序係 Supervisor、Core、作業 系統，喺時間窗（預設 03:00 至 05:00）之內、等夠 0 至 14 日之後 先做，會先備份；有更新、備份或者還原進行緊就唔郁，失敗過嘅版本 唔會再試，亦唔會降級。失敗會出修復提示，可以揀「而家試」或者 「跳過」。 - USB 安裝、USB 復原同返去舊版本仍然要人手做。\n\n檢查：前端型別維持兩個已知錯誤，8492 個測試通過（三個已知失敗）， 本機建置喺 390 px 睇過零頁面錯誤；自動更新嘅 48 個伺服器測試喺 Linux 容器通過。未經真機證實：時間窗內真係自動裝到一次系統更新。"
+    }
+   ]
+  },
+  {
+   "build": 503,
+   "core": "2026.11.1.503",
+   "supervisor": "2026.11.0.503",
+   "os": "18.5.503",
+   "tag": "v2026.11.1.503",
+   "source": "ba18c19f9",
+   "date": "2026-11-17T10:29:46-05:00",
+   "previous_build": 498,
+   "changes": [
+    {
+     "sha": "ba18c19f9",
+     "date": "2026-11-17T10:29:46-05:00",
+     "title": "Add design canvas 36: rich editors for every entity kind",
+     "areas": [
+      "design"
+     ],
+     "detail": "The Speak action greeted people with two empty boxes and a dictionary that proudly announced it had no options yet. These four boards say what it should be instead, and set the rule for every other action: the kind of value decides the control. A colour gets a colour picker, not a text box hoping someone remembers hue numbers; a time gets a time picker; a list of extra settings gets named rows.\n\nBoards: Speak redrawn, the colour picker for a light, the catalogue of which control each kind of value gets, and what every entity kind's editor contains, on a wide window and on a phone.\n\nReferences only. No product page changed in this commit.",
+     "detail_yue": "新增設計畫布 36：每種實體都有嘅豐富編輯器\n\n「朗讀」動作以前係兩格空白框，再加一個好得戚話自己「未有選項」 嘅字典。呢四塊畫板畫返佢應該係點，仲定咗一條通用規矩：數值係乜 類型，就用乜控制。顏色用調色盤，唔係一格文字框等人記色相數字； 時間用時間選擇器；額外設定用有名有姓嘅行。\n\n畫板：重畫嘅朗讀、燈嘅調色盤、每種數值配邊種控制嘅目錄，同埋每種 實體嘅編輯器入面有乜，闊螢幕同手機都有。\n\n純參考，今次冇改任何產品頁面。"
+    },
+    {
+     "sha": "e0034b7c4",
+     "date": "2026-11-17T10:18:51-05:00",
+     "title": "Cloud host page: show the exact proxy lines once the tunnel runs",
+     "areas": [
+      "interface"
+     ],
+     "detail": "When the tunnel is running the Supervisor now reports its address, so the page stops waving vaguely at \"the tunnel container address\" and shows the three lines to add, with a Copy button and a plain sentence that Home Assistant needs a restart and that the page does not edit the configuration itself. The sign-in step says what really happens now (sign in at the provider and the page moves on by itself), and Remove says that the address record at the provider may remain.\n\nSeen on a local build at 390 and 1440 px with pretend Supervisor answers; the real tunnel was not involved.",
+     "detail_yue": "雲端主機頁面：隧道行緊就顯示要加嘅代理設定\n\n隧道運行期間 Supervisor 會報佢個位址，所以頁面唔使再含糊咁講 「隧道容器位址」，直接顯示要加嗰三行，有複製掣，仲有一句講明 Home Assistant 要重新啟動，同埋頁面唔會自己改設定。登入嗰步寫返 而家真正嘅流程（喺供應商度登入之後頁面會自己行落去），移除就講明 供應商嗰邊嘅網址紀錄可能仲喺度。\n\n喺本機建置 390 同 1440 闊度用假嘅 Supervisor 回應睇過；冇用到真 隧道。"
+    },
+    {
+     "sha": "fc18b0d04",
+     "date": "2026-11-17T09:59:57-05:00",
+     "title": "Cloud host: let the Supervisor run the tunnel client",
+     "areas": [
+      "docs",
+      "supervisor"
+     ],
+     "detail": "Until now full hosting mode could only apologise: the control side existed, the part that actually starts the tunnel did not. This adds it, following the same pattern as the Supervisor's other managed containers: a pinned official image, no published ports, no extra privileges, and a private data folder that no backup includes.\n\nSet up starts the client's own sign-in and returns nothing but the provider's sign-in address, refusing anything that is not on the provider's login domain. Once the owner has signed in there, the tunnel is created, the address is routed to it and the tunnel runs against Core's internal address. Every command is built from fixed arguments plus the validated address, with no shell and a timeout on each step. Errors are short fixed reasons that never carry an address, a path or file content. While running, the info route also reports the tunnel container's address so the page can show the exact proxy lines to add; Core's configuration is never edited automatically.\n\nVerified: 80 tests pass in a Linux container, including command construction, sign-in address parsing against the client's real output shape, refusals, timeouts and secret-free errors. Not verifie",
+     "detail_yue": "雲端主機：俾 Supervisor 真係行到隧道程式\n\n之前完整託管模式淨係識得講唔好意思：控制嗰邊有齊，但真正啟動隧道 嗰部分冇。今次補返，跟足 Supervisor 其他受管理容器嘅做法：鎖定版本 嘅官方映像、唔開任何連接埠、冇額外權限，仲有一個任何備份都唔會 包含嘅私人資料夾。\n\n「設定」會啟動程式自己嘅登入流程，淨係交返供應商嘅登入網址，唔係 喺供應商登入網域嘅一律拒絕。主人喺嗰邊登入完，先會建立隧道、將 網址指過去，然後對住 Core 嘅內部位址運行。每個指令都係固定參數 加埋驗證過嘅網址，冇用殼層，每一步都有時限。錯誤訊息係固定嘅 短原因，唔會帶住網址、路徑或者檔案內容。運行期間資訊路由會報埋 隧道容器嘅位址，等頁面可以顯示要加嘅代理設定；Core 嘅設定唔會 自動改。\n\n已驗證：Linux 容器入面 80 個測試通過，包括指令組合、照住程式真實 輸出格式嘅登入網址解析、各種拒絕、時限同唔洩密嘅錯誤。冇人驗證過： 真正登入、建立隧道、DNS 指向，同埋由外面連唔連到。如果對程式嘅 假設錯咗，設定會以錯誤狀態結束，唔會亂估。"
+    }
+   ]
+  },
+  {
+   "build": 498,
+   "core": "2026.11.1.498",
+   "supervisor": "2026.11.0.498",
+   "os": "18.5.498",
+   "tag": "v2026.11.1.498",
+   "source": "55c0ed5bd",
+   "date": "2026-11-17T09:35:06-05:00",
+   "previous_build": 495,
+   "changes": [
+    {
+     "sha": "55c0ed5bd",
+     "date": "2026-11-17T09:35:06-05:00",
+     "title": "One-screen two-key confirmation, honest go-back line, calm queue card",
+     "areas": [
+      "interface"
+     ],
+     "detail": "Found by a second real run, on build 495.\n\n- Going back to an earlier build worked, but the follow-up line could not know that: the older build has no history card, so by the time a newer build looked, a fifteen-minute timer was the only witness and it testified \"did not finish\". The line is now decided by evidence: success recorded while the call was still in flight, a history entry for the target after the start, or the target being installed. \"Did not finish\" needs the instance to still be on the build it started from. Otherwise it says nothing. - After the page reloads onto a new build, the update queue card was red for about nine seconds before correcting itself. A restored step now shows a neutral \"Checking the update\" until there is real data. - The two-key confirmation is one screen: the explanation sits above the keys and slider, with no Continue step in front. The keys work exactly as before. - Backups list: the self-check column has a header and room for its icon, the hosting header reads in full, and the last step of making a backup is titled for what it does.\n\nChecks: types at the two known gallery errors, 8429 tests pass with the three known build-script failures. See",
+     "detail_yue": "雙鑰匙確認變一個畫面、返舊版嘅提示講真話、隊列卡唔再大驚小怪\n\n喺 495 版第二次真機運行度搵到。\n\n- 返去舊版本其實成功，但之後嗰行提示冇辦法知：舊版本冇紀錄卡， 等到新版本睇嗰陣，得返個十五分鐘計時器做證人，佢就話「未完成」。 而家睇證據：呼叫仲進行緊嗰陣記低成功、開始之後有目標版本嘅紀錄、 或者目標版本真係裝咗。要部機仲停喺出發嗰個版本先會講「未完成」， 其他情況唔出聲。 - 頁面重新載入去新版本之後，更新隊列卡會紅足九秒先自己改正。而家 還原返嚟嘅步驟會先顯示中性嘅「檢查緊更新」，有真數據先判斷。 - 雙鑰匙確認變成一個畫面：說明放喺鑰匙同滑桿上面，前面冇咗「繼續」 嗰一步。鑰匙嘅用法完全冇變。 - 備份清單：自我檢查嗰欄有標題同夠位放圖示，託管欄標題顯示齊， 建立備份最後一步個標題改返啱。\n\n檢查：型別維持兩個已知錯誤，8429 個測試通過（三個已知失敗）。喺 本機建置睇過：返舊版三種結果、備份清單，仲有喺 390 同 1440 闊度 經單畫面雙鑰匙真係刪除咗一個輔助項目。隊列卡嘅改動只有測試，要有 Supervisor 先睇到。"
+    },
+    {
+     "sha": "520ed7588",
+     "date": "2026-11-17T08:38:17-05:00",
+     "title": "Record the polish, the new features and what a real run proved",
+     "areas": [
+      "docs"
+     ],
+     "detail": "The handoff now says which build is on the home instance, what was proven by actually using it, what is fixed but not yet shipped, and the limits that a cheerful summary would rather skip: the tunnel has never been started, only the operating system installs offline, and no USB stick has met any of this code.",
+     "detail_yue": "記低翻新、新功能同真機行過證實咗啲乜\n\n交接檔而家寫明屋企部機用緊邊個版本、邊啲係真係用過先證實、邊啲 修好咗但未出街，仲有啲開心總結唔想提嘅限制：隧道從未啟動過、 離線淨係裝到作業系統、冇一支 USB 手指掂過呢啲程式。"
+    },
+    {
+     "sha": "093dccafb",
+     "date": "2026-11-17T08:31:17-05:00",
+     "title": "Fix eleven faults found by clicking through the new features",
+     "areas": [
+      "interface"
+     ],
+     "detail": "Each was seen broken on a real build and seen fixed on a real build.\n\n- Room wizard: Escape closes it and the draft is kept; the \"Start over\" button stays on one line; the step strip no longer cuts \"Devices\" on a phone. - Editor sentence: \"When When the sun sets\" lost its echo. - Editor header: the title keeps its line and the tools move down when they do not fit; the add-action sheet's search is focused on a phone. - A name field no longer turns red before anyone has typed in it. This is in the shared input, so every form benefits. - The editor's search card no longer covers rows; the two-key control shows whole without scrolling. - \"More tools\" on a phone keeps tool names in whole words. - The empty state sits below the filter chips instead of on them, and the column header hides while a list is empty. - List footers count the rows actually shown; list pages have a title, side gutters and a chip row that fades instead of cutting a chip on a phone. - Toasts sit above the editor's bottom bar on a phone. - The Updates page shows its title once.\n\nOne thing left: on a phone, the note under the slider in the two-key delete dialog still scrolls. The keys, dial and slider are visible.\n\nC",
+     "detail_yue": "修正實際操作新功能時搵到嘅十一個問題\n\n每一個都喺真建置見過壞、亦都喺真建置見過修好。\n\n- 房間精靈：Escape 閂到，草稿照留；「重新開始」掣唔再斷行；手機上 面步驟條唔再斬咗「裝置」。 - 編輯器句子：「When When the sun sets」少返個回音。 - 編輯器頁首：標題企返一行，工具唔夠位就落下一行；手機上面新增 動作面板一開就對焦搜尋。 - 名稱欄位未打字之前唔會再變紅。呢個喺共用輸入元件度改，全部表格 都受惠。 - 編輯器個搜尋卡唔再遮住啲行；雙鑰匙控制唔使捲都見晒。 - 手機上面「更多工具」個工具名唔再喺字中間斷開。 - 空白狀態排返喺篩選掣下面，唔再疊上去；清單空嗰陣欄標題會收埋。 - 清單頁尾會數返真正顯示緊嘅行數；手機上面清單頁有標題、兩邊有 留白，篩選列係淡出唔係斬一半。 - 手機上面提示訊息會排喺編輯器底部列上面。 - 更新頁個標題得返一個。\n\n仲有一樣未搞掂：手機上面雙鑰匙刪除對話框，滑桿下面嗰段說明仲要 捲先見到；鑰匙、轉盤同滑桿就見晒。\n\n檢查：型別維持兩個已知錯誤，8420 個測試通過（三個已知失敗）。"
+    }
+   ]
+  },
+  {
+   "build": 495,
+   "core": "2026.11.1.495",
+   "supervisor": "2026.11.0.495",
+   "os": "18.5.495",
+   "tag": "v2026.11.1.495",
+   "source": "9ad470a94",
+   "date": "2026-11-17T07:31:37-05:00",
+   "previous_build": 490,
+   "changes": [
+    {
+     "sha": "9ad470a94",
+     "date": "2026-11-17T07:31:37-05:00",
+     "title": "Fix the false update failure, the room wizard save, and the doubled search",
+     "areas": [
+      "interface"
+     ],
+     "detail": "Found by using the features for real instead of admiring them from a distance.\n\n- Update queue: on a real 481 to 490 run Core reached the new version and the card still announced that it \"did not update\", next to a list that showed it as current. The install call is cut off when Core restarts; only one kind of cut-off was treated as harmless, and a step failed that way was never looked at again. Now a rejection during a restart is judged by the result, any failure heals once the target version is reached (including straight after the page reloads onto the new build), a restored step never re-issues an install, and a failure message can no longer be empty. - \"Update everything\" now goes through the two-key confirmation. - Going back to an earlier build leaves a one-time line after the reload saying whether it finished. - Room setup wizard: it sent empty floor and icon values, which Core refuses on create, so a room could not be made without both. Empty optional fields are now left out. - A dialog can declare that it has its own search; the add-action picker and two others no longer show two search fields. - On a phone the editor's search card sits in the flow instead of over the row",
+     "detail_yue": "修正假嘅更新失敗、房間精靈儲存唔到同雙重搜尋\n\n今次係真係落手用功能先發現，唔係遠遠望住讚好。\n\n- 更新隊列：真機由 481 升到 490，Core 明明升咗，張卡仲話「更新 唔到」，隔籬個清單又顯示佢係最新。原因係 Core 重新啟動嗰陣安裝 呼叫被中斷，以前只當一種中斷係冇事，而且咁樣失敗咗就唔會再睇。 而家重啟期間嘅拒絕會睇結果先判斷，目標版本一到就自動改返成功 （包括頁面重新載入去新版本之後），還原返嚟嘅步驟唔會重發安裝， 失敗訊息亦都唔會再係空白。 - 「全部更新」而家要過雙鑰匙確認。 - 返去舊版本之後，重新載入會有一次性提示講完成咗未。 - 房間設定精靈：以前會送空白嘅樓層同圖示，Core 建立時唔收，搞到 冇揀齊就建立唔到房間。而家空白嘅選填欄位會直接唔送。 - 對話框可以聲明自己有搜尋；新增動作揀選器同另外兩個唔會再出 兩個搜尋框。 - 手機上面編輯器嘅搜尋卡跟返版面排，唔再浮喺啲行上面；底部動作列 變成一行精簡版。\n\n檢查：型別維持兩個已知錯誤，8419 個測試通過（三個已知失敗）。喺 本機建置 390 同 1440 闊度實際操作過：精靈淨係入名都建立到房間， 入門自動化儲存時係關閉；自動化嘅建立、儲存、試行同重播；輔助項目 示範；經雙鑰匙新增同移除輔助項目。隊列修正有測試重演真實失敗， 但仲要再行一次真機先算證實。"
+    },
+    {
+     "sha": "23c7f5d99",
+     "date": "2026-11-17T05:54:35-05:00",
+     "title": "Cloud host page, backup self-check, helper demos, offline pack on the Updates page",
+     "areas": [
+      "core",
+      "interface"
+     ],
+     "detail": "- Cloud host page under Settings then System: the risk said first, one \"Set up\" behind the two-key confirmation, a live five-step list, the provider's own sign-in opened in a new tab and never stored, status with an outside check, and Pause, Resume and Remove. Without the Supervisor it shows the host script route instead of a button that cannot work, and in full hosting mode it repeats the server's own reason when the tunnel runner is not installed. - Backup self-check: after a backup, a background task reads the archive to the end, compares it with the record, tries the backup key, confirms the expected parts are inside and compares copies across locations. The result shows on the backup overview, in the list and on the details page; a failure raises a repair. The key is never stored in or returned with the result. It checks that a backup opens, not that a restore would succeed, and says so in the code. - Making a helper now shows a working demo of that kind: a switch that flips, a slider bounded by the form's own limits, a counter, a timer that really counts down, a week strip for schedules. Nothing is created until Create is pressed, and a kind added without a demo fails the typ",
+     "detail_yue": "雲端主機頁面、備份自我檢查、輔助項目示範、更新頁嘅離線更新包\n\n- 雲端主機頁面（設定 → 系統）：先講風險，「設定」要過雙鑰匙確認， 五步即時進度，登入去供應商自己嘅頁面開新分頁、唔會儲低，仲有外部 檢查、暫停、繼續同移除。冇 Supervisor 就顯示主機腳本嘅做法，唔會 俾粒冇用嘅掣；完整託管模式未裝隧道執行器，就照伺服器原話講。 - 備份自我檢查：備份完之後背景讀晒成個封存、同紀錄對一對、試下 備份鑰匙、睇下應有嘅部分齊唔齊、再對比唔同位置嘅副本。結果喺備份 總覽、清單同詳情頁都見到，唔合格會出修復提示。鑰匙唔會儲入或者 跟結果傳返出嚟。佢檢查嘅係「打唔打得開」，唔係保證還原一定成功， 程式碼入面都有寫明。 - 新增輔助項目而家有一個識郁嘅示範：會撳嘅開關、跟住表格上下限嘅 滑桿、計數器、真係倒數嘅計時器、排程嘅一週條。未撳「建立」之前 乜都唔會建立；加新種類而冇示範，型別檢查會即刻唔過。 - 更新頁嘅 USB 部分識得離線更新包，逐件列出，老實講邊件裝咗、 邊件要網絡。 - 上次睇到嘅小修補：裝置健康嘅圖示、開發者工具得返一個標題同行高 貼返內容、手機上面主標題識得換行。\n\n檢查：前端型別維持兩個已知錯誤，8408 個測試通過（三個已知失敗）， 本機建置 390 同 1440 闊度睇過零頁面錯誤。Core：十一個自我檢查測試 喺 Linux 容器通過；有一個無關嘅現有測試（要求乾淨簽出）喺嗰度失敗， 未證實純粹係環境問題；另有一個測試檔喺嗰個容器載入唔到。"
+    }
+   ]
+  },
   {
    "build": 490,
    "core": "2026.11.1.490",

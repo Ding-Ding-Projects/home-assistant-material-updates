@@ -7,6 +7,9 @@ import {
   asArray, str, fileExists, REPOSITORY, areaYue,
 } from './lib.mjs';
 
+// A demo path must sit under demos/ as an .html file and exist on disk.
+const demoExists = (p) => /^demos\/[^?#]+\.html$/.test(p) && fileExists(join(ROOT, p));
+
 const OUT = join(ROOT, '_site');
 const data = loadChanges();
 const { map: contentMap } = loadContent();
@@ -19,11 +22,16 @@ const releases = data.releases.filter((r) => r && r.tag !== undefined).map((r) =
     ? asArray(content.highlights).filter((h) => h && typeof h === 'object' && str(h.title)).map((h, i) => {
         const id = /^[a-z0-9-]+$/.test(str(h.id)) ? str(h.id) : `feature-${i + 1}`;
         const demoPath = str(h.demo) || `demos/${r.build}/${id}.html`;
-        const hasDemo = /^demos\/[^?#]+\.html$/.test(demoPath) && fileExists(join(ROOT, demoPath));
+        const hasDemo = demoExists(demoPath);
+        // Extra demos for the same feature: each one gets its own tab in the version's demo section.
+        const extraDemos = asArray(h.more_demos)
+          .filter((d) => d && typeof d === 'object' && str(d.title) && demoExists(str(d.demo)))
+          .map((d, k) => ({ id: `${id}-${k + 2}`, title: str(d.title), tryIt: asArray(d.try).map(str).filter(Boolean), demoPath: str(d.demo) }));
         return {
           id, title: str(h.title), areas: asArray(h.areas).filter((a) => typeof a === 'string'),
           what: str(h.what), what_yue: str(h.what_yue), why: str(h.why),
           tryIt: asArray(h.try).map(str).filter(Boolean), demoPath: hasDemo ? demoPath : '',
+          extraDemos,
         };
       })
     : [];
@@ -36,6 +44,7 @@ const releases = data.releases.filter((r) => r && r.tag !== undefined).map((r) =
     summary_yue: (content && str(content.summary_yue)) || '',
     features: highlights.length,
     demos: highlights.filter((h) => h.demoPath).length,
+    demoCount: highlights.reduce((s, h) => s + (h.demoPath ? 1 : 0) + h.extraDemos.length, 0),
     feat: content ? (highlights.length ? 'y' : 'n') : 'u',
     day: dayOf(r.date),
   };
@@ -224,7 +233,7 @@ ${summary}
 
 function homePage() {
   const total = releases.reduce((s, r) => s + r.changes.length, 0);
-  const demoTotal = releases.reduce((s, r) => s + r.demos, 0);
+  const demoTotal = releases.reduce((s, r) => s + r.demoCount, 0);
   const oldest = releases[releases.length - 1];
   const areaCountsVersions = {};
   for (const r of releases) for (const a of AREAS) if (r.areaCounts[a]) areaCountsVersions[a] = (areaCountsVersions[a] || 0) + 1;
@@ -362,7 +371,8 @@ ${h.demoPath ? `<a class="btn filled hl-btn" href="#demo" data-demo-tab="${h.id}
 
   let demo = '';
   if (hasDemos) {
-    const ds = r.highlights.filter((h) => h.demoPath);
+    // Each feature contributes its own demo, then any extra demos it lists, one tab each.
+    const ds = r.highlights.flatMap((h) => [...(h.demoPath ? [h] : []), ...h.extraDemos]);
     demo = `<section id="demo" class="card demo-sec" aria-labelledby="dm-h">
 <div class="dm-head"><div><h2 id="dm-h" data-yue="呢個版本嘅即場示範">Live demo of this version</h2><p class="muted small" data-yue="每項新功能都有可以操作嘅示範，用虛構資料喺你嘅瀏覽器入面行。咩都唔會安裝，咩都唔會儲存。">A working demo of each new feature, run with pretend data in your browser. Nothing is installed and nothing is saved. Each demo shows the feature as it worked in build ${r.build}.</p></div></div>
 <div class="tablist" role="tablist" aria-label="Feature to try">
@@ -747,4 +757,4 @@ writeFileSync(join(OUT, '.nojekyll'), '');
 const withContent = releases.filter((r) => r.content).map((r) => r.build);
 console.log(`Built ${releases.length} version pages, home, compare and 404 into _site/.`);
 console.log(`Versions with written content: ${withContent.length ? withContent.sort((a, b) => a - b).join(', ') : 'none'}.`);
-console.log(`Demos found: ${releases.reduce((s, r) => s + r.demos, 0)}.`);
+console.log(`Demos found: ${releases.reduce((s, r) => s + r.demoCount, 0)}.`);

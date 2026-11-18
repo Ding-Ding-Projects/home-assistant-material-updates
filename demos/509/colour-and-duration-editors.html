@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: the control follows the kind of value</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="colour-and-duration-editors">
+  <h1>Each kind of value gets its own control: a colour picker and a duration picker</h1>
+  <p class="muted">Change the colour or the fade time of this pretend light action. The summary line shows the action as it would be saved.</p>
+
+  <section class="card stack" aria-labelledby="ce-h">
+    <h2 id="ce-h" class="small">Action: light, turn on</h2>
+    <label class="field" for="ce-col">Colour</label>
+    <input type="color" id="ce-col" value="#ffaa00">
+    <p class="small muted">A colour uses the colour picker, not a text box.</p>
+    <fieldset class="stack">
+      <legend class="small">Fade time</legend>
+      <div class="row">
+        <label class="field" for="ce-min">Minutes</label>
+        <input type="number" id="ce-min" min="0" max="59" value="0">
+        <label class="field" for="ce-sec">Seconds</label>
+        <input type="number" id="ce-sec" min="0" max="59" value="30">
+      </div>
+    </fieldset>
+    <p class="small muted">A time span uses the duration picker, so the value cannot be typed as text.</p>
+    <button type="button" class="tonal" id="ce-show">Show the action</button>
+    <p id="ce-out" class="note" aria-live="polite">Press Show the action to read it.</p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var col = document.getElementById('ce-col');
+  var min = document.getElementById('ce-min');
+  var sec = document.getElementById('ce-sec');
+  var out = document.getElementById('ce-out');
+
+  function clamp(el, max) {
+    var v = Math.floor(Number(el.value));
+    if (isNaN(v) || v < 0) v = 0;
+    if (v > max) v = max;
+    el.value = String(v);
+    return v;
+  }
+
+  function render() {
+    var m = clamp(min, 59);
+    var s = clamp(sec, 59);
+    out.textContent = 'Turn the light on, colour ' + col.value.toUpperCase() + ', fade for ' + m + ' min ' + s + ' s.';
+  }
+
+  document.getElementById('ce-show').addEventListener('click', render);
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    col.value = '#ffaa00'; min.value = '0'; sec.value = '30';
+    out.textContent = 'Press Show the action to read it.';
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: proxy lines to add</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="proxy-lines-copy">
+  <h1>The Cloud host page shows the exact proxy lines to add</h1>
+  <p class="muted">Start the tunnel to see the three lines. Copy them, then restart Home Assistant yourself. The page does not edit the configuration.</p>
+
+  <section class="card stack" aria-labelledby="pl-h">
+    <h2 id="pl-h" class="small">Cloud host: running</h2>
+    <div class="row">
+      <button type="button" class="filled" id="pl-toggle" aria-pressed="false">Start the tunnel</button>
+    </div>
+    <p id="pl-state" class="note" aria-live="polite">The tunnel is stopped. There are no lines to add yet.</p>
+    <div id="pl-block" hidden>
+      <pre class="mono" id="pl-lines" aria-label="Lines to add to the configuration">http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 203.0.113.10</pre>
+      <div class="row">
+        <button type="button" class="tonal" id="pl-copy">Copy the lines</button>
+      </div>
+      <p class="small muted">Home Assistant needs a restart after these lines are added. This page does not change the configuration itself.</p>
+    </div>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<style>[hidden] { display: none !important; }</style>
+<script>
+(function () {
+  var toggle = document.getElementById('pl-toggle');
+  var state = document.getElementById('pl-state');
+  var block = document.getElementById('pl-block');
+  var copy = document.getElementById('pl-copy');
+  var running = false;
+
+  function render() {
+    toggle.textContent = running ? 'Stop the tunnel' : 'Start the tunnel';
+    toggle.setAttribute('aria-pressed', String(running));
+    block.hidden = !running;
+    state.textContent = running
+      ? 'The tunnel runs. Add these lines, then restart Home Assistant.'
+      : 'The tunnel is stopped. There are no lines to add yet.';
+    copy.textContent = 'Copy the lines';
+  }
+
+  toggle.addEventListener('click', function () { running = !running; render(); });
+  copy.addEventListener('click', function () { copy.textContent = 'Copied (pretend, nothing was copied)'; });
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () { running = false; render(); });
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: automatic updates switches</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="auto-update-switches">
+  <h1>Automatic updates start off, and each one is switched on by hand</h1>
+  <p class="muted">Switch on the parts you want updated automatically. Set the wait, then read when an update would run.</p>
+
+  <section class="card stack" aria-labelledby="au-h">
+    <h2 id="au-h" class="small">Automatic updates</h2>
+    <p class="note warn">In this build these switches do not save yet. This demo only shows how they will behave once they do.</p>
+    <label class="row"><input type="checkbox" class="switch" id="au-sv" role="switch" aria-checked="false"> Supervisor</label>
+    <label class="row"><input type="checkbox" class="switch" id="au-core" role="switch" aria-checked="false"> Core</label>
+    <label class="row"><input type="checkbox" class="switch" id="au-os" role="switch" aria-checked="false"> Operating system</label>
+    <label class="field" for="au-wait">Wait after a new version appears, in days (0 to 14)</label>
+    <input type="number" id="au-wait" min="0" max="14" value="3">
+    <button type="button" class="tonal" id="au-read">Read the summary</button>
+    <p id="au-out" class="note" aria-live="polite">Press Read the summary after you choose.</p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var ids = ['au-sv', 'au-core', 'au-os'];
+  var names = { 'au-sv': 'Supervisor', 'au-core': 'Core', 'au-os': 'operating system' };
+  var wait = document.getElementById('au-wait');
+  var out = document.getElementById('au-out');
+
+  function render() {
+    var on = ids.filter(function (id) { return document.getElementById(id).checked; });
+    ids.forEach(function (id) { document.getElementById(id).setAttribute('aria-checked', String(document.getElementById(id).checked)); });
+    var d = Math.floor(Number(wait.value));
+    if (isNaN(d) || d < 0) d = 0;
+    if (d > 14) d = 14;
+    wait.value = String(d);
+    if (!on.length) { out.textContent = 'All three are off. Nothing updates on its own.'; return; }
+    var list = on.map(function (id) { return names[id]; }).join(', then ');
+    out.textContent = 'Inside the 03:00 to 05:00 window, after ' + d + ' days, these update in this order: ' + list + '. A backup is made first, and a failed version is not tried again.';
+  }
+
+  document.getElementById('au-read').addEventListener('click', render);
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    ids.forEach(function (id) { document.getElementById(id).checked = false; });
+    wait.value = '3';
+    out.textContent = 'Press Read the summary after you choose.';
+  });
+})();
+</script>
+</body>
+</html>

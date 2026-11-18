@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: the Updates page after an update</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="updates-page-timeout">
+  <h1>The Updates page no longer sits on a blank spinner after an update</h1>
+  <p class="muted">Open the page the way it opens after a reload. One block never answers, and the page still shows itself after two seconds.</p>
+
+  <section class="card stack" aria-labelledby="up-h">
+    <h2 id="up-h" class="small">Updates</h2>
+    <p id="up-spin" class="note" aria-live="polite">Press Open the Updates page to start.</p>
+    <div id="up-page" hidden>
+      <div class="card small-r">
+        <b>Core and Supervisor</b>
+        <p class="small" id="up-core">Up to date (pretend).</p>
+      </div>
+      <div class="card small-r">
+        <b>Backup status</b>
+        <p class="small" id="up-backup">Still loading. This block times out and can be retried.</p>
+        <button type="button" class="tonal" id="up-retry">Retry the backup status</button>
+      </div>
+    </div>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="filled" id="up-open">Open the Updates page</button><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<style>[hidden] { display: none !important; }</style>
+<script>
+(function () {
+  var spin = document.getElementById('up-spin');
+  var page = document.getElementById('up-page');
+  var backup = document.getElementById('up-backup');
+  var retry = document.getElementById('up-retry');
+  var open = document.getElementById('up-open');
+  var timer = null;
+
+  function reset() {
+    if (timer) { clearTimeout(timer); timer = null; }
+    spin.textContent = 'Press Open the Updates page to start.';
+    page.hidden = true;
+    backup.textContent = 'Still loading. This block times out and can be retried.';
+    retry.disabled = false;
+  }
+
+  open.addEventListener('click', function () {
+    reset();
+    spin.textContent = 'Loading the Updates page. It shows itself within two seconds.';
+    timer = setTimeout(function () {
+      spin.textContent = 'The page is showing. Two seconds passed, so it did not wait longer.';
+      page.hidden = false;
+    }, 2000);
+  });
+
+  retry.addEventListener('click', function () {
+    backup.textContent = 'Retrying. Pretend answer: the backup status came back.';
+    retry.disabled = true;
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', reset);
+})();
+</script>
+</body>
+</html>

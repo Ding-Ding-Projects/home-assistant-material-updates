@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: the go-back line</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="go-back-line">
+  <h1>After going back to an earlier build, the line says only what the evidence shows</h1>
+  <p class="muted">Pick the evidence the instance left behind. Each choice gives the line that is shown after the reload.</p>
+
+  <section class="card stack" aria-labelledby="gb-h">
+    <h2 id="gb-h" class="small">Going back from build 495 to build 490</h2>
+    <div class="stack" role="group" aria-label="Evidence left behind">
+      <button type="button" class="tonal" data-ev="success" aria-pressed="false">Success was recorded while the call was still running</button>
+      <button type="button" class="tonal" data-ev="history" aria-pressed="false">The history shows build 490 after the start</button>
+      <button type="button" class="tonal" data-ev="stuck" aria-pressed="false">Still on build 495, nothing recorded</button>
+      <button type="button" class="tonal" data-ev="timer" aria-pressed="false">An older build with no history card, only a fifteen-minute timer</button>
+    </div>
+    <p id="gb-line" class="note" aria-live="polite">Pick one of the four pieces of evidence.</p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var line = document.getElementById('gb-line');
+  var buttons = Array.prototype.slice.call(document.querySelectorAll('[data-ev]'));
+  var TEXT = {
+    success: 'Going back to build 490 finished.',
+    history: 'Going back to build 490 finished.',
+    stuck: 'Going back did not finish. The instance is still on the build it started from.',
+    timer: 'The line says nothing here, because the evidence does not decide it.'
+  };
+
+  function choose(key) {
+    buttons.forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-ev') === key)); });
+    line.textContent = TEXT[key];
+  }
+
+  buttons.forEach(function (b) {
+    b.addEventListener('click', function () { choose(b.getAttribute('data-ev')); });
+  });
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    buttons.forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
+    line.textContent = 'Pick one of the four pieces of evidence.';
+  });
+})();
+</script>
+</body>
+</html>
