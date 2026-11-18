@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: AC Defender and Heat Defender share one comfort band</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.pair { width: 100%; max-width: 390px; margin: 0 auto; background: var(--sl1); border-radius: 24px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.pair button { min-height: 44px; }
+.pair .band { position: relative; height: 40px; border-radius: 20px; background: var(--sl0); overflow: hidden; }
+.pair .band i { position: absolute; top: 0; bottom: 0; background: var(--sl2, #cfc4e6); }
+.pair .card { background: var(--sl0); border-radius: 16px; padding: 10px; overflow-wrap: anywhere; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="defenders-comfort-band">
+  <h1>Two defenders who share one comfort band</h1>
+  <p class="muted">Press Warmer or Cooler to move the room. The two defenders answer from the same band.</p>
+
+  <section class="pair" aria-label="Room and the two defenders">
+    <div class="row">
+      <button type="button" class="tonal" id="cooler">Cooler</button>
+      <button type="button" class="tonal" id="warmer">Warmer</button>
+    </div>
+    <p class="small" id="room">Room: 21 °C. Shared comfort band: 20 to 24 °C.</p>
+    <div class="band" role="img" aria-label="Shared comfort band">
+      <i style="left:40%;width:20%"></i>
+    </div>
+
+    <div class="card" id="ac">AC Defender: cooling off, the room is inside the band.</div>
+    <div class="card" id="heat">Heat Defender: heating off, the room is inside the band. Heating is always allowed below 10 °C.</div>
+
+    <div class="row">
+      <button type="button" class="tonal" id="floor">Try to set the heating floor to 8 °C</button>
+    </div>
+    <p class="small" id="floor-text" aria-live="polite">The heating floor stays at 10 °C or higher.</p>
+
+    <div class="row">
+      <button type="button" class="tonal" id="by-hand">Someone turns heating on by hand</button>
+    </div>
+    <p class="small" id="hand-text" aria-live="polite">Heat Defender waits ten minutes before it turns heating off again.</p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. No air conditioner or heater is touched.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var room = 21;
+  var band = { low: 20, high: 24 };
+  var roomEl = document.getElementById('room');
+  var ac = document.getElementById('ac');
+  var heat = document.getElementById('heat');
+  var bandFill = document.querySelector('.band i');
+
+  function paint() {
+    roomEl.textContent = 'Room: ' + room + ' °C. Shared comfort band: ' + band.low + ' to ' + band.high + ' °C.';
+    if (room > band.high) {
+      ac.textContent = 'AC Defender: cooling on, the room is above the band.';
+    } else if (room < band.low) {
+      ac.textContent = 'AC Defender: cooling off, the room is not above the band.';
+    } else {
+      ac.textContent = 'AC Defender: cooling off, the room is inside the band.';
+    }
+    if (room < 10) {
+      heat.textContent = 'Heat Defender: heating allowed, the room is below the 10 °C floor.';
+    } else if (room < band.low) {
+      heat.textContent = 'Heat Defender: heating allowed up to its cap while the room is under the band.';
+    } else {
+      heat.textContent = 'Heat Defender: heating off, the room is at or above the band.';
+    }
+    var pct = Math.max(0, Math.min(100, ((room - 10) / 20) * 100));
+    bandFill.style.left = (pct - 10) + '%';
+    bandFill.style.width = '20%';
+  }
+
+  document.getElementById('cooler').addEventListener('click', function () { room -= 1; paint(); });
+  document.getElementById('warmer').addEventListener('click', function () { room += 1; paint(); });
+  document.getElementById('floor').addEventListener('click', function () {
+    document.getElementById('floor-text').textContent =
+      'Refused: the heating floor cannot go under 10 °C, in setup, the options, the number entity or a stored value.';
+  });
+  document.getElementById('by-hand').addEventListener('click', function () {
+    document.getElementById('hand-text').textContent =
+      'Heating was turned on by hand. Heat Defender waits ten minutes before it turns heating off again, then only restores off or its cap.';
+  });
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    room = 21;
+    document.getElementById('floor-text').textContent = 'The heating floor stays at 10 °C or higher.';
+    document.getElementById('hand-text').textContent = 'Heat Defender waits ten minutes before it turns heating off again.';
+    paint();
+  });
+  paint();
+})();
+</script>
+</body>
+</html>

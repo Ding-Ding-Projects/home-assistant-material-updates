@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: a camera sheet that stays calm when limited</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.cam { width: 100%; max-width: 390px; margin: 0 auto; background: var(--sl1); border-radius: 24px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.cam .picture { position: relative; width: 100%; aspect-ratio: 16 / 9; background: var(--sl0); border-radius: 16px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 8px; overflow: hidden; box-sizing: border-box; }
+.cam .picture p { margin: 0; overflow-wrap: anywhere; }
+.cam .live-mark { display: none; }
+.cam .live-mark.on { display: inline-block; }
+.cam .states { display: flex; flex-wrap: wrap; gap: 8px; }
+.cam .states button { min-height: 44px; }
+.cam .states button[aria-pressed="true"] { font-weight: 700; outline: 2px solid currentColor; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="camera-live-view">
+  <h1>A camera sheet that stays calm when the provider says no</h1>
+  <p class="muted">Press a state. Everything stays inside the 16:9 picture area.</p>
+
+  <section class="cam" aria-label="Front door camera sheet">
+    <div class="states" role="group" aria-label="Show this state">
+      <button type="button" class="tonal" data-state="starting" aria-pressed="false">Starting</button>
+      <button type="button" class="tonal" data-state="limited" aria-pressed="false">Limited</button>
+      <button type="button" class="tonal" data-state="offline" aria-pressed="false">Offline</button>
+      <button type="button" class="tonal" data-state="live" aria-pressed="true">Live</button>
+    </div>
+    <div class="row"><span class="badge live-mark on" id="live-mark">Live</span></div>
+    <div class="picture" id="picture" role="status" aria-live="polite">
+      <p>Live video of the front door (pretend picture).</p>
+    </div>
+    <div class="row"><button type="button" class="tonal" id="try" hidden>Try now</button></div>
+    <p class="small muted">The provider's own message is one tap away: "Too many requests."</p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. No camera is contacted.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var picture = document.getElementById('picture');
+  var mark = document.getElementById('live-mark');
+  var tryBtn = document.getElementById('try');
+  var messages = {
+    live: 'Live video of the front door (pretend picture).',
+    starting: 'Starting live video. This can take a few seconds.',
+    limited: 'The provider has said too many requests. Waiting 60 seconds before it is asked again. Try now is there for you.',
+    offline: 'This camera is offline. Nothing is asked of it until it returns.'
+  };
+  function show(name) {
+    document.querySelectorAll('[data-state]').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b.getAttribute('data-state') === name));
+    });
+    picture.innerHTML = '';
+    var p = document.createElement('p');
+    p.textContent = messages[name];
+    picture.appendChild(p);
+    mark.classList.toggle('on', name === 'live');
+    tryBtn.hidden = name !== 'limited';
+  }
+  document.querySelectorAll('[data-state]').forEach(function (b) {
+    b.addEventListener('click', function () { show(b.getAttribute('data-state')); });
+  });
+  tryBtn.addEventListener('click', function () {
+    var p = picture.querySelector('p');
+    if (p) p.textContent = 'You asked for this one time. The provider is asked once, and the normal wait starts again if it refuses.';
+  });
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () { show('live'); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: which updates get a backup first</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.choice { width: 100%; max-width: 390px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
+.choice .opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.choice .opts button { min-height: 44px; }
+.choice .opts button[aria-pressed="true"] { font-weight: 700; outline: 2px solid currentColor; }
+.apps label { display: flex; align-items: center; gap: 8px; min-height: 44px; overflow-wrap: anywhere; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="update-backup-choice">
+  <h1>Choose which updates get a backup first</h1>
+  <p class="muted">Press one of the choices. Custom lets you tick single apps.</p>
+
+  <div class="choice" aria-label="Backup choice">
+    <p class="small" id="choice-label">Make a backup first for:</p>
+    <div class="opts" role="group" aria-labelledby="choice-label">
+      <button type="button" class="tonal" data-choice="system" aria-pressed="false">System updates only</button>
+      <button type="button" class="tonal" data-choice="all" aria-pressed="true">Every update</button>
+      <button type="button" class="tonal" data-choice="none" aria-pressed="false">No update</button>
+      <button type="button" class="tonal" data-choice="custom" aria-pressed="false">Custom</button>
+    </div>
+    <p class="small" id="choice-text" aria-live="polite">Every update gets a backup of its own first.</p>
+
+    <section id="apps" class="stack" hidden aria-labelledby="apps-h">
+      <h2 id="apps-h" class="small">Custom: tick the apps that get a backup first</h2>
+      <div class="apps stack">
+        <label><input type="checkbox" checked> Media server</label>
+        <label><input type="checkbox"> Text editor</label>
+        <label><input type="checkbox"> Backup viewer</label>
+      </div>
+      <label class="row"><input type="checkbox" id="later"> Apps installed later also get a backup first</label>
+      <p class="small" id="custom-count">2 of 3 apps tick for a backup first.</p>
+    </section>
+
+    <section class="stack" aria-label="What each kind means">
+      <p class="small">Core, Supervisor and the operating system share one backup made by the first of them in a run.</p>
+      <p class="small">Turning backups off for system updates asks for an extra confirmation.</p>
+    </section>
+  </div>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is backed up or installed.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var texts = {
+    system: 'Core, Supervisor and the operating system get a backup first. Apps do not.',
+    all: 'Every update gets a backup of its own first.',
+    none: 'No update gets a backup first. Turning off system backups asks for an extra confirmation.',
+    custom: 'Only the apps you tick get a backup of themselves first.'
+  };
+  var apps = document.getElementById('apps');
+  var text = document.getElementById('choice-text');
+  var buttons = document.querySelectorAll('[data-choice]');
+  function pick(name) {
+    buttons.forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-choice') === name)); });
+    text.textContent = texts[name];
+    apps.hidden = name !== 'custom';
+  }
+  buttons.forEach(function (b) {
+    b.addEventListener('click', function () { pick(b.getAttribute('data-choice')); });
+  });
+  var boxes = apps.querySelectorAll('input[type="checkbox"]:not(#later)');
+  var count = document.getElementById('custom-count');
+  apps.addEventListener('change', function () {
+    var n = 0;
+    boxes.forEach(function (c) { if (c.checked) n++; });
+    count.textContent = n + ' of ' + boxes.length + ' apps tick for a backup first.' +
+      (document.getElementById('later').checked ? ' Later-installed apps are included too.' : '');
+  });
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    pick('all');
+    boxes[0].checked = true; boxes[1].checked = false; boxes[2].checked = false;
+    document.getElementById('later').checked = false;
+    count.textContent = '1 of 3 apps tick for a backup first.';
+  });
+})();
+</script>
+</body>
+</html>

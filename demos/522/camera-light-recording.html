@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: light recording keeps video only around events</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.rec { width: 100%; max-width: 390px; margin: 0 auto; background: var(--sl1); border-radius: 24px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.rec button { min-height: 44px; }
+.rec .choices { display: flex; flex-wrap: wrap; gap: 8px; }
+.rec .choices button[aria-pressed="true"] { font-weight: 700; outline: 2px solid currentColor; }
+.strip { display: flex; gap: 4px; height: 28px; }
+.strip i { flex: 1; border-radius: 4px; background: var(--sl0); }
+.strip i.kept { background: var(--primary, #6750a4); }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="camera-light-recording">
+  <h1>Light recording keeps video only around events</h1>
+  <p class="muted">Press a recording amount. The day strip shows what Light keeps.</p>
+
+  <section class="rec" aria-label="Recording amount for this camera">
+    <div class="choices" role="group" aria-label="Recording amount">
+      <button type="button" class="tonal" data-amount="light" aria-pressed="false">Light</button>
+      <button type="button" class="tonal" data-amount="off" aria-pressed="false">Off</button>
+      <button type="button" class="tonal" data-amount="all" aria-pressed="true">All day</button>
+    </div>
+    <p class="small" id="amount-text">All day: every minute of video is kept. This is the default.</p>
+
+    <div class="row">
+      <button type="button" class="tonal" id="before-up">Before: 10 s, add 5</button>
+      <button type="button" class="tonal" id="after-up">After: 30 s, add 5</button>
+    </div>
+    <p class="small" id="clip-text">Each event keeps 10 s before and 30 s after, a 40 s clip at least.</p>
+
+    <div class="strip" role="img" aria-label="Day strip: kept moments are shaded" id="strip">
+      <i></i><i></i><i class="kept"></i><i></i><i></i><i class="kept"></i><i></i><i></i><i></i><i></i>
+    </div>
+    <p class="small muted" id="note" hidden>A camera with nothing that can tell events apart refuses Light and says why.</p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is recorded.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var before = 10;
+  var after = 30;
+  var amount = 'all';
+  var amountText = document.getElementById('amount-text');
+  var note = document.getElementById('note');
+  var strip = document.getElementById('strip');
+  var beforeBtn = document.getElementById('before-up');
+  var afterBtn = document.getElementById('after-up');
+  var clipText = document.getElementById('clip-text');
+  var texts = {
+    all: 'All day: every minute of video is kept. This is the default.',
+    light: 'Light: video is kept only around something being seen. Back-to-back events merge, and a clip is capped at ten minutes.',
+    off: 'Off: nothing is recorded for this camera.'
+  };
+
+  function paint() {
+    document.querySelectorAll('[data-amount]').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b.getAttribute('data-amount') === amount));
+    });
+    amountText.textContent = texts[amount];
+    note.hidden = amount !== 'light';
+    strip.querySelectorAll('i').forEach(function (cell, i) {
+      cell.classList.toggle('kept', amount === 'all' || (amount === 'light' && (i === 2 || i === 5)));
+    });
+    beforeBtn.textContent = 'Before: ' + before + ' s, add 5';
+    afterBtn.textContent = 'After: ' + after + ' s, add 5';
+    clipText.textContent = 'Each event keeps ' + before + ' s before and ' + after + ' s after, a ' + (before + after) + ' s clip at least.';
+  }
+
+  document.querySelectorAll('[data-amount]').forEach(function (b) {
+    b.addEventListener('click', function () { amount = b.getAttribute('data-amount'); paint(); });
+  });
+  beforeBtn.addEventListener('click', function () { before = Math.min(60, before + 5); paint(); });
+  afterBtn.addEventListener('click', function () { after = Math.min(120, after + 5); paint(); });
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    before = 10; after = 30; amount = 'all'; paint();
+  });
+  paint();
+})();
+</script>
+</body>
+</html>

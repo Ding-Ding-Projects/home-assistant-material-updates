@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: the backup self-check reads a local copy in full</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.check { width: 100%; max-width: 390px; margin: 0 auto; background: var(--sl1); border-radius: 24px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.check button { min-height: 44px; }
+.check .places { display: flex; flex-wrap: wrap; gap: 8px; }
+.check .places button[aria-pressed="true"] { font-weight: 700; outline: 2px solid currentColor; }
+.check .result { background: var(--sl0); border-radius: 12px; padding: 10px; overflow-wrap: anywhere; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="backup-self-check-full">
+  <h1>The self-check reads a copy on this system in full</h1>
+  <p class="muted">Pick where the copy of this backup lives, then press Check in full.</p>
+
+  <section class="check" aria-label="Backup copy check">
+    <div class="places" role="group" aria-label="Where the copy lives">
+      <button type="button" class="tonal" data-place="core" aria-pressed="false">Core's own storage</button>
+      <button type="button" class="tonal" data-place="supervisor" aria-pressed="true">Supervisor's storage (.local)</button>
+      <button type="button" class="tonal" data-place="network" aria-pressed="false">Network mount</button>
+      <button type="button" class="tonal" data-place="cloud" aria-pressed="false">Cloud place</button>
+    </div>
+    <p class="small" id="kind">Kind of copy: local, because the Supervisor reports location .local.</p>
+    <p class="small" id="rule">Read in full in every mode.</p>
+    <div class="row"><button type="button" class="tonal" id="full">Check in full</button></div>
+    <div class="result" id="result" aria-live="polite">Not checked yet.</div>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is read from a real backup.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var places = {
+    core: { kind: 'Kind of copy: local, in Core’s own storage.', rule: 'Read in full in every mode.', full: 'Verified in full: the size read equals the size reported.' },
+    supervisor: { kind: 'Kind of copy: local, because the Supervisor reports location .local.', rule: 'Read in full in every mode.', full: 'Verified in full: the size read equals the size reported.' },
+    network: { kind: 'Kind of copy: network place on a mount in the home network.', rule: 'Read in full in Light mode up to the size limit (1 GiB by default).', full: 'Full check of this network copy, on demand, only for this place.' },
+    cloud: { kind: 'Kind of copy: remote, in a cloud place.', rule: 'Checked lightly by default.', full: 'Full check of this cloud copy, on demand, only for this place.' }
+  };
+  var current = 'supervisor';
+  function paint() {
+    document.querySelectorAll('[data-place]').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b.getAttribute('data-place') === current));
+    });
+    document.getElementById('kind').textContent = places[current].kind;
+    document.getElementById('rule').textContent = places[current].rule;
+  }
+  document.querySelectorAll('[data-place]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      current = b.getAttribute('data-place');
+      paint();
+      document.getElementById('result').textContent = 'Not checked yet.';
+    });
+  });
+  document.getElementById('full').addEventListener('click', function () {
+    document.getElementById('result').textContent = places[current].full;
+  });
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    current = 'supervisor'; paint();
+    document.getElementById('result').textContent = 'Not checked yet.';
+  });
+  paint();
+})();
+</script>
+</body>
+</html>

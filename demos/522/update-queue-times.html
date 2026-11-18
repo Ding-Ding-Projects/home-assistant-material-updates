@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: how long an update run has been going</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.queue { width: 100%; max-width: 390px; margin: 0 auto; background: var(--sl1); border-radius: 24px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.queue .row { flex-wrap: wrap; }
+.queue button { min-height: 44px; }
+.output { font-family: monospace; font-size: 0.85rem; white-space: pre-wrap; overflow-wrap: anywhere; background: var(--sl0); border-radius: 12px; padding: 8px; margin: 0; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="update-queue-times">
+  <h1>Update everything shows how long the run has been going</h1>
+  <p class="muted">This demo moves the clock by hand, so it does not wait for real seconds.</p>
+
+  <section class="queue" aria-label="Update everything card">
+    <div class="row"><h2 class="small">Update everything</h2><span class="badge" id="run-state">Waiting</span></div>
+    <p class="small" id="clock">Running for 0 min 00 s (counted from the first update that started)</p>
+    <p class="small" id="step-line">Step 1 of 3: Core. Not started.</p>
+    <div class="row">
+      <button type="button" class="tonal" id="next">Next step</button>
+      <button type="button" class="tonal" id="restart">Restart the Supervisor</button>
+      <button type="button" class="tonal" id="finish">Finish run</button>
+    </div>
+    <pre class="output" id="live" aria-live="polite">Live output appears here once an update starts.</pre>
+    <p class="small" id="total"></p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. No update is installed.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var steps = ['Core', 'Supervisor', 'Operating system'];
+  var step = 0;
+  var seconds = 0;
+  var started = false;
+  var restarting = false;
+  var clock = document.getElementById('clock');
+  var stepLine = document.getElementById('step-line');
+  var runState = document.getElementById('run-state');
+  var live = document.getElementById('live');
+  var total = document.getElementById('total');
+
+  function fmt(s) { return Math.floor(s / 60) + ' min ' + String(s % 60).padStart(2, '0') + ' s'; }
+  function render() {
+    clock.textContent = started
+      ? 'Running for ' + fmt(seconds) + ' (counted from the first update that started)'
+      : 'Running for 0 min 00 s, because no update has started yet';
+    stepLine.textContent = step < steps.length
+      ? 'Step ' + (step + 1) + ' of ' + steps.length + ': ' + steps[step] + (started ? ' - Updating' : ' - Not started')
+      : 'All steps done';
+  }
+
+  document.getElementById('next').addEventListener('click', function () {
+    started = true;
+    seconds += 75;
+    if (step < steps.length) step++;
+    restarting = false;
+    runState.textContent = step < steps.length ? 'Updating' : 'Done';
+    live.textContent = 'Log line: ' + steps[Math.max(0, step - 1)] + ' update reported its progress.';
+    render();
+  });
+  document.getElementById('restart').addEventListener('click', function () {
+    started = true;
+    seconds += 20;
+    restarting = true;
+    runState.textContent = 'Restarting';
+    live.textContent = 'The log cannot be read while the Supervisor restarts. The newest lines return when it is back.';
+    render();
+  });
+  document.getElementById('finish').addEventListener('click', function () {
+    if (!started) { total.textContent = 'Nothing ran, so there is no time to show.'; return; }
+    step = steps.length;
+    restarting = false;
+    runState.textContent = 'Done';
+    total.textContent = 'The whole run took ' + fmt(seconds) + '.';
+    live.textContent = 'Log lines come back once the restart is over.';
+    render();
+  });
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    step = 0; seconds = 0; started = false; restarting = false;
+    runState.textContent = 'Waiting';
+    live.textContent = 'Live output appears here once an update starts.';
+    total.textContent = '';
+    render();
+  });
+  render();
+})();
+</script>
+</body>
+</html>

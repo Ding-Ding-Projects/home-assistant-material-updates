@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: entity sheets that fit a phone</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.sheet { width: 100%; max-width: 390px; margin: 0 auto; background: var(--sl1); border-radius: 24px; padding: 12px; display: flex; flex-direction: column; gap: 12px; }
+.sheet h2 { font-size: 1rem; margin: 0; overflow-wrap: anywhere; }
+.wide-bar { width: 100%; height: 44px; border-radius: 22px; background: var(--sl0); overflow: hidden; }
+.wide-bar i { display: block; height: 100%; background: var(--primary, #6750a4); }
+.levels { display: flex; flex-wrap: wrap; gap: 8px; }
+.levels button[aria-pressed="true"] { font-weight: 700; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
+.tiles button { min-height: 44px; }
+.tiles button[aria-pressed="true"] { outline: 2px solid currentColor; }
+.tracker-map { height: 96px; border-radius: 12px; background: var(--sl0); position: relative; }
+.tracker-map span { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+.lock-row { display: flex; flex-direction: column; gap: 6px; }
+.lock-row input[type="range"] { width: 100%; min-height: 44px; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="entity-sheets">
+  <h1>Entity sheets fit a phone and can be touched</h1>
+  <p class="muted">Each sheet below is shaped to its own control. Press Brighter first, then try the lock slider.</p>
+
+  <div class="sheet" aria-label="Phone-width entity sheets">
+    <section class="stack" aria-labelledby="light-h">
+      <h2 id="light-h">Kitchen light</h2>
+      <div class="row">
+        <button type="button" class="tonal" id="bright-up">Brighter</button>
+        <button type="button" class="tonal" id="bright-down">Dimmer</button>
+      </div>
+      <div class="wide-bar" role="img" aria-label="Brightness bar"><i id="bright-fill" style="width:60%"></i></div>
+      <p class="small" id="bright-text">Brightness 60%</p>
+    </section>
+
+    <section class="stack" aria-labelledby="fan-h">
+      <h2 id="fan-h">Bedroom fan</h2>
+      <div class="levels" role="group" aria-label="Fan level">
+        <button type="button" class="tonal" data-level="0" aria-pressed="false">Off</button>
+        <button type="button" class="tonal" data-level="1" aria-pressed="false">Low</button>
+        <button type="button" class="tonal" data-level="2" aria-pressed="true">Medium</button>
+        <button type="button" class="tonal" data-level="3" aria-pressed="false">High</button>
+      </div>
+      <p class="small" id="fan-text">Level: Medium</p>
+    </section>
+
+    <section class="stack" aria-labelledby="mode-h">
+      <h2 id="mode-h">Home mode (five or fewer choices shows as tiles)</h2>
+      <div class="tiles" role="group" aria-label="Home mode">
+        <button type="button" class="tonal" data-mode="Home" aria-pressed="true">Home</button>
+        <button type="button" class="tonal" data-mode="Away" aria-pressed="false">Away</button>
+        <button type="button" class="tonal" data-mode="Night" aria-pressed="false">Night</button>
+        <button type="button" class="tonal" data-mode="Holiday" aria-pressed="false">Holiday</button>
+      </div>
+      <p class="small" id="mode-text">Mode: Home</p>
+    </section>
+
+    <section class="stack lock-row" aria-labelledby="lock-h">
+      <h2 id="lock-h">Front door lock</h2>
+      <label for="lock-slide" class="small">Slide to unlock (Enter also works on the keyboard)</label>
+      <input type="range" id="lock-slide" min="0" max="100" value="0" aria-describedby="lock-text">
+      <p class="small" id="lock-text" aria-live="polite">Locked. Slide the thumb all the way to unlock.</p>
+    </section>
+
+    <section class="stack" aria-labelledby="track-h">
+      <h2 id="track-h">Car tracker</h2>
+      <div class="tracker-map" role="img" aria-label="Map showing the car (pretend)"><span>car</span></div>
+      <p class="small muted">The map is shown first for trackers and zones.</p>
+    </section>
+  </div>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing in your home is changed.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var level = 2;
+  var brightness = 60;
+  var fill = document.getElementById('bright-fill');
+  var brightText = document.getElementById('bright-text');
+  function setBright(v) {
+    brightness = Math.max(0, Math.min(100, v));
+    fill.style.width = brightness + '%';
+    brightText.textContent = 'Brightness ' + brightness + '%';
+  }
+  document.getElementById('bright-up').addEventListener('click', function () { setBright(brightness + 10); });
+  document.getElementById('bright-down').addEventListener('click', function () { setBright(brightness - 10); });
+
+  var levelNames = ['Off', 'Low', 'Medium', 'High'];
+  function setLevel(n) {
+    level = n;
+    document.querySelectorAll('[data-level]').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(Number(b.getAttribute('data-level')) === n));
+    });
+    document.getElementById('fan-text').textContent = 'Level: ' + levelNames[n];
+  }
+  document.querySelectorAll('[data-level]').forEach(function (b) {
+    b.addEventListener('click', function () { setLevel(Number(b.getAttribute('data-level'))); });
+  });
+
+  function setMode(name) {
+    document.querySelectorAll('[data-mode]').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b.getAttribute('data-mode') === name));
+    });
+    document.getElementById('mode-text').textContent = 'Mode: ' + name;
+  }
+  document.querySelectorAll('[data-mode]').forEach(function (b) {
+    b.addEventListener('click', function () { setMode(b.getAttribute('data-mode')); });
+  });
+
+  var lock = document.getElementById('lock-slide');
+  var lockText = document.getElementById('lock-text');
+  lock.addEventListener('input', function () {
+    lockText.textContent = Number(lock.value) >= 100
+      ? 'Unlocked in this demo. The real lock would open now.'
+      : 'Locked. Slide the thumb all the way to unlock.';
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    setBright(60); setLevel(2); setMode('Home');
+    lock.value = 0;
+    lockText.textContent = 'Locked. Slide the thumb all the way to unlock.';
+  });
+})();
+</script>
+</body>
+</html>

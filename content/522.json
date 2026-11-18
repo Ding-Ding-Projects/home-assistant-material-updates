@@ -1,0 +1,113 @@
+{
+  "build": 522,
+  "headline": "Entity sheets that fit a phone, a choice of which updates get a backup, and two new defenders",
+  "summary": "Build 522 reworks the entity sheets: a lock slides open rather than opening on a press, lights and covers get one wide bar, and every button on a sheet can be touched with a thumb. Updates can now choose which ones get a backup first, down to single apps, and the update queue shows how long it has been running, with real start times and live output. The cameras share one live view per camera, wait politely after a provider refuses for too many requests, and offer a light recording mode. The backup self-check fix from build 521 guessed where the Supervisor keeps its own copies; this build reads that location from a running Supervisor and proves it on a throwaway full-hosting copy. Two new integrations, AC Defender and Heat Defender, are in this build. They have been seen running in a throwaway test instance of Home Assistant, but they have never run on a real air conditioner or heater.",
+  "summary_yue": "522 版將實體面板改到啱手機用：門鎖要拉過先開，燈同窗簾有一條闊橫條，面板上面每個掣都撳得到。更新可以揀邊啲要先備份，細到單一應用程式；更新隊列會顯示已經行咗幾耐，每個更新亦顯示真實開始時間同即時輸出。鏡頭每部只共用一條即時影像，畀供應商拒絕之後會耐心等，仲加咗輕量錄影。備份自我檢查嘅修正，喺 521 版係估監督程式嘅儲存位置，而家改為由運行緊嘅監督程式讀返出嚟，並且喺一份完整寄存嘅副本度證明過。另外兩個新整合，AC Defender 同 Heat Defender，都喺呢版。佢哋喺一個用完即棄嘅測試 Home Assistant 度睇過運行，但未試過真正嘅冷氣或者暖氣。",
+  "highlights": [
+    {
+      "id": "entity-sheets",
+      "title": "Entity sheets that slide, fit a phone and can be touched",
+      "areas": ["interface"],
+      "what": "Each kind of device and service has a detail sheet shaped to its own controls. A lock opens with a slide rather than a press, so a brushed thumb cannot open the front door, and a keyboard can use Enter on the slider. Lights and covers get one wide bar instead of a tall tower, fans get a row of levels, and a select with five options or fewer shows them as tiles. Trackers and zones show their map first. Sheet titles no longer split a word in half, and every button on a sheet is at least 44 px. A test reads the list of entity platforms and fails if one has no first control or if any text in a sheet goes over 28 px. In a third pass in a real browser at 390 px, 118 of 119 tiles opened the right sheet, and 33 actions stayed saved after closing and reopening. The one tile that opened the wrong sheet is not yet fixed.",
+      "what_yue": "每種實體而家都有啱佢哋控制項嘅詳情面板。門鎖要拉過先會開，唔會因為手指撞到就開門；鍵盤可以喺滑桿上面撳 Enter。燈同窗簾改為一條闊橫條，唔再係高高一條柱；風扇有一排檔位；五個選項或以下嘅選單會排成方磚。追蹤器同區域先顯示地圖。面板標題唔會切開一個字，面板上面每個掣都有 44 像素高。測試會檢查每種實體平台都有第一個控制，面板入面嘅字體亦唔可以超過 28 像素。第三轉喺真實瀏覽器、390 像素闊嘅畫面度試過：119 個方磚有 118 個開啱咗面板，33 個動作閂咗再開都仲喺度。有一個方磚開錯咗面板，仲未修好。",
+      "why": "Each control should match the thing it controls, and a stray touch should not do something that is hard to undo.",
+      "try": [
+        "Press Brighter and watch the bar and the percentage follow it.",
+        "Drag the lock slider all the way and read the state it reports.",
+        "Pick a fan level and see which level is marked as chosen."
+      ],
+      "sha": ["218279a85", "d94590113", "80af39d52"],
+      "demo": "demos/522/entity-sheets.html"
+    },
+    {
+      "id": "update-backup-choice",
+      "title": "Choose which updates get a backup first, down to single apps",
+      "areas": ["core", "interface"],
+      "what": "One choice now says which updates get a backup before they install: system updates only (Core, Supervisor and the operating system), every update, or no update. A list under it explains what each kind means, and a Custom setting lets you tick individual apps, with its own choice for apps installed later. A ticked app gets a backup of itself just before its own update. The Update button, Update everything and automatic updates on the server all read this one decision, so the page and the automatic path agree. Core, Supervisor and the operating system share a single backup made by the first of them in a run. Turning backups off for system updates asks for an extra confirmation. The old single switch carries over: on becomes every update, and off becomes no update. The default is every update, which is what the old switch meant. The row's Update button used to make no backup, and now it follows the choice. Apps show no size, because nothing reports one. Nothing here has been seen in a browser or on a real update.",
+      "what_yue": "更新而家有一個選擇，決定邊啲更新安裝之前要先備份：只限系統更新（核心、監督程式同作業系統）、所有更新，或者全部唔備份。下面嘅清單逐類講明係咩意思。「自訂」可以逐個揀應用程式，剔咗嘅應用程式會喺自己更新之前單獨備份一份，另外仲可以揀之後先裝嘅應用程式點處理。「更新」掣、「全部更新」同伺服器嘅自動更新都跟同一個決定。核心、監督程式同作業系統喺同一輪更新入面共用第一個做嘅備份。熄咗系統更新嘅備份要多一步確認。舊嘅單一開關會自動轉換：開變成「所有更新」，熄變成「全部唔備份」。預設係「所有更新」，但以前逐行嗰個「更新」掣係唔做備份嘅，而家會跟揀嘅選擇。應用程式唔顯示大細，因為冇任何來源報告。未喺瀏覽器或者真實更新上面睇過。",
+      "why": "A backup before a system update protects against a restart that goes wrong, but a backup before every small app update costs time, so the owner decides.",
+      "try": [
+        "Pick System updates only and read which kinds of update are listed as backed up.",
+        "Pick Custom, tick two apps, and watch the list of backed-up apps change.",
+        "Turn on the choice for apps installed later and read what it means."
+      ],
+      "sha": ["4cb1fe589"],
+      "demo": "demos/522/update-backup-choice.html"
+    },
+    {
+      "id": "update-queue-times",
+      "title": "Update everything shows how long it has run, and each update shows its real start",
+      "areas": ["interface", "core"],
+      "what": "An installing update takes its start time from a real source: the page's own start, the Supervisor's job time, the queue, or the moment this page saw the update begin. If none of those is known, the row says it started before this page opened and shows no running time, rather than a guess. The Update everything card runs a clock that ticks once a second from the first update that really started, shows the time of the step in progress beside Updating, and shows the whole run's time when it ends. While a queue is active the clock runs; with no recorded start there is no time at all. During a Core, Supervisor or operating system update, the live output reads the Supervisor's log, filtered to that update, until the restart begins. After that the row says the log cannot be read, and the newest lines return once things are back. A newly started update scrolls into view. The queue clock has not yet been seen in a browser.",
+      "what_yue": "安裝緊嘅更新而家嘅開始時間由真實來源攞：頁面自己嘅開始時間、監督程式工作嘅時間、隊列，或者頁面見到更新開始嗰刻。全部都冇就寫「喺呢頁打開之前已經開始」，唔顯示已用時間，唔會估。「全部更新」張卡會每秒跳一下，由第一個真正開始嘅更新計起，進行中嗰一步亦喺「更新緊」旁邊顯示自己嘅時間，完成之後顯示成輪用咗幾耐。核心、監督程式或者作業系統更新期間，即時輸出會讀監督程式嘅日誌，只留同嗰次更新有關嘅行，直到開始重新啟動；之後會講明讀唔到日誌，返嚟之後再顯示最新幾行。新開始嘅更新會捲入畫面。隊列計時器仲未喺瀏覽器上面睇過。",
+      "why": "A run of several updates gave no sense of how long it had taken, and a page reload could lose the real start.",
+      "try": [
+        "Press Next step and watch the clock and the step time move on.",
+        "Press Restart the Supervisor in the demo and read what the live output says.",
+        "Press Finish run and read the time for the whole run."
+      ],
+      "sha": ["3f969e067", "a5bbfa5da"],
+      "demo": "demos/522/update-queue-times.html"
+    },
+    {
+      "id": "camera-live-view",
+      "title": "One live view per camera, a calm limited state, and light recording",
+      "areas": ["interface", "core"],
+      "what": "Cameras stopped asking their provider for live video too often. A browser tab now keeps one shared live session per camera, instead of one for every card and sheet. Dashboard cards start live video only for cameras that are on the screen. After a refusal for too many requests, nothing asks again by itself for 60 seconds, then 2 minutes, then 5 minutes, remembered per camera, and a Try now button is there for a person. The sheet keeps its 16:9 picture area, and every state sits inside it: starting, limited with a countdown, offline, or another error. The Live mark only shows when video is really playing, and the provider's own message is one tap away. Light recording keeps video only around something being seen, 10 seconds before and 30 seconds after by default, and both can be changed. Back-to-back events merge, and a clip is capped at ten minutes. All day recording stays the default. A camera with nothing that can tell events apart refuses light recording and says why. A camera that only offers live video through its provider keeps event clips and pictures instead, but round-the-clock recording for it is not built, because that would need the provider's sign-in secrets passed to another program. Nothing was seen in a browser, and no real cloud camera or running video program was used.",
+      "what_yue": "鏡頭嘅即時影像唔會再太密咁問供應商。每個分頁每部鏡頭只共用一條即時影像，唔再係每張卡、每個面板各自開一條。儀表板上面嘅卡淨係為畫面入面嘅鏡頭開即時影像。因為請求太多畀人拒絕之後，60 秒內唔會自己再問，之後 2 分鐘、5 分鐘，逐部鏡頭記住；人手可以撳「即刻試」。面板嘅 16:9 影像位置固定，所有狀態都擺喺入面：啟動緊、限速連倒數、離線，或者其他錯誤。「直播」標記只有真係播緊先會出現，供應商原話撳一下就睇到。仲有輕量錄影，只留見到嘢前後嘅影片，預設前 10 秒、後 30 秒，兩樣都可以調。全日錄影仍然係預設。只靠供應商提供即時影像嘅鏡頭，全日錄影未有做，因為要將供應商嘅登入機密交畀另一個程式。未喺瀏覽器睇過，亦冇用過真嘅雲端鏡頭。",
+      "why": "Every open card asked the provider for live video again, and that repeated asking is what gets a camera refused.",
+      "try": [
+        "Pick a state in the demo and read what the picture area shows.",
+        "Pick Limited and press Try now, and read what it does.",
+        "Open the light recording demo and change the seconds before and after."
+      ],
+      "sha": ["327dbe009"],
+      "demo": "demos/522/camera-live-view.html",
+      "more_demos": [
+        {
+          "title": "Light recording keeps video only around events",
+          "demo": "demos/522/camera-light-recording.html",
+          "try": [
+            "Pick All day, Light or Off and read the sentence for each.",
+            "Add seconds before the event and read the new buffer length.",
+            "Pick Light and read the note about cameras that cannot spot events."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "backup-self-check-full",
+      "title": "The backup self-check reads a copy on this system correctly in full hosting mode",
+      "areas": ["core"],
+      "what": "The build 521 fix guessed where the Supervisor's own storage was. On a real Supervisor that location is written as .local, never empty, so a copy on this system was still treated as a network place. A backup over the one-gigabyte limit was then checked only lightly, and a good backup could read 0 of 4 checks passed. This fix reads the location and agent name from a running Supervisor (hassio.local, location .local) and treats a copy there as local. Core's own storage works as before, the cloud location stays remote, and any other location is a network place. In a throwaway full-hosting copy with the strictest setting (checks of other places switched off), a fresh backup reads passed, every applicable check passes, and the copy is verified in full with the size read equal to the size reported. Before this change the same check came back light, with no reference size. Network mounts and cloud places have not been exercised. Nothing was seen in a browser; the proof comes from the service's own answers.",
+      "what_yue": "521 版嘅修正係估監督程式自己嘅儲存位置喺邊度。但係真正運行緊嘅監督程式入面，嗰個位置寫住「.local」，唔係空，所以部機上面嘅副本仍然畀人當成網絡位置。超過一 GB 上限嘅備份因此只做輕量檢查，一份完全正常嘅備份會寫住「4 項之中 0 項通過」。今次由運行緊嘅監督程式讀返出嚟：一個代理，名叫 hassio.local，位置係 .local。檢查而家會憑呢個位置同呢個名認佢做本機；核心自己嘅儲存維持原樣，雲端位置仍然係遠端，其他位置就係網絡位置。喺一份用完即棄嘅完整寄存副本、用最嚴格嘅設定（其他位置嘅檢查全部關閉）度證實：新做嘅備份顯示通過，適用嘅檢查全部通過，副本係完整驗證，讀到嘅大細同報告嘅大細一樣。未修之前，同一個檢查只做輕量，冇參考大細。未有試過網絡掛載同雲端位置。未喺瀏覽器睇過，證明全部來自服務自己嘅回應。",
+      "why": "A check that is wrong about where a copy lives makes a good backup look unchecked, which worries the owner for no reason.",
+      "try": [
+        "Pick a place for the copy in the demo and read how the check treats it.",
+        "Press Check in full on the copy on this system and read the result.",
+        "Pick a cloud place and read how it is checked by default."
+      ],
+      "sha": ["c373e6a4c"],
+      "demo": "demos/522/backup-self-check-full.html"
+    },
+    {
+      "id": "defenders-comfort-band",
+      "title": "AC Defender and Heat Defender, two new integrations that share one comfort band",
+      "areas": ["core", "interface"],
+      "what": "Two new integrations arrive in this build. AC Defender keeps cooling on the way it was set. Heat Defender keeps heating off, or no warmer than a chosen number, so a room does not overheat. Each is set up from Add integration, gets one device with a switch for each guard, and has its own page with Now, Guards, Cost and Log. When both look after the same unit, they share one comfort band for the room, hand the room over to each other through a shared log, and never fight over the thermostat. Heat Defender only ever restores heating to off, or to its own cap while the room is under it, and never touches cooling. A person who turns heating on by hand gets a ten minute courtesy wait before it is turned off again. Heat Defender has a floor: nothing can set it under 10 degrees, through setup, the options, the number entity, the websocket or a stored value, and heating is always allowed below that floor. Freezing weather raises the floor, and with no room reading the defender stands down. The pause, the stop-everything state, today's running time and cost, who holds the room, and the last hundred log lines survive a restart, and the defenders wait for a fresh reading before they touch the unit. The decision engine was ported from a separate reference program, and each number taken from it has a test. They have been seen running in a throwaway test instance of Home Assistant, where they caught each other arguing over the thermostat and then behaved. They have never run on a real air conditioner or heater. The quality checklist is filled in honestly, so the bronze level is not reached yet.",
+      "what_yue": "冷氣守護同暖氣守護兩兄妹而家正式入伙。阿哥負責保持冷氣跟住設定去開，阿妹負責唔畀暖氣開到太熱，等間房唔會變蒸籠。兩個都係喺「新增整合」度設定，每條守則一個開關，每個有自己一頁：現況、守則、成本、記錄。兩個睇住同一部機嘅時候，會共用一個舒適範圍，互相交更，寫入同一本記錄，唔會好似真兄妹咁爭遙控。阿妹只會將暖氣還原做關閉，或者喺房間未夠佢上限嗰陣還原做上限，冷氣佢唔掂。有人用手開咗暖氣，阿妹會等十分鐘先熄返。阿妹有條底線唔可以打破：喺設定流程、選項、數值實體、websocket，或者儲存嘅數值度，都唔可以低過 10 度，低過底線一定畀開暖氣。外面結冰嗰陣底線會調高；冇房間讀數嗰陣就收手。重新啟動之後會記住暫停、今日行咗幾耐同用咗幾多錢、邊個守住間房，同埋最近一百行記錄，等新讀數到先郁部機。數字由參考程式抄返嚟，每個數字都有測試。喺一個用完即棄嘅測試 Home Assistant 度睇過佢哋運行，阿哥同阿妹爭過溫度掣，之後就乖返。但係未曾喺真正嘅冷氣或者暖氣上面運行過。品質清單填得老實，所以銅級暫時未達標。",
+      "why": "Two devices that control one room should agree, and heating should never drop a room below a safe floor.",
+      "try": [
+        "Press Warmer and Cooler and read which defender acts.",
+        "Press Try to set the heating floor to 8 °C and read the refusal.",
+        "Turn heating on by hand and read the ten minute courtesy wait."
+      ],
+      "sha": ["d78560d34", "32949f117", "b62a3e0ef"],
+      "demo": "demos/522/defenders-comfort-band.html"
+    }
+  ],
+  "other": [
+    { "title": "Design boards for the update, backup, camera and draft screens", "sha": ["fcca8da65", "73f1081fd", "7b87d3d84", "bc72ce681", "2bbd3d4af"] },
+    { "title": "Design boards for the two defenders, showing them as siblings who share one band", "sha": ["aa92e0171", "32d3a7134"] }
+  ]
+}
