@@ -1,0 +1,39 @@
+{
+  "build": 524,
+  "headline": "Search in the top bar reaches the rest of the pages, and the faults from a real update run are fixed",
+  "summary": "Build 524 finishes moving search into the top bar. The developer tools tabs, the problem log, the help page, the integrations page and the Settings home now search from the bar as well, and the bar shows how many items match. Automation history had two search fields and now has one that filters both of its lists. Phone lists use the same bar field as wide windows. The build also fixes a set of faults that showed up when build 523 was updated for real: a page opened in the middle of an update now finds the real start time, the Core row says to update the Supervisor first, and several cards, sheets and search results behave as they should. The search pages were first checked by unit tests, and the commit that brings them together reports that every moved search page was then looked at in a browser. The fault fixes are tested, but had not been watched in a real update run when the build was made.",
+  "summary_yue": "524 版將搜尋再搬去頂欄。開發者工具嘅分頁、問題記錄、說明頁、整合頁同設定首頁而家都可以喺頂欄搜尋，頂欄會顯示幾多項相符。自動化歷史以前有兩個搜尋欄，而家一個搜尋會同時篩晒兩張清單。手機上面嘅清單頁用同闊螢幕一樣嘅頂欄搜尋欄。另外修好咗真係更新 523 嗰陣搵到嘅一批問題：更新中途先開嘅頁面而家搵到真正開始時間，核心嗰行會講「請先更新監督程式」，幾張卡、面板同搜尋都跟返正確行為。搬過去嘅搜尋頁先用單元測試檢查，收尾嗰個 commit 話每一個搬過去嘅搜尋頁都已經喺瀏覽器睇過。修正嘅部分有測試，但建置呢版嗰陣，仲未喺真正嘅更新過程入面睇過。",
+  "highlights": [
+    {
+      "id": "top-bar-search-more-pages",
+      "title": "Search in the top bar now reaches the developer tools, the problem log, help and the rest of the pages",
+      "areas": ["interface"],
+      "what": "The search button in the top bar now works on the developer tools tabs, the problem log, the help page, the integrations page and the Settings home. Each developer tools tab keeps the words it was searched for while the bar drives it. Automation history used to have two search fields; now one search filters both of its lists. On a phone, list pages use the same search field as a wide window. The bar shows how many items match, such as 4 of 9, and the summary line under a list title stays on one line on a wide screen.",
+      "what_yue": "頂欄嘅搜尋掣而家可以用喺開發者工具嘅分頁、問題記錄、說明頁、整合頁同設定首頁。開發者工具每個分頁都會記住自己打過嘅字，頂欄照樣可以操控佢。自動化歷史以前有兩個搜尋欄，而家一個搜尋會同時篩晒兩張清單。手機上面嘅清單頁，用同闊螢幕一樣嘅頂欄搜尋欄。頂欄會顯示幾多項相符，例如「9 個之中嘅 4 個」；清單標題下面嗰行摘要，喺闊螢幕會保持一行。",
+      "why": "A search box that scrolls out of reach on a long page does not help, so every page should reach the same bar.",
+      "try": [
+        "Press the search button in the top bar and type a word.",
+        "Change the word and read the count in the bar.",
+        "Clear the search and see every page come back."
+      ],
+      "sha": ["92fb942bc", "28cd39810"],
+      "demo": "demos/524/top-bar-search-more-pages.html"
+    },
+    {
+      "id": "update-run-faults",
+      "title": "Faults found in a real update of build 523 are fixed",
+      "areas": ["core", "interface"],
+      "what": "A real update of build 523 turned up a set of faults, and they are fixed in this build. A page opened in the middle of an update now reads the job list, finds the real start time, and no longer says the backup was skipped by your choice when nobody on that page chose it. The Core row says Update the Supervisor first instead of trying and being refused. The build card stops looking busy once that build is installed. The release link in an update sheet points at the build on offer, not the one already installed. The backup self-check card refreshes by itself when a new backup is checked, and Custom stays selected on the backup choice. Release notes marks the words it finds and steps through them. A search on Personal settings no longer matches help text nobody can see, and entity sheets glide between heights instead of jumping. The fixes are tested, but they had not been watched in a real update run when this build was made.",
+      "what_yue": "真係行一次 523 更新時搵到嘅一批問題，呢版已經修好。更新中途先開嘅頁面而家會讀工作清單，搵到真正開始時間，唔再話備份係你揀咗跳過，其實嗰頁根本冇人揀過。核心嗰行會直接寫「請先更新監督程式」，唔會試咗先俾人拒絕。版本卡裝好嗰個版本之後唔再扮忙。更新面板嗰條連結指去準備裝嗰版，唔係已經裝咗嗰版。新備份檢查完，自我檢查張卡會自己更新。備份揀咗「自訂」之後會保持揀中。版本說明會標出搵到嘅字，仲可以逐個跳。個人設定搜尋唔再搵埋睇唔到嘅說明文字。實體面板轉高度會滑過去，唔會彈一下。以上修正有測試，但建置呢版嗰陣，仲未喺真正嘅更新過程入面睇過。",
+      "why": "An update page that says a backup was skipped when nobody skipped it, or offers a step that is refused, is worth fixing before the next real update.",
+      "try": [
+        "Press one of the fault names and read what was fixed.",
+        "Press another fault and see the count change.",
+        "Read the note at the bottom, which says these fixes have not yet been watched in a real update run."
+      ],
+      "sha": ["c9e3a5e67"],
+      "demo": "demos/524/update-run-faults.html"
+    }
+  ],
+  "other": []
+}

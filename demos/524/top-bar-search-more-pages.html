@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: search in the top bar reaches more pages</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.bar { display: flex; align-items: center; gap: 8px; min-height: 56px; background: var(--sl2); border-radius: 28px; padding: 6px 8px; width: 100%; max-width: 390px; margin: 0 auto; }
+.bar .title { flex: 1; font-weight: 500; overflow-wrap: anywhere; min-width: 0; }
+.bar button { min-height: 48px; }
+.bar .field { flex: 1; min-width: 0; max-width: 360px; }
+.bar input { min-height: 44px; }
+.bar .badge { flex: none; }
+.pages { width: 100%; max-width: 390px; margin: 0 auto; }
+.pages li[hidden] { display: none; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="top-bar-search-more-pages">
+  <h1>Search in the top bar reaches more pages</h1>
+  <p class="muted">Press the search button in the top bar, type a word, and watch the count in the bar change.</p>
+
+  <div class="bar" aria-label="Top bar">
+    <span class="title" id="page-title">Pages</span>
+    <div class="field" id="field" hidden>
+      <label class="sr-only" for="q">Search these pages</label>
+      <input type="search" id="q" placeholder="Search" autocomplete="off">
+    </div>
+    <span class="badge primary" id="badge" aria-hidden="true">9 of 9</span>
+    <button type="button" class="tonal" id="search-btn" aria-expanded="false" aria-controls="field">Search</button>
+  </div>
+  <p class="small" id="count" aria-live="polite">Showing all 9 pages.</p>
+
+  <ul class="list pages" id="pages" aria-label="Pages">
+    <li data-name="state">Developer tools: State</li>
+    <li data-name="statistics">Developer tools: Statistics</li>
+    <li data-name="action history">Developer tools: Action history</li>
+    <li data-name="converter">Developer tools: Converter</li>
+    <li data-name="yaml">Developer tools: YAML</li>
+    <li data-name="problem log">Problem log</li>
+    <li data-name="help">Help</li>
+    <li data-name="integrations">Integrations</li>
+    <li data-name="settings home">Settings home</li>
+  </ul>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. The pages listed are not real.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var TOTAL = 9;
+  var btn = document.getElementById('search-btn');
+  var field = document.getElementById('field');
+  var input = document.getElementById('q');
+  var count = document.getElementById('count');
+  var badge = document.getElementById('badge');
+  var items = document.querySelectorAll('#pages li');
+  var title = document.getElementById('page-title');
+  function show(open) {
+    field.hidden = !open;
+    btn.setAttribute('aria-expanded', String(open));
+    title.hidden = open;
+    if (open) input.focus();
+  }
+  function filter() {
+    var typed = input.value.trim();
+    var q = typed.toLowerCase();
+    var n = 0;
+    items.forEach(function (li) {
+      var hit = !q || li.getAttribute('data-name').indexOf(q) !== -1;
+      li.hidden = !hit;
+      if (hit) n++;
+    });
+    badge.textContent = n + ' of ' + TOTAL;
+    if (!q) count.textContent = 'Showing all ' + TOTAL + ' pages.';
+    else if (n === 0) count.textContent = 'No page matches "' + typed + '".';
+    else count.textContent = n + ' of ' + TOTAL + ' pages match "' + typed + '".';
+  }
+  btn.addEventListener('click', function () { show(field.hidden); });
+  input.addEventListener('input', filter);
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    input.value = ''; filter(); show(false);
+  });
+  filter();
+})();
+</script>
+</body>
+</html>
