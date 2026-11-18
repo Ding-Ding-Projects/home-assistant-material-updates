@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: setup form controls</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="setup-form-controls">
+  <h1>A setup form gives each field the control that suits it</h1>
+  <p class="muted">Try a port number outside its range, show the password, move the slider, and switch the yes or no answer.</p>
+
+  <form class="card stack" id="sf-form" novalidate>
+    <label class="field">Host name
+      <input type="text" id="sf-host" value="pretend-host" autocomplete="off">
+    </label>
+
+    <div class="stack">
+      <label class="field" for="sf-port">Port</label>
+      <div class="row">
+        <input type="number" id="sf-port" min="1" max="65535" value="8123" aria-describedby="sf-port-err">
+      </div>
+      <p id="sf-port-err" class="note error" hidden>Port must be between 1 and 65535.</p>
+    </div>
+
+    <div class="stack">
+      <label class="field" for="sf-retries">Retries: <span id="sf-rval">3</span> (slider and number box)</label>
+      <div class="row">
+        <input type="range" id="sf-retries" min="0" max="10" value="3">
+        <input type="number" id="sf-rnum" min="0" max="10" value="3" aria-label="Retries number">
+      </div>
+    </div>
+
+    <div class="row">
+      <span class="grow">Use secure connection</span>
+      <input type="checkbox" class="switch" id="sf-secure" checked aria-label="Use secure connection">
+    </div>
+
+    <div class="stack">
+      <label class="field" for="sf-pw">Password</label>
+      <div class="row">
+        <input type="password" id="sf-pw" value="pretend-secret" autocomplete="off" class="grow">
+        <button type="button" class="tonal" id="sf-show" aria-pressed="false">Show</button>
+      </div>
+    </div>
+
+    <fieldset class="stack">
+      <legend class="small muted">Area (choose one)</legend>
+      <div class="row" role="radiogroup" aria-label="Area">
+        <button type="button" class="chip" role="radio" aria-checked="true" data-area="Kitchen">Kitchen</button>
+        <button type="button" class="chip" role="radio" aria-checked="false" data-area="Garage">Garage</button>
+        <button type="button" class="chip" role="radio" aria-checked="false" data-area="Hall">Hall</button>
+      </div>
+    </fieldset>
+
+    <p id="sf-out" class="note" aria-live="polite">Nothing is saved.</p>
+  </form>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var port = document.getElementById('sf-port');
+  var portErr = document.getElementById('sf-port-err');
+  var slider = document.getElementById('sf-retries');
+  var num = document.getElementById('sf-rnum');
+  var rval = document.getElementById('sf-rval');
+  var pw = document.getElementById('sf-pw');
+  var show = document.getElementById('sf-show');
+  var secure = document.getElementById('sf-secure');
+  var out = document.getElementById('sf-out');
+  var areas = Array.prototype.slice.call(document.querySelectorAll('[data-area]'));
+
+  function checkPort() {
+    var v = Number(port.value);
+    var bad = port.value === '' || !Number.isInteger(v) || v < 1 || v > 65535;
+    portErr.hidden = !bad;
+    port.setAttribute('aria-invalid', String(bad));
+    return !bad;
+  }
+
+  port.addEventListener('input', function () {
+    checkPort();
+    if (checkPort()) out.textContent = 'Port ' + port.value + ' is valid.';
+  });
+
+  slider.addEventListener('input', function () {
+    num.value = slider.value;
+    rval.textContent = slider.value;
+  });
+  num.addEventListener('input', function () {
+    slider.value = num.value;
+    rval.textContent = num.value;
+  });
+
+  show.addEventListener('click', function () {
+    var shown = pw.type === 'text';
+    pw.type = shown ? 'password' : 'text';
+    show.textContent = shown ? 'Show' : 'Hide';
+    show.setAttribute('aria-pressed', String(!shown));
+  });
+
+  secure.addEventListener('change', function () {
+    out.textContent = secure.checked ? 'Secure connection is on.' : 'Secure connection is off.';
+  });
+
+  areas.forEach(function (b) {
+    b.addEventListener('click', function () {
+      areas.forEach(function (x) { x.setAttribute('aria-checked', String(x === b)); x.setAttribute('aria-pressed', String(x === b)); });
+      out.textContent = 'Area chosen: ' + b.getAttribute('data-area') + '.';
+    });
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    port.value = '8123';
+    checkPort();
+    slider.value = 3; num.value = 3; rval.textContent = '3';
+    pw.type = 'password'; show.textContent = 'Show'; show.setAttribute('aria-pressed', 'false');
+    secure.checked = true;
+    areas.forEach(function (x, i) { x.setAttribute('aria-checked', String(i === 0)); x.setAttribute('aria-pressed', String(i === 0)); });
+    out.textContent = 'Nothing is saved.';
+  });
+
+  checkPort();
+})();
+</script>
+</body>
+</html>

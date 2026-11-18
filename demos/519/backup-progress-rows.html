@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: backup progress rows</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="backup-progress-rows">
+  <h1>A running backup shows each stage and each upload place</h1>
+  <p class="muted">Press Next stage to move the backup on. Each upload place keeps its own row, so one slow place stays visible.</p>
+
+  <section class="card stack" aria-labelledby="bp-h">
+    <h2 id="bp-h" class="small">Stages</h2>
+    <ul class="list" id="bp-stages" aria-label="Backup stages"></ul>
+
+    <h2 class="small">Upload places</h2>
+    <ul class="list" id="bp-places" aria-label="Upload places"></ul>
+
+    <button type="button" class="tonal" disabled aria-disabled="true">Backup running (cannot be cancelled)</button>
+    <p id="bp-out" class="note" aria-live="polite">The backup is starting.</p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="filled" id="bp-next">Next stage</button><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var STAGES = ['Home Assistant', 'Apps', 'Folders and media', 'Waiting for apps to restart', 'Uploading', 'Removing old backups'];
+  var PLACES = [
+    { name: 'Local drive', total: 2048, uploaded: 0, reports: true },
+    { name: 'Cloud folder', total: 2048, uploaded: 0, reports: true },
+    { name: 'Network share', total: 0, uploaded: 0, reports: false }
+  ];
+  var stage = 0;
+  var done = false;
+  var stagesEl = document.getElementById('bp-stages');
+  var placesEl = document.getElementById('bp-places');
+  var out = document.getElementById('bp-out');
+  var next = document.getElementById('bp-next');
+
+  function fmtMB(n) { return n + ' MB'; }
+
+  function draw() {
+    stagesEl.innerHTML = '';
+    STAGES.forEach(function (name, i) {
+      var li = document.createElement('li');
+      var st = i < stage ? 'done' : (i === stage && !done ? 'running' : 'waiting');
+      if (done) st = 'done';
+      li.textContent = name + ': ' + st;
+      stagesEl.appendChild(li);
+    });
+    placesEl.innerHTML = '';
+    PLACES.forEach(function (p) {
+      var li = document.createElement('li');
+      li.className = 'stack';
+      var head = document.createElement('div');
+      head.className = 'row';
+      var label = document.createElement('span');
+      label.className = 'grow';
+      var pctText = p.reports && p.total ? Math.round((p.uploaded / p.total) * 100) + '%' : 'no progress reported';
+      label.innerHTML = '<strong></strong><br><span class="small muted"></span>';
+      label.querySelector('strong').textContent = p.name;
+      label.querySelector('span').textContent = p.reports && p.total ? fmtMB(p.uploaded) + ' of ' + fmtMB(p.total) + ', ' + pctText : 'Bytes done not known for this place';
+      head.appendChild(label);
+      li.appendChild(head);
+      var bar = document.createElement('div');
+      bar.className = 'bar';
+      bar.setAttribute('role', 'progressbar');
+      bar.setAttribute('aria-label', p.name + ' progress');
+      if (p.reports && p.total) {
+        bar.setAttribute('aria-valuenow', String(Math.round((p.uploaded / p.total) * 100)));
+        var fill = document.createElement('i');
+        fill.style.width = Math.round((p.uploaded / p.total) * 100) + '%';
+        bar.appendChild(fill);
+      } else {
+        bar.className = 'bar indeterminate';
+        bar.setAttribute('aria-valuetext', 'Progress not reported');
+      }
+      li.appendChild(bar);
+      placesEl.appendChild(li);
+    });
+  }
+
+  next.addEventListener('click', function () {
+    if (done) return;
+    if (stage === 4) {
+      // Uploading: each place that reports moves one chunk per press.
+      PLACES.forEach(function (p) { if (p.reports) p.uploaded = Math.min(p.total, p.uploaded + 1024); });
+      var full = PLACES.every(function (p) { return !p.reports || p.uploaded >= p.total; });
+      if (full) stage += 1;
+      out.textContent = 'Uploading. The local drive and the cloud folder show bytes done. The network share reports no progress, so its bar says so.';
+    } else {
+      stage += 1;
+      out.textContent = 'Now at: ' + STAGES[Math.min(stage, STAGES.length - 1)] + '.';
+    }
+    if (stage >= STAGES.length) {
+      done = true;
+      out.textContent = 'Backup finished: 4.0 GB, took 0:42, now kept on the local drive and the cloud folder. The network share had no progress report.';
+      next.disabled = true;
+    }
+    draw();
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    stage = 0; done = false;
+    PLACES.forEach(function (p) { p.uploaded = 0; });
+    next.disabled = false;
+    out.textContent = 'The backup is starting.';
+    draw();
+  });
+
+  draw();
+})();
+</script>
+</body>
+</html>

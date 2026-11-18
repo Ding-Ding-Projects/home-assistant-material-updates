@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: how each copy of a backup is checked</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="backup-self-check-copies">
+  <h1>Each copy of a backup is one of three kinds</h1>
+  <p class="muted">Pick where a copy lives and the check mode. Then press Check in full to see the result for that copy.</p>
+
+  <section class="card stack" aria-labelledby="sc-h">
+    <h2 id="sc-h" class="small">Where the copy lives</h2>
+    <div class="row" role="radiogroup" aria-label="Where the copy lives">
+      <button type="button" class="chip" role="radio" aria-checked="false" data-kind="local">Local</button>
+      <button type="button" class="chip" role="radio" aria-checked="true" data-kind="network">Network</button>
+      <button type="button" class="chip" role="radio" aria-checked="false" data-kind="remote">Remote</button>
+    </div>
+    <div class="row" role="radiogroup" aria-label="Check mode">
+      <button type="button" class="chip" role="radio" aria-checked="true" data-mode="light">Light</button>
+      <button type="button" class="chip" role="radio" aria-checked="false" data-mode="full">Full</button>
+    </div>
+    <label class="field">Size of the copy (GB)
+      <input type="number" id="sc-size" min="0" max="20" value="3">
+    </label>
+    <p class="small muted" id="sc-kind-text" aria-live="polite"></p>
+  </section>
+
+  <section class="card stack" aria-labelledby="sc-res-h">
+    <h2 id="sc-res-h" class="small">Result</h2>
+    <button type="button" class="filled" id="sc-check">Check in full</button>
+    <p id="sc-out" class="note" aria-live="polite">Press Check in full to see the result.</p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var LIMIT = 1; // GB, the default size limit for a full download in Light mode
+  var kind = 'network';
+  var mode = 'light';
+  var kindBtns = Array.prototype.slice.call(document.querySelectorAll('[data-kind]'));
+  var modeBtns = Array.prototype.slice.call(document.querySelectorAll('[data-mode]'));
+  var sizeEl = document.getElementById('sc-size');
+  var kindText = document.getElementById('sc-kind-text');
+  var out = document.getElementById('sc-out');
+
+  var KIND_WORDS = {
+    local: 'Local copy: in Core or Supervisor storage. Read in full in every mode.',
+    network: 'Network copy: on a storage mount on the home network. Read in full in Light mode up to the size limit, lightly above it.',
+    remote: 'Remote copy: cloud places and anything else. Checked lightly by default.'
+  };
+
+  function markGroup(btns, attr, value) {
+    btns.forEach(function (b) {
+      var on = b.getAttribute(attr) === value;
+      b.setAttribute('aria-checked', String(on));
+      b.setAttribute('aria-pressed', String(on));
+    });
+  }
+
+  function draw() {
+    markGroup(kindBtns, 'data-kind', kind);
+    markGroup(modeBtns, 'data-mode', mode);
+    kindText.textContent = KIND_WORDS[kind];
+  }
+
+  function result() {
+    var size = Number(sizeEl.value);
+    if (kind === 'local') return 'Verified in full. This is the copy the check reads in full.';
+    if (mode === 'full') return 'Read in full: verified in full, the whole copy was read.';
+    if (kind === 'network' && size <= LIMIT) return 'Read in full: verified in full, the copy is under the size limit.';
+    if (kind === 'network') return 'Light check: present and size matches. Read lightly, above the size limit.';
+    return 'Light check: present and size matches. The first chunk was read, nothing downloaded.';
+  }
+
+  kindBtns.forEach(function (b) {
+    b.addEventListener('click', function () { kind = b.getAttribute('data-kind'); draw(); });
+  });
+  modeBtns.forEach(function (b) {
+    b.addEventListener('click', function () { mode = b.getAttribute('data-mode'); draw(); });
+  });
+
+  document.getElementById('sc-check').addEventListener('click', function () {
+    out.textContent = result();
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    kind = 'network'; mode = 'light'; sizeEl.value = 3;
+    out.textContent = 'Press Check in full to see the result.';
+    draw();
+  });
+
+  draw();
+})();
+</script>
+</body>
+</html>

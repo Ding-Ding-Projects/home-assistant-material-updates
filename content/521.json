@@ -1,0 +1,61 @@
+{
+  "build": 521,
+  "headline": "Phone menus open as sheets, slimmer update rows, and a backup self-check that reads the Supervisor's own copy",
+  "summary": "Build 521 is a duplicate of build 520: it was built again from the same source, so the changes are the same. They are fixes from a real phone run of build 519. Menus open as sheets from the bottom on a phone so that Delete is never cut off, finished updates show the time they really took, update rows are a third of their old height, and an Update coming soon card shows the progress of the next build. The backup self-check no longer treats a copy on the Supervisor's own storage as a remote copy. That fix has not yet been checked on a real Supervisor, and the next build will show whether it works.",
+  "summary_yue": "521 版係 520 版嘅重複版本，即係同一個源碼再建一次，所以改動都一樣。內容係喺真實手機上面行 519 版之後搵返嘅修正：手機上面，選單由底部升起成為面板，「刪除」唔會再畀切走；完成咗嘅更新顯示真正用咗幾耐；更新行高度只有以前三分之一，加咗一張「更新即將推出」卡；備份自我檢查唔再將監督程式儲存入面嘅副本當成遠端副本。呢個修正仲未喺真實嘅監督程式上面驗證。",
+  "highlights": [
+    {
+      "id": "phone-menus-and-durations",
+      "title": "On a phone, menus open as sheets, and a finished update shows the time it really took",
+      "areas": ["interface"],
+      "what": "Below 600 pixels wide, every menu opens as a sheet from the bottom with rows tall enough to tap. The sheet scrolls inside itself and sits above the floating bars, so Delete on the last step can no longer be cut off. Update rows also stop timing themselves from the reload that follows an update. Their start is kept from when the update began, so a two-minute update shows two minutes. If the start really is unknown, the row gives the finish time and no duration.",
+      "what_yue": "闊度細過 600 像素嗰陣，每個選單都會由底部升起成為面板，每行夠高，撳得準。面板喺自己入面捲動，並且放喺浮動欄上面，所以最後一步嘅「刪除」唔會再畀切走。更新嗰行亦唔再由重新載入嗰刻開始計時間，而係由更新開始嗰刻記低；如果真係唔知開始時間，就只寫完成嗰刻，唔寫用咗幾耐。",
+      "why": "A menu that opened upwards on the last step lost its top, and a reload made a two-minute update look like five seconds.",
+      "try": [
+        "Open a step's menu in the phone-width demo and see it rise from the bottom.",
+        "Press Delete in the sheet.",
+        "Read the duration shown on the finished update in the second demo."
+      ],
+      "sha": ["28e6e9e7d"],
+      "demo": "demos/521/phone-menus-and-durations.html",
+      "more_demos": [
+        {
+          "title": "A finished update keeps the duration from when it started",
+          "demo": "demos/521/durations-keep-start.html",
+          "try": ["Press Start update, then press Reload page, and read the row.", "Press Finish and read the duration, which counts from the start."]
+        }
+      ]
+    },
+    {
+      "id": "phone-update-rows",
+      "title": "Update rows take a third of the phone height, and one Update coming soon card",
+      "areas": ["interface"],
+      "what": "On a phone, an update row is about 66 pixels tall, down from 145: the badge, a one-line name, the versions and the Update button. A chevron opens the summary, the Notes link and the Automatic switch. The build progress, which used to be several large cards, is now one card called Update coming soon. It shows the build number, the real percentage, a thin bar and the jobs done. Opened, it lists each stage with its state, an estimate that says it comes from earlier builds, up to three things that will be in the build, and what can be done now. It never installs anything. The largest type on the Updates page also drops from 72 to 28 pixels.",
+      "what_yue": "喺手機上面，更新行由以前 145 像素高收到 66 像素：徽章、一行名稱、版本同更新掣。撳箭嘴可以打開摘要、說明連結同自動開關。建置進度以前係幾張大卡，而家收成一張「更新即將推出」卡，顯示版本編號、真實百分比、一條幼進度條同完成咗幾多項工作；打開就列出每個階段嘅狀態、一個根據以往建置嘅估計，同最多三樣會喺呢個版本入面嘅嘢。佢永遠唔會自己安裝嘢。更新頁最大嘅字亦由 72 像素細到 28 像素。",
+      "why": "On a phone, the rows and cards were so tall and the type so large that one update took more than a screen.",
+      "try": [
+        "Open the demo at phone width and read the height of a closed row.",
+        "Press the chevron and see the summary, Notes and the switch.",
+        "Open the Update coming soon card and read each stage."
+      ],
+      "sha": ["11e60d596"],
+      "demo": "demos/521/phone-update-rows.html"
+    },
+    {
+      "id": "backup-self-check-copies",
+      "title": "The backup self-check reads a copy on the Supervisor's own storage in full",
+      "areas": ["core"],
+      "what": "A copy of a backup is now one of three kinds. A local copy is in Core's own storage or the Supervisor's local storage, and it is read in full in every mode. A network copy sits on a storage mount on the home network, and it is read in full in Light mode up to the size limit. Everything else, including cloud places, is a remote copy and is checked lightly by default. In build 519, a backup made seconds earlier could be reported as could not be fully checked, 0 of 4 checks passed, because a copy served by the Supervisor was treated as remote and never read. Nothing was wrong with the backup. This fix has not yet been checked on a real Supervisor.",
+      "what_yue": "一份備份副本而家分三種。本機副本放喺核心自己嘅儲存，或者監督程式嘅本機儲存，任何模式都會完整讀一次。網絡副本放喺屋企網絡上面嘅儲存掛載，輕量模式下，大細上限以內會完整讀。其餘包括雲端位置，全部當遠端副本，預設做輕量檢查。519 版有時會將幾秒前整好嘅備份講成「未能完整檢查，4 項之中 0 項通過」，因為監督程式提供嘅本機副本畀當咗做遠端、完全冇讀過。份備份其實冇問題。呢個修正仲未喺真實嘅監督程式上面驗證。",
+      "why": "The check was wrong about where the copy was, so a good backup looked unchecked.",
+      "try": [
+        "Choose a kind of copy in the demo and read how it is checked.",
+        "Press Check in full and see the result for a local copy.",
+        "Read the message for a remote copy in Light mode."
+      ],
+      "sha": ["2e4885975"],
+      "demo": "demos/521/backup-self-check-copies.html"
+    }
+  ],
+  "other": []
+}

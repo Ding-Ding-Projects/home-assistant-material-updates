@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: light backup self-check</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="backup-light-check">
+  <h1>The self-check reads copies elsewhere lightly by default</h1>
+  <p class="muted">Choose a mode and a size limit, then read what the check does to each place. Nothing is downloaded here.</p>
+
+  <section class="card stack" aria-labelledby="lc-h">
+    <h2 id="lc-h" class="small">Remote check mode</h2>
+    <div class="row" role="radiogroup" aria-label="Remote check mode">
+      <button type="button" class="chip" role="radio" aria-checked="false" data-mode="full">Full</button>
+      <button type="button" class="chip" role="radio" aria-checked="true" data-mode="light">Light</button>
+      <button type="button" class="chip" role="radio" aria-checked="false" data-mode="off">Off</button>
+    </div>
+    <label class="field">Size limit for an automatic full download (GB)
+      <input type="number" id="lc-limit" min="0" max="50" value="1">
+    </label>
+    <p id="lc-mode-text" class="note" aria-live="polite"></p>
+  </section>
+
+  <section class="card stack" aria-labelledby="lc-places-h">
+    <h2 id="lc-places-h" class="small">Places holding this backup (3.5 GB)</h2>
+    <ul class="list" id="lc-places" aria-label="Places"></ul>
+    <p class="small muted">Each place gets its own result. A slow or throttled place is "could not be checked", not a failed backup.</p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var PLACES = [
+    { name: 'Local storage', size: 3.5, slow: false, local: true },
+    { name: 'Cloud folder', size: 3.5, slow: true, local: false },
+    { name: 'Network share', size: 3.5, slow: false, local: false }
+  ];
+  var mode = 'light';
+  var modeBtns = Array.prototype.slice.call(document.querySelectorAll('[data-mode]'));
+  var limitEl = document.getElementById('lc-limit');
+  var modeText = document.getElementById('lc-mode-text');
+  var list = document.getElementById('lc-places');
+
+  function resultFor(p) {
+    if (p.local) return 'Read in full: verified in full.';
+    if (mode === 'off') return 'Not checked: the remote check is off.';
+    if (mode === 'full' || (mode === 'light' && p.size <= Number(limitEl.value))) {
+      if (p.slow) return 'Could not be checked: the place answered too slowly. This is not a failed backup.';
+      return 'Read in full: verified in full.';
+    }
+    if (p.slow) return 'Could not be checked: the place answered too slowly. This is not a failed backup.';
+    return 'Light check: present and size matches. No archive downloaded.';
+  }
+
+  function draw() {
+    modeBtns.forEach(function (b) {
+      var on = b.getAttribute('data-mode') === mode;
+      b.setAttribute('aria-checked', String(on));
+      b.setAttribute('aria-pressed', String(on));
+    });
+    var words = {
+      light: 'Light: the place is asked for the copy, its size is compared and its first chunk is read. Copies above the size limit are never fully downloaded on their own.',
+      full: 'Full: every remote copy is downloaded and hashed after each backup. This costs time and data.',
+      off: 'Off: remote copies are not checked automatically. A full check of one backup can still be started by hand.'
+    };
+    modeText.textContent = words[mode];
+    list.innerHTML = '';
+    PLACES.forEach(function (p) {
+      var li = document.createElement('li');
+      li.className = 'stack';
+      var strong = document.createElement('strong');
+      strong.textContent = p.name + (p.local ? ' (local copy: always read in full)' : ' (remote copy)');
+      var res = document.createElement('span');
+      res.className = 'small';
+      res.textContent = resultFor(p);
+      li.appendChild(strong);
+      li.appendChild(res);
+      list.appendChild(li);
+    });
+  }
+
+  modeBtns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      mode = b.getAttribute('data-mode');
+      draw();
+    });
+  });
+  limitEl.addEventListener('input', draw);
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    mode = 'light';
+    limitEl.value = 1;
+    draw();
+  });
+
+  draw();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: one bottom bar on a phone</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.phone { width: 100%; max-width: 390px; margin: 0 auto; background: var(--sl1); border-radius: 24px; padding: 12px; display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
+.pills { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+.pills button { flex: none; min-height: 48px; }
+.bottombar { display: flex; gap: 8px; border-top: 1px solid var(--outv); padding-top: 8px; }
+.bottombar button { flex: 1; }
+.wrap { white-space: normal; overflow-wrap: anywhere; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="phone-one-bottom-bar">
+  <h1>On a phone, one bottom bar and rows that wrap</h1>
+  <p class="muted">The frame below is phone width. Count the bars at the bottom, scroll the sub-tabs sideways, and read the long row.</p>
+
+  <div class="phone" aria-label="Phone-width page">
+    <h2 class="small">Entities</h2>
+    <div class="pills" role="tablist" aria-label="Sub-tabs">
+      <button type="button" class="chip" role="tab" aria-selected="true">Lights</button>
+      <button type="button" class="chip" role="tab" aria-selected="false">Switches</button>
+      <button type="button" class="chip" role="tab" aria-selected="false">Sensors</button>
+      <button type="button" class="chip" role="tab" aria-selected="false">Covers</button>
+      <button type="button" class="chip" role="tab" aria-selected="false">Climate</button>
+    </div>
+    <ul class="list" aria-label="Entities">
+      <li class="wrap"><span class="grow">Kitchen ceiling light, the one over the sink and the island, north side</span></li>
+      <li class="wrap"><span class="grow">Hall</span></li>
+    </ul>
+    <p class="small muted" id="pb-count">Bars at the bottom: 1</p>
+    <div class="bottombar" role="toolbar" aria-label="Main bar">
+      <button type="button" class="tonal" data-main="Home">Home</button>
+      <button type="button" class="tonal" data-main="Entities">Entities</button>
+      <button type="button" class="tonal" data-main="Settings">Settings</button>
+    </div>
+    <p class="small" id="pb-out" aria-live="polite">Select lives in the page menu now.</p>
+  </div>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var out = document.getElementById('pb-out');
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+  tabs.forEach(function (t) {
+    t.addEventListener('click', function () {
+      tabs.forEach(function (x) { x.setAttribute('aria-selected', String(x === t)); });
+      out.textContent = 'Showing ' + t.textContent + '.';
+    });
+  });
+  Array.prototype.slice.call(document.querySelectorAll('[data-main]')).forEach(function (b) {
+    b.addEventListener('click', function () {
+      out.textContent = b.getAttribute('data-main') + ' is the one main bar on this page.';
+    });
+  });
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    tabs.forEach(function (x, i) { x.setAttribute('aria-selected', String(i === 0)); });
+    out.textContent = 'Select lives in the page menu now.';
+  });
+})();
+</script>
+</body>
+</html>

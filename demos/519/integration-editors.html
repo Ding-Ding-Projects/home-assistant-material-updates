@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: an integration's action editor</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="integration-editors">
+  <h1>An integration's action editor adds steps at the end</h1>
+  <p class="muted">Choose an action, press Add action, and see where the new step lands. Open More options to see the optional fields.</p>
+
+  <section class="card stack" aria-labelledby="ie-h">
+    <h2 id="ie-h" class="small">Steps</h2>
+    <ol class="list" id="ie-steps" aria-label="Steps"></ol>
+    <div class="row">
+      <label class="field grow-field">Action
+        <select id="ie-pick">
+          <option value="light">Light: turn on</option>
+          <option value="brightness">Light: set brightness</option>
+          <option value="message">Notify: send a message</option>
+        </select>
+      </label>
+      <button type="button" class="filled" id="ie-add">Add action</button>
+    </div>
+  </section>
+
+  <section class="card stack" aria-labelledby="ie-more-h">
+    <h2 id="ie-more-h" class="small">Brightness step</h2>
+    <button type="button" class="tonal" id="ie-more" aria-expanded="false" aria-controls="ie-extra">More options (2)</button>
+    <div id="ie-extra" hidden class="stack">
+      <label class="field">Transition seconds
+        <input type="number" id="ie-secs" min="0" max="60" value="0">
+      </label>
+      <label class="field">Brightness: <span id="ie-bval">180</span>
+        <input type="range" id="ie-bright" min="1" max="255" value="180">
+      </label>
+    </div>
+    <p id="ie-out" class="note" aria-live="polite">Add a step to see it appear.</p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<style>
+.grow-field { flex: 1; min-width: 200px; }
+</style>
+<script>
+(function () {
+  var NAMES = { light: 'Light: turn on', brightness: 'Light: set brightness', message: 'Notify: send a message' };
+  var steps = [];
+  var list = document.getElementById('ie-steps');
+  var out = document.getElementById('ie-out');
+  var more = document.getElementById('ie-more');
+  var extra = document.getElementById('ie-extra');
+  var bright = document.getElementById('ie-bright');
+  var bval = document.getElementById('ie-bval');
+
+  function render() {
+    list.innerHTML = '';
+    steps.forEach(function (s, i) {
+      var li = document.createElement('li');
+      li.textContent = (i + 1) + '. ' + NAMES[s];
+      list.appendChild(li);
+    });
+    if (!steps.length) {
+      var empty = document.createElement('li');
+      empty.className = 'muted';
+      empty.textContent = 'No steps yet.';
+      list.appendChild(empty);
+    }
+  }
+
+  document.getElementById('ie-add').addEventListener('click', function () {
+    var kind = document.getElementById('ie-pick').value;
+    steps.push(kind);
+    render();
+    out.textContent = 'Added "' + NAMES[kind] + '" as step ' + steps.length + ', at the end of the list.';
+  });
+
+  more.addEventListener('click', function () {
+    var open = extra.hidden;
+    extra.hidden = !open;
+    more.setAttribute('aria-expanded', String(open));
+    more.textContent = open ? 'Hide options' : 'More options (2)';
+  });
+
+  bright.addEventListener('input', function () {
+    bval.textContent = bright.value;
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    steps = [];
+    render();
+    extra.hidden = true;
+    more.setAttribute('aria-expanded', 'false');
+    more.textContent = 'More options (2)';
+    bright.value = 180;
+    bval.textContent = '180';
+    document.getElementById('ie-secs').value = 0;
+    out.textContent = 'Add a step to see it appear.';
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

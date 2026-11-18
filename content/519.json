@@ -1,0 +1,116 @@
+{
+  "build": 519,
+  "headline": "Editors for every integration's steps, setup forms that fit each field, and real progress for updates and backups",
+  "summary": "Build 519 gives the actions, triggers and conditions of every integration their own editors. A test checks all 1,576 integration folders, and none is left without one. Setup forms use the control that suits each field, every update and backup shows its real stages and numbers, and automation, script and scene edits are kept as drafts until you press Save. Phone layouts are tidier, and the build now carries this project's own English wording. Several of these editors had not yet been looked at in a browser when they were written.",
+  "summary_yue": "519 版為每個整合嘅動作、觸發同條件都做咗自己嘅編輯器。測試檢查咗全部 1,576 個整合資料夾，冇一個冇編輯器。設定表格嘅控制會跟住欄位而變，每個更新同備份都顯示真實嘅階段、數字同輸出；自動化、腳本同場景嘅改動會先存做草稿，撳「儲存」先至正式生效。手機版面整理過，而家建置用返本項目自己嘅英文字眼。部分編輯器寫嗰陣仲未喺瀏覽器度睇過。",
+  "highlights": [
+    {
+      "id": "integration-editors",
+      "title": "Every integration's actions, triggers and conditions get their own editor",
+      "areas": ["interface"],
+      "what": "Integrations that define actions now have editors shaped to those actions. Numbers use sliders or steppers, colours use a colour picker, durations and times have their own controls, and passwords and codes are hidden. Triggers, conditions and device automations get the same kind of editor, and the community Bambu Lab printer integration has editors of its own. Long forms fold their optional fields into a More options button that shows how many there are. Add action now puts a new step at the end of the list, where it used to go to the top.",
+      "what_yue": "每個定義咗自己動作嘅整合，而家都有啱佢哋嘅編輯器。數字用滑桿或者加減掣，顏色用選色器，時長同時間有專屬控制，密碼同代碼會遮住。觸發、條件同裝置自動化都用同一類編輯器，社群嘅 Bambu Lab 打印機整合亦有自己嘅編輯器。長表格會將選填欄位收埋喺「更多選項」掣入面，掣上面會顯示有幾多個。「新增動作」而家會加喺清單最尾，以前會跑到頂。",
+      "why": "Each field should show the kind of value it takes, so a person can see what to enter without looking up every step.",
+      "try": [
+        "Press Add action in the demo and see the new step appear at the end.",
+        "Open More options on the long form and see the optional fields appear.",
+        "Move the slider and read the value it keeps."
+      ],
+      "sha": ["0e32f6ee9", "a48fc170f", "991e35fbc", "900ceccca"],
+      "demo": "demos/519/integration-editors.html"
+    },
+    {
+      "id": "setup-form-controls",
+      "title": "Setup forms use the control that suits each field",
+      "areas": ["interface"],
+      "what": "The sign-in and setup forms of about a thousand integrations are drawn by one shared form, and each field's name and kind choose its control. Passwords, tokens, keys and PINs are hidden behind a show and hide button. Whole numbers with a small range are a slider with a number box, yes or no is a switch with its explanation beside it, and up to five choices show as tiles. Help text stays visible under its field, and an error sits under the field that caused it.",
+      "what_yue": "大約一千個整合嘅登入同設定表格，而家由同一個表格畫出嚟，每個欄位嘅名同種類決定用邊種控制。密碼、權杖、金鑰同 PIN 會遮住，有顯示同隱藏掣。範圍細嘅整數用滑桿加數字格，是或否用開關，說明擺喺旁邊；五個或以下嘅選擇用方磚。說明文字一直睇得到，錯誤就放喺出事嗰個欄位下面。",
+      "why": "A password, a port number and a yes or no answer each need a different control, and a secret should never be shown by accident.",
+      "try": [
+        "Type a port number outside its range and read the error under the field.",
+        "Press the show button on the password field.",
+        "Move the slider and watch the number box follow it."
+      ],
+      "sha": ["c86deec24"],
+      "demo": "demos/519/setup-form-controls.html"
+    },
+    {
+      "id": "update-progress",
+      "title": "Each update row shows its real stages, numbers and output",
+      "areas": ["interface"],
+      "what": "An installing update now shows a progress bar with the percentage the update itself reports. If no percentage is reported, the bar is marked as indeterminate and says so. Each update lists the stages for its kind, such as backup, download, unpack, install, restart and check, and each stage is waiting, running, done, failed or skipped. The newest lines from its log appear with secrets masked. A waiting update says its place and why it waits. A finished update shows its versions and a What's new link, and a failed one shows the stage, the reason and what can be done. Nothing retries by itself.",
+      "what_yue": "安裝緊嘅更新而家會顯示真正做緊乜。進度條跟住更新自己報嘅百分比；冇報就用不確定進度條，並且講明。每個更新列出嗰種更新嘅階段，例如備份、下載、解壓、安裝、重新啟動同檢查，每個階段標明等候、進行中、完成、失敗或者略過。即時輸出顯示最新幾行日誌，機密會遮住。等緊嘅更新會講排第幾同點解要等；完成嘅更新顯示由邊個版本去到邊個版本，同埋「有乜新嘢」連結；失敗嘅更新就講明邊個階段、原因同可以點做。冇一樣嘢會自己重試。",
+      "why": "An update that was installing used to show a small spinner and three words, which did not say whether anything was moving.",
+      "try": [
+        "Press Next stage in the demo and watch each stage change its state.",
+        "Find the waiting update and read why it is waiting.",
+        "Press Fail this stage and read the reason and what can be done."
+      ],
+      "sha": ["ff0eeea8e"],
+      "demo": "demos/519/update-progress.html"
+    },
+    {
+      "id": "backup-progress-rows",
+      "title": "A running backup shows each stage and each upload place on its own row",
+      "areas": ["interface"],
+      "what": "The progress of a running backup is a list of stages, each with its full name and a state. Every upload place has its own row with bytes done of the total, a percentage, a speed and an estimate once there are enough real samples, plus start and finish times in 24-hour form. A place that reports nothing gets an indeterminate bar. The button says Backup running and that it cannot be cancelled, because the server has no cancel command. When the backup ends, the row shows its size, its duration and where it now lives, or the failed stage and place with the reason.",
+      "what_yue": "備份進行緊嘅時候，進度係一份階段清單，每個階段有完整名稱同狀態。每個上載位置有自己一行，顯示已傳同總共嘅位元組、百分比；有足夠真實樣本嗰陣先會顯示速度同估計時間；開始同完成時間用 24 小時制。冇報進度嘅位置用不確定進度條。粒掣會寫「備份進行中」，並且講明取消唔到，因為伺服器冇取消指令。完成之後顯示大小、用咗幾耐，同埋而家存放喺邊度；失敗就講明邊個階段、邊個位置，同埋原因。",
+      "why": "One slow or failed place used to hide behind the others, and the single progress bar was too small to read.",
+      "try": [
+        "Press Next stage to move the backup through its stages.",
+        "Find the place that reports no progress and read its bar.",
+        "Press Next stage until the backup finishes, and read the size and time shown."
+      ],
+      "sha": ["15f5ff0a6"],
+      "demo": "demos/519/backup-progress-rows.html"
+    },
+    {
+      "id": "drafts-and-history",
+      "title": "Automations, scripts and scenes are kept as drafts until you press Save",
+      "areas": ["interface", "core"],
+      "what": "While an automation, script or scene is being edited, each change is kept as a draft about two seconds later. A draft never runs and never reloads anything, so the live item changes only when Save is pressed. After a crash, a closed tab or a restart, the editor offers the draft back with Continue editing, See what changed or Discard, and it warns if the live item changed in the meantime. A draft history lists the autosaves and can restore one. Each automation, script or scene can be exported as a YAML file or copied, several automations can be exported at once from the list, and files can be imported the same way.",
+      "what_yue": "編輯自動化、腳本或者場景嗰陣，每次改動兩秒後會存做草稿。草稿永遠唔會執行，亦唔會重新載入；正式項目要撳「儲存」先至會改。撞機、閂咗分頁或者重新啟動之後，再開返嗰個項目會問你要唔要草稿：繼續編輯、睇下改咗乜，或者丟棄；如果正式項目期間有改過，會提你知。草稿歷史會列出每次自動儲存，亦可以還原其中一次。每個自動化、腳本或者場景都可以匯出做 YAML 檔或者複製，清單入面亦可以一次匯出幾個自動化；匯入都係同一個做法。",
+      "why": "A long edit could be lost when a tab closed or the system restarted, and there was no simple way to keep a copy or move an item.",
+      "try": [
+        "Type a change in the demo and read that a draft is kept (the real editor waits two seconds first).",
+        "Press Discard draft and see that the saved item has not changed.",
+        "Open the draft history and restore an earlier autosave."
+      ],
+      "sha": ["9ad0a9d54"],
+      "demo": "demos/519/drafts-and-history.html"
+    },
+    {
+      "id": "backup-light-check",
+      "title": "Copies held in other places are checked lightly unless you ask for more",
+      "areas": ["core"],
+      "what": "After each backup, the self-check no longer downloads every copy again from every other place. Copies held elsewhere are checked lightly by default: the place is asked for the copy, its reported size is compared, and the start of the copy is read. A setting chooses Light, Full or Off, and a size limit, 1 GiB by default, stops a full download happening on its own. A full check of one backup in one place is still available on demand. Each place gets its own result, and a slow or throttled place is reported as could not be checked rather than as a failed backup.",
+      "what_yue": "每次備份完之後，自我檢查唔會再由每個其他位置將成份副本再落載一次。副本放喺其他位置嘅話，預設做輕量檢查：問個位置有冇呢份副本，比較佢報嘅大細，再讀副本開頭嗰段。有個設定可以揀輕量、完整或者關閉，仲有個大細上限，預設 1 GiB，超過就唔會自動完整落載。想完整檢查某一份備份喺某一個位置，隨時可以手動做。每個位置有自己嘅結果；慢咗或者被限速嘅位置會寫「未能檢查」，唔會當成備份失敗。",
+      "why": "Each check downloaded the whole archive again, which costs time and data, and a throttled connection could raise a false failure.",
+      "try": [
+        "Choose Light, Full or Off and read what each one does.",
+        "Change the size limit and see when a full check stops being automatic.",
+        "Read the result for a place that is slow to answer."
+      ],
+      "sha": ["89f61a1cb"],
+      "demo": "demos/519/backup-light-check.html"
+    },
+    {
+      "id": "phone-one-bottom-bar",
+      "title": "On a phone, one bottom bar, nothing wider than the screen, and lists for scripts and scenes",
+      "areas": ["interface"],
+      "what": "On a phone, pages that had three bars stacked at the bottom now have one. Sub-tabs are a row that scrolls sideways under the title, and Select moves into the page menu. Long update names no longer make a page wider than the screen, and list rows wrap to a second line instead of being cut off. Script and scene lists gain the same export and import that automations already had.",
+      "what_yue": "喺手機上面，原本底部疊住三條欄嘅頁，而家得返一條。副分頁變成標題下面一行可以橫向捲動嘅藥丸，「選取」放入頁面選單。長嘅更新名唔會再令成版頁闊過螢幕，清單行會換行，唔會截斷個字。腳本同場景清單都有匯出同匯入，同自動化一樣。",
+      "why": "Stacked bars and wide rows covered the screen and cut off words on a phone.",
+      "try": [
+        "Open the demo at phone width and count the bars at the bottom.",
+        "Scroll the row of sub-tabs sideways.",
+        "Read the long list row, which wraps instead of being cut off."
+      ],
+      "sha": ["117f536c0"],
+      "demo": "demos/519/phone-one-bottom-bar.html"
+    }
+  ],
+  "other": [
+    { "title": "The build carries this project's own English wording for every integration", "sha": ["7889b9ba1"] }
+  ]
+}

@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: drafts and history</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="drafts-and-history">
+  <h1>Edits are kept as drafts until you press Save</h1>
+  <p class="muted">Type a change, which the editor keeps as a draft. The saved item changes only when you press Save. In the real editor the draft is kept about two seconds after you stop typing; here it is kept at once.</p>
+
+  <section class="card stack" aria-labelledby="dh-h">
+    <h2 id="dh-h" class="small">Automation: Porch light at dusk</h2>
+    <label class="field">Name
+      <input type="text" id="dh-name" value="Porch light at dusk">
+    </label>
+    <label class="field">Turn on after (minutes)
+      <input type="number" id="dh-min" min="0" max="120" value="10">
+    </label>
+    <div class="row">
+      <button type="button" class="filled" id="dh-save">Save</button>
+      <button type="button" class="tonal" id="dh-discard">Discard draft</button>
+    </div>
+    <p id="dh-status" class="badge" aria-live="polite">No draft</p>
+    <p id="dh-out" class="note" aria-live="polite">The saved item is: Porch light at dusk, after 10 minutes.</p>
+  </section>
+
+  <section class="card stack" aria-labelledby="dh-hist-h">
+    <h2 id="dh-hist-h" class="small">Draft history</h2>
+    <ul class="list" id="dh-hist" aria-label="Draft history"><li class="muted">No autosaves yet.</li></ul>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var saved = { name: 'Porch light at dusk', minutes: 10 };
+  var draft = null;
+  var history = [];
+  var nameEl = document.getElementById('dh-name');
+  var minEl = document.getElementById('dh-min');
+  var status = document.getElementById('dh-status');
+  var out = document.getElementById('dh-out');
+  var hist = document.getElementById('dh-hist');
+
+  function describe(v) { return v.name + ', after ' + v.minutes + ' minutes'; }
+
+  function current() {
+    return { name: nameEl.value, minutes: Number(minEl.value) };
+  }
+
+  function renderHistory() {
+    hist.innerHTML = '';
+    if (!history.length) {
+      var li = document.createElement('li');
+      li.className = 'muted';
+      li.textContent = 'No autosaves yet.';
+      hist.appendChild(li);
+      return;
+    }
+    history.forEach(function (h, i) {
+      var li = document.createElement('li');
+      li.className = 'grow';
+      var txt = document.createElement('span');
+      txt.className = 'grow';
+      txt.textContent = 'Autosave ' + (i + 1) + ': ' + describe(h);
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'tonal';
+      b.textContent = 'Restore into editor';
+      b.addEventListener('click', function () {
+        nameEl.value = h.name;
+        minEl.value = h.minutes;
+        draft = { name: h.name, minutes: h.minutes };
+        status.textContent = 'Draft restored into the editor';
+        out.textContent = 'The editor now shows autosave ' + (i + 1) + '. The saved item has not changed until you press Save.';
+      });
+      li.appendChild(txt);
+      li.appendChild(b);
+      hist.appendChild(li);
+    });
+  }
+
+  function autosave() {
+    var now = current();
+    if (describe(now) === describe(saved)) {
+      draft = null;
+      status.textContent = 'No draft';
+      return;
+    }
+    draft = now;
+    history.push(now);
+    status.textContent = 'Draft kept: the live item is not changed';
+    renderHistory();
+  }
+
+  nameEl.addEventListener('input', autosave);
+  minEl.addEventListener('input', autosave);
+
+  document.getElementById('dh-save').addEventListener('click', function () {
+    if (!draft) {
+      out.textContent = 'Nothing to save: the item is the same as the saved one.';
+      return;
+    }
+    saved = { name: draft.name, minutes: draft.minutes };
+    draft = null;
+    status.textContent = 'Saved; the draft is removed';
+    out.textContent = 'Saved: ' + describe(saved) + '.';
+  });
+
+  document.getElementById('dh-discard').addEventListener('click', function () {
+    draft = null;
+    nameEl.value = saved.name;
+    minEl.value = saved.minutes;
+    status.textContent = 'Draft discarded';
+    out.textContent = 'Back to the saved item: ' + describe(saved) + '.';
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    saved = { name: 'Porch light at dusk', minutes: 10 };
+    draft = null;
+    history = [];
+    nameEl.value = saved.name;
+    minEl.value = saved.minutes;
+    status.textContent = 'No draft';
+    out.textContent = 'The saved item is: Porch light at dusk, after 10 minutes.';
+    renderHistory();
+  });
+
+  renderHistory();
+})();
+</script>
+</body>
+</html>

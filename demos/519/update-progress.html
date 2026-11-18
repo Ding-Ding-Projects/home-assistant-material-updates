@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: update progress with stages</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="update-progress">
+  <h1>An installing update shows its stages, numbers and reason</h1>
+  <p class="muted">Press Next stage to move the update along. Press Fail this stage to see a failure.</p>
+
+  <section class="card stack" aria-labelledby="up-h">
+    <h2 id="up-h" class="small">Example integration 2.1.0 to 2.2.0</h2>
+    <div class="stack">
+      <div class="row"><span class="grow small" id="up-pct">Reported: 40%</span><span class="badge" id="up-state">Running</span></div>
+      <div class="bar" role="progressbar" id="up-bar" aria-label="Progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="40"><i id="up-fill" style="width:40%"></i></div>
+    </div>
+    <ol class="list" id="up-stages" aria-label="Stages"></ol>
+    <p class="small muted" id="up-wait">Waiting for an earlier update to finish: 2 of 3, after the Supervisor.</p>
+    <div class="row">
+      <button type="button" class="filled" id="up-next">Next stage</button>
+      <button type="button" class="tonal" id="up-fail">Fail this stage</button>
+    </div>
+    <p id="up-out" class="note" aria-live="polite">The update is running its backup stage.</p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var STAGES = ['Backup', 'Download', 'Unpack', 'Install', 'Restart', 'Check'];
+  var state = [];
+  var current = 0;
+  var failed = false;
+  var stagesEl = document.getElementById('up-stages');
+  var pct = document.getElementById('up-pct');
+  var fill = document.getElementById('up-fill');
+  var bar = document.getElementById('up-bar');
+  var badge = document.getElementById('up-state');
+  var out = document.getElementById('up-out');
+  var waitEl = document.getElementById('up-wait');
+
+  function reset() {
+    state = STAGES.map(function () { return 'waiting'; });
+    current = 0;
+    failed = false;
+    state[0] = 'running';
+    draw();
+    out.textContent = 'The update is running its backup stage.';
+  }
+
+  function draw() {
+    stagesEl.innerHTML = '';
+    STAGES.forEach(function (name, i) {
+      var li = document.createElement('li');
+      li.textContent = name + ': ' + state[i];
+      stagesEl.appendChild(li);
+    });
+    var done = state.filter(function (s) { return s === 'done'; }).length;
+    var reported = failed ? 'Stopped' : 'Reported: ' + Math.round((done / STAGES.length) * 100) + '%';
+    pct.textContent = reported;
+    fill.style.width = failed ? '0%' : Math.round((done / STAGES.length) * 100) + '%';
+    bar.setAttribute('aria-valuenow', String(failed ? 0 : Math.round((done / STAGES.length) * 100)));
+    badge.textContent = failed ? 'Failed' : (done === STAGES.length ? 'Done' : 'Running');
+    badge.className = 'badge ' + (failed ? 'error' : (done === STAGES.length ? 'good' : ''));
+    waitEl.textContent = done === STAGES.length ? 'Finished: from 2.1.0 to 2.2.0. What’s new is linked on the row.' : 'Waiting for an earlier update to finish: 2 of 3, after the Supervisor.';
+  }
+
+  document.getElementById('up-next').addEventListener('click', function () {
+    if (failed || current >= STAGES.length) return;
+    state[current] = 'done';
+    current += 1;
+    if (current < STAGES.length) state[current] = 'running';
+    draw();
+    out.textContent = current < STAGES.length ? STAGES[current - 1] + ' is done. ' + STAGES[current] + ' is running now.' : 'All stages are done.';
+  });
+
+  document.getElementById('up-fail').addEventListener('click', function () {
+    if (failed || current >= STAGES.length) return;
+    state[current] = 'failed';
+    for (var i = current + 1; i < STAGES.length; i++) state[i] = 'skipped';
+    failed = true;
+    draw();
+    out.textContent = 'Failed at the ' + STAGES[current] + ' stage. Reason: this stage did not finish, as the real update would report it. Nothing retries by itself. Press Start again to see the update from the beginning.';
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', reset);
+  reset();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: update duration kept through a reload</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="durations-keep-start">
+  <h1>A finished update keeps the time it really took</h1>
+  <p class="muted">Start an update, reload the page while it runs, then finish it. The duration counts from when the update started, not from the reload.</p>
+
+  <section class="card stack" aria-labelledby="dk-h">
+    <h2 id="dk-h" class="small">Example integration 2.1.0 to 2.2.0</h2>
+    <p id="dk-row" class="note" aria-live="polite">Not started.</p>
+    <div class="row">
+      <button type="button" class="filled" id="dk-start">Start update</button>
+      <button type="button" class="tonal" id="dk-reload">Reload page</button>
+      <button type="button" class="tonal" id="dk-finish">Finish</button>
+    </div>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var startedAt = null;
+  var reloaded = false;
+  var finishedAt = null;
+  var row = document.getElementById('dk-row');
+  var clock = 0; // pretend seconds since the update started
+
+  function fmt(s) {
+    var m = Math.floor(s / 60);
+    var r = s % 60;
+    return m + ':' + (r < 10 ? '0' : '') + r;
+  }
+
+  function draw() {
+    if (startedAt === null) { row.textContent = 'Not started.'; return; }
+    if (finishedAt === null) {
+      row.textContent = 'Running for ' + fmt(clock) + (reloaded ? ' (page was reloaded, start still kept).' : '.');
+      return;
+    }
+    row.textContent = 'Finished. Took ' + fmt(finishedAt) + ', counted from the start. It is not measured from the reload.';
+  }
+
+  document.getElementById('dk-start').addEventListener('click', function () {
+    if (startedAt !== null) return;
+    startedAt = true;
+    clock = 0;
+    // Pretend two minutes pass while the update runs.
+    clock = 115;
+    draw();
+  });
+
+  document.getElementById('dk-reload').addEventListener('click', function () {
+    if (startedAt === null || finishedAt !== null) return;
+    reloaded = true;
+    // A reload used to restart the timer; the kept start means the clock is not reset.
+    draw();
+  });
+
+  document.getElementById('dk-finish').addEventListener('click', function () {
+    if (startedAt === null || finishedAt !== null) return;
+    finishedAt = 120;
+    clock = 120;
+    draw();
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    startedAt = null; reloaded = false; finishedAt = null; clock = 0;
+    draw();
+  });
+
+  draw();
+})();
+</script>
+</body>
+</html>
