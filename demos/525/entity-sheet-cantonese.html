@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: entity sheet in English, Cantonese or both</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.modes { display: flex; flex-wrap: wrap; gap: 8px; }
+.modes button, .tabs button, .actions button { min-height: 48px; }
+.modes button[aria-pressed="true"] { background: var(--sc); color: var(--on-sc); border-color: transparent; font-weight: 500; }
+.sheet { width: 100%; max-width: 390px; margin: 16px auto 0; padding: 0; overflow: hidden; }
+.sheet-head { padding: 16px; display: flex; flex-direction: column; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
+.sheet-body { padding: 0 16px 16px; min-height: 200px; }
+.tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--sl2); }
+.tabs button { border: 0; border-radius: 0; min-height: 61px; padding: 4px 2px; flex-direction: column; gap: 0; background: transparent; color: var(--onv); min-width: 0; }
+.tabs button[aria-pressed="true"] { background: var(--sc); color: var(--on-sc); font-weight: 500; }
+.bi { display: block; min-width: 0; overflow-wrap: anywhere; }
+.yue { font-size: 13px; line-height: 18px; }
+.ago .en, .ago .yue { display: inline; }
+.pane[hidden] { display: none; }
+.pane dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; }
+.pane dt { color: var(--onv); }
+.pane dd { margin: 0; }
+.pane ul { margin: 0; padding-left: 20px; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.big { font-size: 24px; line-height: 32px; font-weight: 400; }
+/* Language mode decides which words show */
+main[data-mode="en"] .yue { display: none; }
+main[data-mode="yue"] .en { display: none; }
+main[data-mode="both"] .yue { color: var(--onv); }
+main[data-mode="en"] .ago .yue, main[data-mode="yue"] .ago .en { display: none; }
+main[data-mode="both"] .ago .yue::before { content: " / "; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="entity-sheet-cantonese" data-mode="both">
+  <h1>Entity sheet in English, Cantonese or both</h1>
+  <p class="muted">Press English, 廣東話 or Both, then press a tab at the foot of the sheet. The words change; the places stay put.</p>
+
+  <div class="modes" role="group" aria-label="Language">
+    <button type="button" data-mode-btn="en" aria-pressed="false">English</button>
+    <button type="button" data-mode-btn="yue" aria-pressed="false">廣東話</button>
+    <button type="button" data-mode-btn="both" aria-pressed="true">Both</button>
+  </div>
+
+  <div class="card sheet" aria-label="Pretend entity sheet">
+    <div class="sheet-head">
+      <span class="bi"><span class="en big">Pretend living room light</span><span class="yue big">假想客廳燈</span></span>
+      <span class="small muted ago"><span class="en">5 minutes ago</span><span class="yue">5 分鐘前</span></span>
+    </div>
+
+    <div class="sheet-body">
+      <section class="pane" data-pane="controls">
+        <div class="stack">
+          <p><span class="bi"><span class="en">State</span><span class="yue">狀態</span></span>
+            <strong id="state-word">On</strong></p>
+          <div class="actions">
+            <button type="button" class="filled" id="power"><span class="en">Turn off</span><span class="yue">關燈</span></button>
+          </div>
+          <p><span class="bi"><span class="en">Brightness</span><span class="yue">亮度</span></span>
+            <strong id="level">60%</strong></p>
+          <div class="actions">
+            <button type="button" class="tonal" id="dim"><span class="en">Less</span><span class="yue">調低</span></button>
+            <button type="button" class="tonal" id="brighten"><span class="en">More</span><span class="yue">調高</span></button>
+          </div>
+        </div>
+      </section>
+
+      <section class="pane" data-pane="details" hidden>
+        <dl>
+          <dt><span class="en">Name</span><span class="yue">名稱</span></dt>
+          <dd><span class="en">Living room light</span><span class="yue">客廳燈</span></dd>
+          <dt><span class="en">Room</span><span class="yue">房間</span></dt>
+          <dd><span class="en">Living room</span><span class="yue">客廳</span></dd>
+          <dt><span class="en">Last changed</span><span class="yue">最後更改</span></dt>
+          <dd><span class="en">5 minutes ago</span><span class="yue">5 分鐘前</span></dd>
+        </dl>
+      </section>
+
+      <section class="pane" data-pane="history" hidden>
+        <ul>
+          <li><span class="en">Brightness set to 60%</span><span class="yue">亮度調到 60%</span></li>
+          <li><span class="en">Turned off by the evening scene</span><span class="yue">傍晚情境將佢關咗</span></li>
+        </ul>
+      </section>
+
+      <section class="pane" data-pane="related" hidden>
+        <ul>
+          <li><span class="en">Living room motion sensor</span><span class="yue">客廳動作感應器</span></li>
+          <li><span class="en">Evening scene</span><span class="yue">傍晚情境</span></li>
+        </ul>
+      </section>
+    </div>
+
+    <div class="tabs" role="group" aria-label="Sheet tabs">
+      <button type="button" data-tab="controls" aria-pressed="true"><span class="en">Controls</span><span class="yue">控制</span></button>
+      <button type="button" data-tab="details" aria-pressed="false"><span class="en">Details</span><span class="yue">詳情</span></button>
+      <button type="button" data-tab="history" aria-pressed="false"><span class="en">History</span><span class="yue">歷史</span></button>
+      <button type="button" data-tab="related" aria-pressed="false"><span class="en">Related</span><span class="yue">相關</span></button>
+    </div>
+  </div>
+
+  <p class="small" id="status" aria-live="polite">Showing both languages.</p>
+  <p class="note warn small">State words such as On and Off stay in English in this build. The Cantonese here has not been read by a native reader.</p>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var main = document.querySelector('main');
+  var modeNames = { en: 'Showing English only.', yue: 'Showing Cantonese only.', both: 'Showing both languages.' };
+  var status = document.getElementById('status');
+  var power = document.getElementById('power');
+  var stateWord = document.getElementById('state-word');
+  var levelOut = document.getElementById('level');
+  var modeBtns = document.querySelectorAll('[data-mode-btn]');
+  var tabs = document.querySelectorAll('[data-tab]');
+  var panes = document.querySelectorAll('[data-pane]');
+  var on = true;
+  var level = 60;
+
+  function setMode(m) {
+    main.setAttribute('data-mode', m);
+    modeBtns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-mode-btn') === m)); });
+    status.textContent = modeNames[m];
+  }
+  function setTab(name) {
+    tabs.forEach(function (t) { t.setAttribute('aria-pressed', String(t.getAttribute('data-tab') === name)); });
+    panes.forEach(function (p) { p.hidden = p.getAttribute('data-pane') !== name; });
+  }
+  function paintPower() {
+    stateWord.textContent = on ? 'On' : 'Off';
+    power.querySelector('.en').textContent = on ? 'Turn off' : 'Turn on';
+    power.querySelector('.yue').textContent = on ? '關燈' : '開燈';
+  }
+  function paintLevel() { levelOut.textContent = level + '%'; }
+
+  modeBtns.forEach(function (b) { b.addEventListener('click', function () { setMode(b.getAttribute('data-mode-btn')); }); });
+  tabs.forEach(function (t) { t.addEventListener('click', function () { setTab(t.getAttribute('data-tab')); }); });
+  power.addEventListener('click', function () {
+    on = !on; paintPower();
+    status.textContent = 'Light is now ' + (on ? 'on' : 'off') + '.';
+  });
+  document.getElementById('dim').addEventListener('click', function () { level = Math.max(10, level - 10); paintLevel(); });
+  document.getElementById('brighten').addEventListener('click', function () { level = Math.min(100, level + 10); paintLevel(); });
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    on = true; level = 60; paintPower(); paintLevel(); setTab('controls'); setMode('both');
+  });
+  setMode('both');
+})();
+</script>
+</body>
+</html>

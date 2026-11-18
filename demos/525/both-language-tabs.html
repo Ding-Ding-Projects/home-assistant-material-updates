@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: both languages on one row of tabs</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.modes { display: flex; flex-wrap: wrap; gap: 8px; }
+.modes button, .tabs button, .ranges button { min-height: 48px; }
+.modes button[aria-pressed="true"] { background: var(--sc); color: var(--on-sc); border-color: transparent; font-weight: 500; }
+.frame { width: 100%; max-width: 390px; margin: 16px auto 0; padding: 0; overflow: hidden; }
+.tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--sl2); }
+.tabs button { border: 0; border-radius: 0; min-height: 61px; padding: 4px 2px; flex-direction: column; gap: 0; background: transparent; color: var(--onv); min-width: 0; }
+.tabs button[aria-pressed="true"] { background: var(--sc); color: var(--on-sc); font-weight: 500; }
+.bi { display: block; min-width: 0; overflow-wrap: anywhere; text-align: center; }
+.yue { font-size: 12px; line-height: 16px; }
+.body { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.ranges { display: flex; flex-wrap: wrap; gap: 8px; }
+.ranges button[aria-pressed="true"] { background: var(--sc); color: var(--on-sc); border-color: transparent; font-weight: 500; }
+.track { height: 16px; border-radius: 8px; background: var(--sl4); overflow: hidden; }
+.track span { display: block; height: 100%; background: var(--p); width: 100%; transition: width .2s; }
+main[data-mode="en"] .yue { display: none; }
+main[data-mode="yue"] .en { display: none; }
+main[data-mode="yue"] .tabs .yue { font-size: 13px; line-height: 18px; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="both-language-tabs" data-mode="both">
+  <h1>Both languages on one row of tabs</h1>
+  <p class="muted">Press English, 廣東話 or Both, then press a tab or a time range. The tabs stay on one row at 320 px.</p>
+
+  <div class="modes" role="group" aria-label="Language">
+    <button type="button" data-mode-btn="en" aria-pressed="false">English</button>
+    <button type="button" data-mode-btn="yue" aria-pressed="false">廣東話</button>
+    <button type="button" data-mode-btn="both" aria-pressed="true">Both</button>
+  </div>
+
+  <div class="card frame">
+    <div class="body">
+      <p id="readout" aria-live="polite">
+        <span class="en" data-show="controls">Showing the controls tab.</span>
+      </p>
+      <div class="ranges" role="group" aria-label="Time range">
+        <button type="button" data-range="1" aria-pressed="false">1 h</button>
+        <button type="button" data-range="6" aria-pressed="true">6 h</button>
+        <button type="button" data-range="24" aria-pressed="false">24 h</button>
+      </div>
+      <div class="track" aria-hidden="true"><span id="bar"></span></div>
+      <p class="small muted" id="range-text">
+        <span class="en">Pretend footage from the last 6 hours.</span><span class="yue">假想嘅錄影，過去 6 個鐘頭。</span>
+      </p>
+    </div>
+
+    <div class="tabs" role="group" aria-label="Sheet tabs">
+      <button type="button" data-tab="controls" aria-pressed="true"><span class="bi"><span class="en">Controls</span><span class="yue">控制</span></span></button>
+      <button type="button" data-tab="details" aria-pressed="false"><span class="bi"><span class="en">Details</span><span class="yue">詳情</span></span></button>
+      <button type="button" data-tab="history" aria-pressed="false"><span class="bi"><span class="en">History</span><span class="yue">歷史</span></span></button>
+      <button type="button" data-tab="related" aria-pressed="false"><span class="bi"><span class="en">Related</span><span class="yue">相關</span></span></button>
+    </div>
+  </div>
+
+  <p class="note warn small">The tabs fit one row in both-language mode. The Cantonese here has not been read by a native reader.</p>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var main = document.querySelector('main');
+  var tabNames = {
+    controls: ['Showing the controls tab.', '正在睇控制分頁。'],
+    details: ['Showing the details tab.', '正在睇詳情分頁。'],
+    history: ['Showing the history tab.', '正在睇歷史分頁。'],
+    related: ['Showing the related tab.', '正在睇相關分頁。']
+  };
+  var ranges = {
+    '1': [100, 'Pretend footage from the last hour.', '假想嘅錄影，過去 1 個鐘頭。'],
+    '6': [60, 'Pretend footage from the last 6 hours.', '假想嘅錄影，過去 6 個鐘頭。'],
+    '24': [100, 'Pretend footage from the last 24 hours.', '假想嘅錄影，過去 24 個鐘頭。']
+  };
+  var modeBtns = document.querySelectorAll('[data-mode-btn]');
+  var tabs = document.querySelectorAll('[data-tab]');
+  var rangeBtns = document.querySelectorAll('[data-range]');
+  var readout = document.getElementById('readout');
+  var rangeText = document.getElementById('range-text');
+  var bar = document.getElementById('bar');
+  var currentTab = 'controls';
+  var currentRange = '6';
+
+  function paintReadout() {
+    var t = tabNames[currentTab];
+    readout.innerHTML = '<span class="en"></span><span class="yue"></span>';
+    readout.querySelector('.en').textContent = t[0];
+    readout.querySelector('.yue').textContent = t[1];
+  }
+  function paintRange() {
+    var r = ranges[currentRange];
+    bar.style.width = r[0] + '%';
+    rangeText.querySelector('.en').textContent = r[1];
+    rangeText.querySelector('.yue').textContent = r[2];
+    rangeBtns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-range') === currentRange)); });
+  }
+  function setMode(m) {
+    main.setAttribute('data-mode', m);
+    modeBtns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-mode-btn') === m)); });
+  }
+
+  modeBtns.forEach(function (b) { b.addEventListener('click', function () { setMode(b.getAttribute('data-mode-btn')); }); });
+  tabs.forEach(function (t) {
+    t.addEventListener('click', function () {
+      currentTab = t.getAttribute('data-tab');
+      tabs.forEach(function (x) { x.setAttribute('aria-pressed', String(x === t)); });
+      paintReadout();
+    });
+  });
+  rangeBtns.forEach(function (b) {
+    b.addEventListener('click', function () { currentRange = b.getAttribute('data-range'); paintRange(); });
+  });
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    currentTab = 'controls'; currentRange = '6';
+    tabs.forEach(function (x) { x.setAttribute('aria-pressed', String(x.getAttribute('data-tab') === 'controls')); });
+    paintReadout(); paintRange(); setMode('both');
+  });
+  paintReadout();
+  paintRange();
+  setMode('both');
+})();
+</script>
+</body>
+</html>

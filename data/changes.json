@@ -1,9 +1,52 @@
 {
  "format": 1,
- "generated": "2026-11-18T20:38:49Z",
+ "generated": "2026-11-18T22:40:12Z",
  "repository": "Ding-Ding-Projects/home-assistant-material",
- "newest_build": 524,
+ "newest_build": 525,
  "releases": [
+  {
+   "build": 525,
+   "core": "2026.11.1.525",
+   "supervisor": "2026.11.0.525",
+   "os": "18.5.525",
+   "tag": null,
+   "source": "44d5a60e5",
+   "date": "2026-11-18T16:55:39-05:00",
+   "previous_build": 524,
+   "changes": [
+    {
+     "sha": "44d5a60e5",
+     "date": "2026-11-18T16:55:39-05:00",
+     "title": "Both-language mode fits on a phone; Backups speaks Cantonese [skip ci]",
+     "areas": [
+      "core",
+      "interface"
+     ],
+     "detail": "With English and Cantonese shown together, the four tabs at the foot of an entity sheet wrapped onto two rows and took a third of the screen at 320 px. Each tab now stacks the English with the Cantonese smaller beneath: one row, 44 px targets, a 61 px bar in every mode. Segmented buttons stop splitting a word in half, the camera timeline's range chips read 1 h, 6 h and 24 h on one row, and the related list rows reach 44 px.\n\nThe Backups pages get their Cantonese: the page title, \"Set up backups\", \"Back up now\", \"My backups\", the backup types, and the Filters and More labels shared by every list page.\n\nAlso removes a one-off helper script that should never have been committed.\n\nSeen in a browser at 390 and 320 px. Still wrapping in both-language mode: the fan speed buttons and the sensor range chips.",
+     "detail_yue": "英文同廣東話一齊顯示嗰陣，實體面板底部四個分頁會爆成兩行，喺 320 px 霸咗成個螢幕三分一。而家每個分頁上面英文、下面細字廣東話：一行過， 每個 44 px，成條底欄喺邊個模式都係 61 px。分段掣唔再將一個字斬開 兩半，鏡頭時間軸嘅範圍掣一行寫晒 1 h、6 h、24 h，相關清單每行夠 44 px。\n\n備份頁有返廣東話：頁面標題、「設定備份」、「立即備份」、「我嘅備份」、 備份類型，仲有每個清單頁共用嘅「篩選」同「更多」。\n\n順手刪走一個本來唔應該提交嘅一次性小工具。\n\n喺瀏覽器 390 同 320 px 睇過。雙語模式仲會換行嘅有：風扇速度掣同 感應器範圍掣。"
+    },
+    {
+     "sha": "6e399887e",
+     "date": "2026-11-18T15:29:05-05:00",
+     "title": "Cantonese for entity sheets, backups, the camera timeline [skip ci]",
+     "areas": [
+      "interface"
+     ],
+     "detail": "In Cantonese mode an entity sheet used to answer in English for almost everything except its one line of purpose, like a waiter who greets you in Cantonese and then reads the whole menu in English. About 240 control labels now have Cantonese: lights, covers, locks, fans, climate, media players, alarms, vacuums, timers, weather, the details table and the related list. \"5 minutes ago\" follows the mode too, using the browser's own Hong Kong wording.\n\nThe camera timeline, the Backups overview and its dialogs, and a few lines on the Updates page follow as well.\n\nStill English by necessity: state words such as On, Open and Home, which come from the server's single language bundle and need their own pass, and a handful of sentences whose blanks are filled with links or buttons.\n\nNot yet seen in a browser, and not yet read by a native reader.",
+     "detail_yue": "廣東話模式入面，實體面板以前除咗一行用途說明之外幾乎樣樣都答英文， 好似個侍應用廣東話同你打招呼，跟住成個餐牌讀英文。而家大約二百四十 個控制標籤有返廣東話：燈、窗簾、門鎖、風扇、冷暖氣、媒體播放器、 警報、吸塵機、計時器、天氣、詳情表同相關清單。「5 分鐘前」都會跟 模式，用瀏覽器本身嘅香港講法。\n\n鏡頭時間軸、備份總覽同佢啲對話框、更新頁有幾行字都跟埋。\n\n暫時仲係英文：開、關、在家呢類狀態字，因為佢哋嚟自伺服器單一語言 包，要另外做一轉；仲有幾句入面要填連結或者掣嘅句子。\n\n未喺瀏覽器睇過，亦未畀母語人士讀過。"
+    },
+    {
+     "sha": "c96301804",
+     "date": "2026-11-18T15:14:09-05:00",
+     "title": "Docs: handoff, roadmap and feature pages up to build 523 [skip ci]",
+     "areas": [
+      "docs"
+     ],
+     "detail": "The paperwork catches up again. New pages for the top bar search, camera event clips and live recording around events, defender guard descriptions and reasons, and the automation editor's event picker and zone map. The handoff says what is live (build 523), lists the eight faults a real run found on it, and says which of them are fixed on main but not yet released. The roadmap ticks only what was seen in a real run: six items, with twenty-two still honestly open.",
+     "detail_yue": "文件又追返上進度。新增頂欄搜尋、鏡頭事件短片同事件前後錄直播、守護 守則說明同原因、自動化編輯器事件揀選器同區域地圖嘅說明頁。交接文件 寫明而家行緊邊個版本（523），列出真機跑過之後搵到嘅八個問題，邊啲 已經喺主線修好但未發佈。路線圖只剔親眼喺真機見過嘅：六項，仲有 二十二項老老實實未完成。"
+    }
+   ]
+  },
   {
    "build": 524,
    "core": "2026.11.1.524",
