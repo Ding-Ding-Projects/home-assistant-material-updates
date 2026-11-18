@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: What's new in the running build</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="whats-new-running-build">
+  <h1>The What's new button names the build you run</h1>
+  <p class="muted">Choose the version you are running. The button appears only when that version ends with a build number.</p>
+
+  <section class="card stack" aria-labelledby="wn-h">
+    <label class="field" for="wn-sel">Version you are running</label>
+    <select id="wn-sel">
+      <option value="2026.11.1.512">2026.11.1.512</option>
+      <option value="2026.11.1.509">2026.11.1.509</option>
+      <option value="2026.11.1.517">2026.11.1.517</option>
+      <option value="nightly-build">nightly-build</option>
+    </select>
+  </section>
+
+  <section class="card tonal stack" aria-labelledby="wn-h">
+    <h2 id="wn-h" class="small">Updates</h2>
+    <p class="small" id="wn-running">Running Core 2026.11.1.512.</p>
+    <div class="row">
+      <button type="button" class="tonal" id="wn-btn">What's new in build 512</button>
+    </div>
+    <p id="wn-out" class="note" aria-live="polite">Pressing the button would open that build's page on the updates log.</p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var sel = document.getElementById('wn-sel');
+  var running = document.getElementById('wn-running');
+  var btn = document.getElementById('wn-btn');
+  var out = document.getElementById('wn-out');
+  var build = null;
+
+  function render() {
+    var v = sel.value;
+    var m = /\.(\d+)$/.exec(v);
+    running.textContent = 'Running Core ' + v + '.';
+    if (m) {
+      build = m[1];
+      btn.hidden = false;
+      btn.textContent = "What's new in build " + build;
+      out.textContent = 'Pressing the button would open build ' + build + ' on the updates log.';
+    } else {
+      build = null;
+      btn.hidden = true;
+      out.textContent = 'This version has no build number, so no button is shown.';
+    }
+  }
+
+  sel.addEventListener('change', render);
+  btn.addEventListener('click', function () {
+    if (build) out.textContent = 'Would open build ' + build + ' on the updates log.';
+  });
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    sel.value = '2026.11.1.512';
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

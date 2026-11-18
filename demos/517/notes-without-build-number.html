@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: Notes without a build number</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="notes-without-build-number">
+  <h1>A version with no build number keeps the old link</h1>
+  <p class="muted">Type a version, or press an example, and read what Notes would do. The build number is the part after the last dot.</p>
+
+  <section class="card stack" aria-labelledby="nb-h">
+    <h2 id="nb-h" class="small">Version</h2>
+    <label class="field" for="nb-in">Version</label>
+    <input type="text" id="nb-in" value="18.5.481" autocomplete="off" spellcheck="false">
+    <div class="row" role="group" aria-label="Examples">
+      <button type="button" class="chip" data-v="2026.11.1.509">2026.11.1.509</button>
+      <button type="button" class="chip" data-v="18.5.481">18.5.481</button>
+      <button type="button" class="chip" data-v="nightly-build">nightly-build</button>
+    </div>
+    <p id="nb-out" class="note" aria-live="polite"></p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var input = document.getElementById('nb-in');
+  var out = document.getElementById('nb-out');
+  var chips = Array.prototype.slice.call(document.querySelectorAll('[data-v]'));
+
+  function update() {
+    var v = input.value.trim();
+    var m = /\.(\d+)$/.exec(v);
+    if (m) {
+      out.className = 'note good';
+      out.textContent = 'Notes would open build ' + m[1] + ' on the updates log.';
+    } else {
+      out.className = 'note';
+      out.textContent = 'There is no build number at the end of "' + v + '", so Notes keeps the link the update carried.';
+    }
+  }
+
+  input.addEventListener('input', update);
+  chips.forEach(function (c) {
+    c.addEventListener('click', function () {
+      input.value = c.getAttribute('data-v');
+      update();
+      input.focus();
+    });
+  });
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    input.value = '18.5.481';
+    update();
+  });
+
+  update();
+})();
+</script>
+</body>
+</html>

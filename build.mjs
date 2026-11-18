@@ -449,7 +449,7 @@ ${demo}
 ${all}
 ${update}
 ${nav}
-<p class="small muted">Release tag <span class="mono">${esc(r.tag)}</span> in ${esc(REPOSITORY)}.${byBuild.has(prev) ? ` <a href="../../compare/index.html?from=${prev}&amp;to=${r.build}" data-yue="與第 ${prev} 版比較">Compare with build ${prev}</a>.` : ''}</p>`;
+<p class="small muted">${r.tag ? `Release tag <span class="mono">${esc(r.tag)}</span> in ${esc(REPOSITORY)}.` : `Not tagged in ${esc(REPOSITORY)} yet.`}${byBuild.has(prev) ? ` <a href="../../compare/index.html?from=${prev}&amp;to=${r.build}" data-yue="與第 ${prev} 版比較">Compare with build ${prev}</a>.` : ''}</p>`;
   return layout({
     title: `Build ${r.build}${r.headline ? ': ' + r.headline : ''} - Home Assistant Material updates`,
     description: r.summary || `${sinceLine} Home Assistant Material ${r.core}.`,

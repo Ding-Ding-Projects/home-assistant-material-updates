@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: lighter long lists</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="lighter-long-lists">
+  <h1>A long list only touches the rows that change</h1>
+  <p class="muted">Add a row, or apply the same states again. The count shows how many rows were restyled, the new way and the old way.</p>
+
+  <section class="card stack" aria-labelledby="ll-h">
+    <h2 id="ll-h" class="small">Sensor rows</h2>
+    <div class="row">
+      <button type="button" class="tonal" id="ll-add-new">Add a row, new way</button>
+      <button type="button" class="tonal" id="ll-add-old">Add a row, old way</button>
+      <button type="button" class="tonal" id="ll-apply-new">Apply again, new way</button>
+      <button type="button" class="tonal" id="ll-apply-old">Apply again, old way</button>
+    </div>
+    <p id="ll-out" class="note" aria-live="polite">Nothing changed yet.</p>
+    <ul id="ll-list" class="ll-list" aria-label="Sensor rows"></ul>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<style>
+.ll-list { list-style: none; margin: 0; padding: 0 12px; max-height: 320px; overflow-y: auto; border-radius: 16px; background: var(--sl0); }
+.ll-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 52px; border-top: 1px solid var(--outv); }
+.ll-row:first-child { border-top: 0; }
+.ll-row label { display: flex; align-items: center; gap: 8px; min-height: 48px; }
+.ll-row input { width: 24px; height: 24px; }
+.ll-st { font-size: 14px; color: var(--onv); }
+.ll-row.is-on .ll-st { color: var(--p); font-weight: 500; }
+</style>
+<script>
+(function () {
+  var list = document.getElementById('ll-list');
+  var out = document.getElementById('ll-out');
+  var rows = [];
+  var next = 1;
+
+  function paint(r, want) {
+    r.on = want;
+    r.cb.checked = want;
+    r.li.classList.toggle('is-on', want);
+    r.st.textContent = want ? 'On' : 'Off';
+  }
+
+  // The new way: a row is written only when its checkbox differs from what is shown.
+  function syncChanged(r) {
+    var want = r.cb.checked;
+    if (r.on === want) return 0;
+    paint(r, want);
+    return 1;
+  }
+
+  // The old way: every row is written again, changed or not.
+  function paintAll() {
+    rows.forEach(function (r) { paint(r, r.cb.checked); });
+    return rows.length;
+  }
+
+  function makeRow(n, on) {
+    var li = document.createElement('li');
+    li.className = 'll-row';
+    var label = document.createElement('label');
+    var cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = on;
+    var name = document.createElement('span');
+    name.textContent = 'Sensor ' + n;
+    label.appendChild(cb);
+    label.appendChild(name);
+    var st = document.createElement('span');
+    st.className = 'll-st';
+    li.appendChild(label);
+    li.appendChild(st);
+    var r = { li: li, cb: cb, st: st, on: null, n: n };
+    cb.addEventListener('change', function () {
+      var written = syncChanged(r);
+      out.textContent = 'Sensor ' + n + ' changed. Restyled ' + written + ' of ' + rows.length + ' rows.';
+    });
+    return r;
+  }
+
+  function reset() {
+    list.textContent = '';
+    rows = [];
+    next = 1;
+    for (var i = 0; i < 40; i++) {
+      var r = makeRow(next, i % 3 === 0);
+      next += 1;
+      rows.push(r);
+      list.appendChild(r.li);
+      paint(r, r.cb.checked);
+    }
+    out.textContent = 'Nothing changed yet. 40 rows, 14 are on.';
+  }
+
+  function addRow(newWay) {
+    var r = makeRow(next, false);
+    next += 1;
+    rows.unshift(r);
+    list.insertBefore(r.li, list.firstChild);
+    var written;
+    if (newWay) {
+      paint(r, false);
+      written = 1;
+    } else {
+      written = paintAll();
+    }
+    out.textContent = 'Added Sensor ' + r.n + (newWay ? ', new way' : ', old way') + '. Restyled ' + written + ' of ' + rows.length + ' rows.';
+  }
+
+  document.getElementById('ll-add-new').addEventListener('click', function () { addRow(true); });
+  document.getElementById('ll-add-old').addEventListener('click', function () { addRow(false); });
+  document.getElementById('ll-apply-new').addEventListener('click', function () {
+    var written = 0;
+    rows.forEach(function (r) { written += syncChanged(r); });
+    out.textContent = 'Apply again, new way. Restyled ' + written + ' of ' + rows.length + ' rows: unchanged checkboxes do no work.';
+  });
+  document.getElementById('ll-apply-old').addEventListener('click', function () {
+    var written = paintAll();
+    out.textContent = 'Apply again, old way. Restyled ' + written + ' of ' + rows.length + ' rows, changed or not.';
+  });
+  document.querySelector('[data-demo-reset]').addEventListener('click', reset);
+
+  reset();
+})();
+</script>
+</body>
+</html>

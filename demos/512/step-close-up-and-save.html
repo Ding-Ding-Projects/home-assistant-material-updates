@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: step closes up, and save tick</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="step-close-up-and-save">
+  <h1>A deleted step closes up, and Save shows a tick</h1>
+  <p class="muted">Delete a step and the steps below move up to fill the gap. Press Save to see the tick.</p>
+
+  <section class="card stack" aria-labelledby="cs-h">
+    <h2 id="cs-h" class="small">Steps</h2>
+    <ol id="cs-list" class="stack" aria-label="Steps"></ol>
+    <div class="row">
+      <button type="button" class="filled" id="cs-save">Save</button>
+      <span id="cs-tick" class="tick" aria-hidden="true"></span>
+    </div>
+    <p id="cs-out" class="note" aria-live="polite">Nothing has changed yet.</p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<style>
+#cs-list li { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--sl2); border-radius: 16px; padding: 4px 8px 4px 14px; min-height: 52px; }
+.tick { display: inline-flex; width: 36px; height: 36px; color: var(--green); }
+.tick svg { width: 36px; height: 36px; }
+</style>
+<script>
+(function () {
+  var START = ['Motion starts in the hall', 'Wait 5 minutes', 'Turn on the hall light', 'Turn off the hall light'];
+  var steps = START.slice();
+  var saved = false;
+  var list = document.getElementById('cs-list');
+  var out = document.getElementById('cs-out');
+  var tick = document.getElementById('cs-tick');
+  var TICK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  function markChanged() {
+    saved = false;
+    tick.innerHTML = '';
+  }
+
+  function render() {
+    list.textContent = '';
+    steps.forEach(function (text, i) {
+      var li = document.createElement('li');
+      var label = document.createElement('span');
+      label.textContent = 'Step ' + (i + 1) + ': ' + text;
+      li.appendChild(label);
+      var del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'text';
+      del.textContent = 'Delete';
+      del.setAttribute('aria-label', 'Delete step ' + (i + 1) + ': ' + text);
+      del.addEventListener('click', function () {
+        var gone = steps.splice(i, 1)[0];
+        markChanged();
+        render();
+        out.textContent = 'Deleted "' + gone + '". The steps below moved up. ' + steps.length + ' steps are left.';
+      });
+      li.appendChild(del);
+      list.appendChild(li);
+    });
+  }
+
+  document.getElementById('cs-save').addEventListener('click', function () {
+    saved = true;
+    tick.innerHTML = TICK;
+    out.textContent = 'Saved (pretend). The tick shows for this save. Changing a step clears it.';
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    steps = START.slice();
+    markChanged();
+    render();
+    out.textContent = 'Nothing has changed yet.';
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

@@ -22,7 +22,9 @@ try {
   const res = await fetch(URL_, { headers: { Accept: 'application/json' } });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const data = await res.json();
-  const fetched = (data.releases || []).filter((r) => r && r.tag);
+  // A build that is not tagged yet has "tag": null in the feed. It is kept, so its entry can be written,
+  // and build.mjs labels it as not tagged instead of printing a tag.
+  const fetched = (data.releases || []).filter((r) => r && (typeof r.tag === 'string' || r.tag === null));
   const problem = valid({ ...data, releases: fetched });
   if (problem) throw new Error(`invalid data: ${problem}`);
   // The public list only carries the most recent releases, so older ones roll off it.

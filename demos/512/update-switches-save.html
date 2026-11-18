@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: automatic update switches save</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="update-switches-save">
+  <h1>Automatic update switches save once you confirm</h1>
+  <p class="muted">Turn on a switch, then confirm it. Turning one off saves at once. The summary shows what is saved.</p>
+
+  <section class="card stack" aria-labelledby="us-h">
+    <h2 id="us-h" class="small">Automatic updates</h2>
+    <label class="row"><input type="checkbox" class="switch" id="us-sv"> <span>Supervisor</span></label>
+    <label class="row"><input type="checkbox" class="switch" id="us-core"> <span>Core</span></label>
+    <label class="row"><input type="checkbox" class="switch" id="us-os"> <span>Operating system</span></label>
+    <div class="row"><button type="button" class="tonal" id="us-read">Read the summary</button></div>
+
+    <div id="us-confirm" class="note warn" hidden>
+      <p id="us-ask"></p>
+      <div class="row">
+        <button type="button" class="filled" id="us-yes">Confirm</button>
+        <button type="button" class="tonal" id="us-no">Cancel</button>
+      </div>
+    </div>
+
+    <p id="us-out" class="note" aria-live="polite">All three are off. Nothing updates on its own.</p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var KEYS = ['sv', 'core', 'os'];
+  var NAMES = { sv: 'Supervisor', core: 'Core', os: 'operating system' };
+  var ids = { sv: 'us-sv', core: 'us-core', os: 'us-os' };
+  var saved = { sv: false, core: false, os: false };
+  var pending = null;
+  var confirmBox = document.getElementById('us-confirm');
+  var ask = document.getElementById('us-ask');
+  var out = document.getElementById('us-out');
+  out.textContent = 'Press Read the summary after you choose.';
+
+  function box(k) { return document.getElementById(ids[k]); }
+
+  function summary() {
+    var on = KEYS.filter(function (k) { return saved[k]; });
+    var parts = KEYS.map(function (k) { return NAMES[k] + (saved[k] ? ' on' : ' off'); });
+    if (!on.length) return 'All three are off. Nothing updates on its own.';
+    return 'Saved: ' + parts.join(', ') + '. Updates run in a window from 03:00 to 05:00.';
+  }
+
+  function hideConfirm() {
+    confirmBox.hidden = true;
+    pending = null;
+  }
+
+  KEYS.forEach(function (k) {
+    box(k).addEventListener('change', function () {
+      if (box(k).checked) {
+        if (pending && pending !== k) box(pending).checked = false;
+        pending = k;
+        ask.textContent = 'Turn on automatic updates for ' + NAMES[k] + '? Press Confirm to save.';
+        confirmBox.hidden = false;
+        out.textContent = 'Waiting for your confirmation for ' + NAMES[k] + '. Not saved yet.';
+      } else {
+        saved[k] = false;
+        if (pending === k) hideConfirm();
+        out.textContent = NAMES[k] + ' is saved as off. ' + summary();
+      }
+    });
+  });
+
+  document.getElementById('us-yes').addEventListener('click', function () {
+    if (!pending) return;
+    saved[pending] = true;
+    var k = pending;
+    hideConfirm();
+    out.textContent = NAMES[k] + ' is saved as on. ' + summary();
+  });
+
+  document.getElementById('us-no').addEventListener('click', function () {
+    if (!pending) return;
+    box(pending).checked = false;
+    hideConfirm();
+    out.textContent = 'Cancelled. Nothing was saved.';
+  });
+
+  document.getElementById('us-read').addEventListener('click', function () {
+    out.textContent = summary();
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    KEYS.forEach(function (k) { box(k).checked = false; saved[k] = false; });
+    hideConfirm();
+    out.textContent = 'Press Read the summary after you choose.';
+  });
+})();
+</script>
+</body>
+</html>

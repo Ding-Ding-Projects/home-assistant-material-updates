@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: starter tiles</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="starter-tiles">
+  <h1>Six starter tiles fit one phone screen, two across</h1>
+  <p class="muted">Press a starter to begin an automation from its steps. The tiles sit two across, so all six fit without sideways scrolling.</p>
+
+  <section class="card stack" aria-labelledby="st-h">
+    <h2 id="st-h" class="small">Start from</h2>
+    <div class="tiles" id="st-tiles">
+      <button type="button" class="tile" data-tile="0"><span class="tn">Motion</span><span class="tt small muted">When motion starts in a room</span></button>
+      <button type="button" class="tile" data-tile="1"><span class="tn">Time</span><span class="tt small muted">At a set time each day</span></button>
+      <button type="button" class="tile" data-tile="2"><span class="tn">Door</span><span class="tt small muted">When a door opens</span></button>
+      <button type="button" class="tile" data-tile="3"><span class="tn">Button</span><span class="tt small muted">When a button is pressed</span></button>
+      <button type="button" class="tile" data-tile="4"><span class="tn">Sunset</span><span class="tt small muted">At sunset</span></button>
+      <button type="button" class="tile" data-tile="5"><span class="tn">Arrive</span><span class="tt small muted">When a phone arrives home</span></button>
+    </div>
+  </section>
+
+  <section class="card stack" aria-labelledby="st-out-h">
+    <h2 id="st-out-h" class="small">Your automation</h2>
+    <p id="st-status" class="note" aria-live="polite">No starter chosen yet.</p>
+    <ol id="st-steps" class="list" aria-label="Steps from the starter"></ol>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<style>
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tile { min-height: 104px; height: auto; padding: 12px; border: 0; border-radius: 20px; background: var(--sl2); color: var(--on); display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 4px; text-align: start; }
+.tile[aria-pressed="true"] { background: var(--sc); color: var(--on-sc); }
+.tn { font-size: 16px; font-weight: 500; }
+.tt { line-height: 18px; }
+#st-steps li { min-height: 48px; }
+</style>
+<script>
+(function () {
+  var STARTERS = [
+    { name: 'Motion', steps: ['When motion starts in the hall', 'Turn on the hall light'] },
+    { name: 'Time', steps: ['At 19:00 every day', 'Turn on the kitchen plug'] },
+    { name: 'Door', steps: ['When the front door opens', 'Send a note to the phone'] },
+    { name: 'Button', steps: ['When the bedside button is pressed', 'Turn off the bedroom light'] },
+    { name: 'Sunset', steps: ['At sunset', 'Turn on the porch light'] },
+    { name: 'Arrive', steps: ['When a phone arrives home', 'Set the heating to 21 degrees'] }
+  ];
+  var tiles = Array.prototype.slice.call(document.querySelectorAll('[data-tile]'));
+  var status = document.getElementById('st-status');
+  var list = document.getElementById('st-steps');
+
+  function show(index) {
+    var s = STARTERS[index];
+    list.textContent = '';
+    s.steps.forEach(function (text) {
+      var li = document.createElement('li');
+      li.textContent = text;
+      list.appendChild(li);
+    });
+    status.textContent = s.name + ' starter chosen. Your automation has ' + s.steps.length + ' steps.';
+  }
+
+  tiles.forEach(function (t) {
+    t.setAttribute('aria-pressed', 'false');
+    t.addEventListener('click', function () {
+      var i = Number(t.getAttribute('data-tile'));
+      tiles.forEach(function (x) { x.setAttribute('aria-pressed', String(x === t)); });
+      show(i);
+    });
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    tiles.forEach(function (x) { x.setAttribute('aria-pressed', 'false'); });
+    list.textContent = '';
+    status.textContent = 'No starter chosen yet.';
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+{
+  "build": 512,
+  "headline": "A calmer automation editor, lighter long lists, and a fix for the automatic update switches",
+  "summary": "Build 512 makes the automation editor calmer on a phone: Simple, Advanced and YAML sit in one control, the steps are numbered, and the six starter tiles fit on one phone screen. Long lists scroll with less work for the phone. The automatic update switches could not be saved in build 509, and this build fixes that, along with the hour and minute buttons in the time window. Some of the new motion, the saved tick and the update queue ring, has not yet been checked in a browser.",
+  "summary_yue": "512 版令手機上面嘅自動化編輯器清爽啲：「簡單」、「進階」同 YAML 放喺同一個控制掣入面，步驟有編號，六個入門磚一個手機畫面睇晒。手機上面嘅長清單捲動時做嘅功夫少咗。509 版嘅自動更新開關儲存唔到，今版已經修正，時間視窗嘅小時同分鐘掣都一齊修咗。部分新動態，即係儲存剔號同更新隊列嗰個圈，仲未喺瀏覽器度驗證。",
+  "highlights": [
+    {
+      "id": "calmer-automation-editor",
+      "title": "The automation editor is calmer, with one control for its three views",
+      "areas": ["interface"],
+      "what": "On a phone, Simple, Advanced and YAML are now one pill control under the title, and the top row of add buttons is gone. Each step sits in a numbered block with tonal rows, and the six starter tiles of an empty automation fit on one phone screen. Home information groups its fields in cards, and the Network and Areas pages are tidier, with compact Areas rows on a phone. Motion only shows for real moments: a deleted step closes up, and Save shows a tick.",
+      "what_yue": "喺手機上面，「簡單」、「進階」同 YAML 而家係標題下面一條藥丸控制，頂部一行新增掣已經拎走。每個步驟放喺一個編號方塊入面，行係色塊，空白自動化嗰六塊入門磚一個手機畫面睇晒。屋企資料將欄位分組放入卡，網絡同分區頁都整理過，手機上面分區係精簡行。動態只係喺真有事嗰陣先出現：刪除步驟會收合，儲存會畫一個剔號。",
+      "why": "On a phone the editor had a crowded row of buttons, and the starter tiles were hidden in a strip that scrolled sideways.",
+      "try": [
+        "Press Advanced, then YAML, and see the same steps shown in each view.",
+        "Press Delete on a step and watch the numbers close up.",
+        "Press Add a step and read the new block at the end."
+      ],
+      "sha": ["a7f6196c6"],
+      "demo": "demos/512/automation-editor-views.html",
+      "more_demos": [
+        {
+          "title": "Six starter tiles fit one phone screen, two across",
+          "demo": "demos/512/starter-tiles.html",
+          "try": ["Press a tile to start an automation with its steps.", "Press Start again and see the list go back to empty."]
+        },
+        {
+          "title": "A deleted step closes up, and Save shows a tick",
+          "demo": "demos/512/step-close-up-and-save.html",
+          "try": ["Delete step 2 and read what happened to the steps below it.", "Press Save and look for the tick."]
+        }
+      ]
+    },
+    {
+      "id": "lighter-long-lists",
+      "title": "Long lists on a phone scroll with less work",
+      "areas": ["interface"],
+      "what": "When one row arrives in a long list, the browser no longer restyles every row on the screen. Each checkbox also applies its states only when they really change, not on every update. On a 1500-row test list at 390 px, the elements restyled per scroll step fell from 4015 to 1344, and the cost of a fixed scroll fell by 26 percent on Entities and 16 percent on Automations. The share of slow frames only moved from about 18 to about 16 percent, so the gain is real but modest.",
+      "what_yue": "一行新資料加入長清單嗰陣，瀏覽器唔會再重新計算畫面上每一行嘅樣式。剔格亦只係喺狀態真係改變時先更新。喺 390 像素、處理器慢四倍嘅測試入面，1500 行清單每次捲動要重新計樣式嘅元素由 4015 個減到 1344 個；實體清單嘅固定捲動成本少咗 26%，自動化清單少咗 16%。慢格嘅比例只由約 18% 降到約 16%，所以改善係真嘅，但唔算大；裝置、儀表板、日誌同真手機仲未量度。",
+      "why": "On a phone, a long list could feel heavy, because each new row made the browser redo the look of every row.",
+      "try": [
+        "Press Add a row, new way, and read how many rows were restyled.",
+        "Press Add a row, old way, and compare the count.",
+        "Press Apply again, new way, and see that unchanged checkboxes do no work."
+      ],
+      "sha": ["6b6ac0e92"],
+      "demo": "demos/512/lighter-long-lists.html"
+    },
+    {
+      "id": "update-switches-save",
+      "title": "The automatic update switches can be saved, and so can the hour and minute",
+      "areas": ["interface"],
+      "what": "In build 509, turning on any of the three automatic update switches (Supervisor, Core and the operating system) passed the confirmation, looked switched on, and then failed to save. The switch and the hour and minute buttons in the time dialog used a name the page already uses for something else, so the wrong value was sent. Nothing was saved, so nothing could update by itself. Build 512 fixes both controls, but the switches have not yet been seen saving on a real build.",
+      "what_yue": "509 版入面，三個系統自動更新開關（Supervisor、核心同作業系統）開任何一個，都會過咗確認、睇落已經開咗，跟住儲存失敗。開關同時間對話框入面嘅小時、分鐘掣，用咗頁面本身另有用途嘅一個名，所以錯嘅數值畀咗出去。乜都冇儲存，所以乜都唔會自己更新。512 版兩組控制都已經修正，但三個開關仲未喺真實版本度見過儲存成功。",
+      "why": "A switch that looks on but does not save is worse than a switch that is clearly off.",
+      "try": [
+        "Turn on Core, press Confirm, and read the saved line.",
+        "Turn Core off, and read that it is saved as off straight away.",
+        "Turn on the operating system switch too, and read the order in the summary."
+      ],
+      "sha": ["a6886fe92"],
+      "demo": "demos/512/update-switches-save.html",
+      "more_demos": [
+        {
+          "title": "The hour and minute of the update window have their own buttons",
+          "demo": "demos/512/time-window-hour-minute.html",
+          "try": ["Press Hour up, and read the new start time.", "Press Minute up, and see the window move on by five minutes."]
+        }
+      ]
+    }
+  ],
+  "other": [
+    { "title": "Internal project notes brought up to date. No change to the product.", "sha": ["e27b2bff8"] }
+  ]
+}

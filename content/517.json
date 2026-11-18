@@ -1,0 +1,53 @@
+{
+  "build": 517,
+  "headline": "A Notes button on a system update opens that build's page, and a What's new button for the build you run",
+  "summary": "Build 517 changes the Notes button beside Core, the Supervisor and the operating system. It now opens that build's own page on this updates log, found from the build number at the end of the version. The Updates page also has a What's new in build N button for the build you are running, and it follows each update. The Notes button has not yet been seen on a real pending update, and a What's new page for a build only exists once that build has an entry in this log.",
+  "summary_yue": "517 版改咗核心、Supervisor 同作業系統旁邊嗰個「說明」掣，會開返該版本喺呢個更新日誌入面嗰一頁，由版本號最尾嗰個建置編號搵返。更新頁亦多咗一粒「N 版有乜新嘢」掣，講緊你而家行緊嗰個版本，每次更新都會跟住轉。「說明」掣仲未喺真實待裝更新上面睇過。一個版本嘅「有乜新嘢」頁，要等呢個日誌寫咗嗰版先至會有。",
+  "highlights": [
+    {
+      "id": "notes-opens-build-page",
+      "title": "The Notes button on a system update opens that build's page",
+      "areas": ["interface"],
+      "what": "The Notes button beside Core, the Supervisor and the operating system used to open whatever link the update carried, and for the operating system that was often no help. It now opens that build's own page on this updates log, using the build number at the end of the version, so 2026.11.1.509 leads to build 509. Integrations and apps keep the link their author gave, and a version with no build number keeps the old behaviour.",
+      "what_yue": "核心、Supervisor 同作業系統旁邊嗰個「說明」掣，以前會開更新本身帶住嘅連結，對作業系統嚟講通常冇咩幫助。而家會開呢個更新日誌入面嗰個版本自己嗰一頁，用版本號最尾嗰個建置編號搵返，例如 2026.11.1.509 會去 509 版。整合同應用程式照用作者畀嘅連結，冇建置編號嘅版本就照舊。",
+      "why": "The old link often led nowhere useful, so a reader could not easily see what the update changed.",
+      "try": [
+        "Press Notes on the Operating system row in the demo.",
+        "Read which build page it would open.",
+        "Press Notes on the integration row, and see that it keeps its own link."
+      ],
+      "sha": ["5fc4fbe08"],
+      "demo": "demos/517/notes-opens-build-page.html",
+      "more_demos": [
+        {
+          "title": "A version with no build number keeps the old behaviour",
+          "demo": "demos/517/notes-without-build-number.html",
+          "try": ["Type a version with no build number at its end.", "Read that Notes keeps the link the update carried."]
+        }
+      ]
+    },
+    {
+      "id": "whats-new-running-build",
+      "title": "A What's new button for the build that is running",
+      "areas": ["interface"],
+      "what": "The Updates page could tell you about builds you have not installed, but had no single place to read about the one already running. The top block now has a small button, such as What's new in build 512, that opens that build's page on this updates log. The button is worked out from the running version, so it follows each update, and it is hidden when the version has no build number.",
+      "what_yue": "更新頁一直會講你未裝嘅版本，但冇一個地方講你而家行緊嗰個版本。頂部嗰格而家有一粒細掣，例如「512 版有乜新嘢」，會開呢個日誌入面嗰個版本嗰一頁。掣係由行緊嘅版本號計出嚟，所以每次更新都會跟住轉；版本號冇建置編號就唔會顯示。",
+      "why": "A reader on the current build had no obvious place to find out what that build brought.",
+      "try": [
+        "Open the Updates page in the demo and find the top block.",
+        "Read the button, which names the build that is running.",
+        "Press it, and read the page it would open."
+      ],
+      "sha": ["3cdb9adac"],
+      "demo": "demos/517/whats-new-running-build.html",
+      "more_demos": [
+        {
+          "title": "Type a running version and see the button appear or go",
+          "demo": "demos/517/whats-new-typed-version.html",
+          "try": ["Type a version that ends with a build number, and see the button appear.", "Type nightly-build, and read why no button is shown."]
+        }
+      ]
+    }
+  ],
+  "other": []
+}

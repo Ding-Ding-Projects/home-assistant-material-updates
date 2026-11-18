@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: update window hour and minute</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="time-window-hour-minute">
+  <h1>The hour and minute of the update window have their own buttons</h1>
+  <p class="muted">Set the time the update window starts. The window is two hours long, as it is in the more-info dialog.</p>
+
+  <section class="card stack" aria-labelledby="tw-h">
+    <h2 id="tw-h" class="small">Update window</h2>
+    <div class="row">
+      <span>Start</span>
+      <output id="tw-start" class="mono" aria-live="polite">03:00</output>
+    </div>
+    <div class="row" role="group" aria-label="Start time">
+      <button type="button" class="tonal" id="tw-hu">Hour up</button>
+      <button type="button" class="tonal" id="tw-hd">Hour down</button>
+      <button type="button" class="tonal" id="tw-mu">Minute up</button>
+      <button type="button" class="tonal" id="tw-md">Minute down</button>
+    </div>
+    <p id="tw-sum" class="note">Updates start inside the window from 03:00 to 05:00.</p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var h = 3;
+  var m = 0;
+  var start = document.getElementById('tw-start');
+  var sum = document.getElementById('tw-sum');
+
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function label(hh, mm) { return pad(hh) + ':' + pad(mm); }
+
+  function render() {
+    var s = label(h, m);
+    var endH = (h + 2) % 24;
+    var e = label(endH, m);
+    start.textContent = s;
+    sum.textContent = 'Updates start inside the window from ' + s + ' to ' + e + '.';
+  }
+
+  document.getElementById('tw-hu').addEventListener('click', function () { h = (h + 1) % 24; render(); });
+  document.getElementById('tw-hd').addEventListener('click', function () { h = (h + 23) % 24; render(); });
+  document.getElementById('tw-mu').addEventListener('click', function () { m = (m + 5) % 60; render(); });
+  document.getElementById('tw-md').addEventListener('click', function () { m = (m + 55) % 60; render(); });
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () { h = 3; m = 0; render(); });
+
+  render();
+})();
+</script>
+</body>
+</html>

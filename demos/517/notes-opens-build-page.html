@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: Notes opens the build page</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="notes-opens-build-page">
+  <h1>Notes opens the build's own page on this log</h1>
+  <p class="muted">Press Notes on a row. This demo does not open any link. It says where Notes would take you.</p>
+
+  <section class="card stack" aria-labelledby="no-h">
+    <h2 id="no-h" class="small">Updates</h2>
+    <ul class="list" aria-label="Updates">
+      <li>
+        <span class="grow"><strong>Core</strong><br><span class="small muted">2026.11.1.509</span></span>
+        <button type="button" class="tonal" data-row="0" aria-label="Notes for Core">Notes</button>
+      </li>
+      <li>
+        <span class="grow"><strong>Supervisor</strong><br><span class="small muted">2026.11.0.509</span></span>
+        <button type="button" class="tonal" data-row="1" aria-label="Notes for Supervisor">Notes</button>
+      </li>
+      <li>
+        <span class="grow"><strong>Operating system</strong><br><span class="small muted">18.5.481</span></span>
+        <button type="button" class="tonal" data-row="2" aria-label="Notes for Operating system">Notes</button>
+      </li>
+      <li>
+        <span class="grow"><strong>Example integration</strong><br><span class="small muted">1.4.2</span></span>
+        <button type="button" class="tonal" data-row="3" aria-label="Notes for Example integration">Notes</button>
+      </li>
+    </ul>
+    <p id="no-out" class="note" aria-live="polite">Press Notes on a row to see where it goes.</p>
+  </section>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<style>
+.grow { flex: 1; min-width: 0; }
+.list li { gap: 12px; }
+</style>
+<script>
+(function () {
+  var ROWS = [
+    { name: 'Core', version: '2026.11.1.509', system: true },
+    { name: 'Supervisor', version: '2026.11.0.509', system: true },
+    { name: 'Operating system', version: '18.5.481', system: true },
+    { name: 'Example integration', version: '1.4.2', system: false }
+  ];
+  var out = document.getElementById('no-out');
+  var buttons = Array.prototype.slice.call(document.querySelectorAll('[data-row]'));
+
+  function describe(r) {
+    if (!r.system) {
+      return r.name + ' is an integration, so Notes keeps the link its author gave.';
+    }
+    var m = /\.(\d+)$/.exec(r.version);
+    if (m) {
+      return 'Notes would open build ' + m[1] + ' on this updates log: its own page for ' + r.name + ' ' + r.version + '.';
+    }
+    return 'Notes keeps the link the update carried, because the version has no build number.';
+  }
+
+  buttons.forEach(function (b) {
+    b.addEventListener('click', function () {
+      out.textContent = describe(ROWS[Number(b.getAttribute('data-row'))]);
+    });
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    out.textContent = 'Press Notes on a row to see where it goes.';
+  });
+})();
+</script>
+</body>
+</html>

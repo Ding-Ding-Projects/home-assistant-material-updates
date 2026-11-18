@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: automation editor views</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+</head>
+<body>
+<main class="demo" data-demo="calmer-automation-editor">
+  <h1>Simple, Advanced and YAML are one control on a phone</h1>
+  <p class="muted">Press a view. The same steps show in each view. Delete a step and the numbers close up.</p>
+
+  <div class="pill" role="group" aria-label="Editor view">
+    <button type="button" data-view="simple" aria-pressed="true">Simple</button>
+    <button type="button" data-view="advanced" aria-pressed="false">Advanced</button>
+    <button type="button" data-view="yaml" aria-pressed="false">YAML</button>
+  </div>
+  <p id="ae-status" class="small muted" aria-live="polite" tabindex="-1">Press a view to see the steps in that view.</p>
+
+  <section id="ae-box" class="stack" aria-label="Automation steps"></section>
+  <div class="row"><button type="button" class="tonal" id="ae-add">Add a step</button></div>
+
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<style>
+.pill { display: inline-flex; gap: 4px; padding: 4px; border-radius: 28px; background: var(--sl3); align-self: flex-start; max-width: 100%; }
+.pill button { min-height: 48px; padding: 0 14px; border: 0; border-radius: 24px; background: transparent; color: var(--onv); font-weight: 400; }
+.pill button[aria-pressed="true"] { background: var(--sc); color: var(--on-sc); font-weight: 500; }
+.blk { background: var(--sl2); border-radius: 20px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.blk-h { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.blk-h .row { flex-wrap: nowrap; }
+.num { width: 32px; height: 32px; flex: none; border-radius: 16px; background: var(--pc); color: var(--on-pc); display: inline-flex; align-items: center; justify-content: center; font-weight: 500; }
+.trow { background: var(--sl0); border-radius: 12px; padding: 8px 12px; display: flex; flex-direction: column; }
+.yaml { background: var(--sl0); border-radius: 12px; padding: 12px; margin: 0; overflow-x: auto; font-family: var(--mono); font-size: 14px; line-height: 20px; white-space: pre; }
+</style>
+<script>
+(function () {
+  var START = [
+    { when: 'Motion starts in the hall', then: 'Turn on the hall light', entity: 'binary_sensor.hall_motion', service: 'light.turn_on' },
+    { when: 'It is 19:00', then: 'Turn on the kitchen plug', entity: 'time', service: 'switch.turn_on' },
+    { when: 'The front door opens', then: 'Send a note to the phone', entity: 'binary_sensor.front_door', service: 'notify.phone' }
+  ];
+  var steps = JSON.parse(JSON.stringify(START));
+  var view = 'simple';
+  var box = document.getElementById('ae-box');
+  var status = document.getElementById('ae-status');
+  var pills = Array.prototype.slice.call(document.querySelectorAll('[data-view]'));
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+  function row(label, value) {
+    var r = el('div', 'trow');
+    r.appendChild(el('span', 'small muted', label));
+    r.appendChild(el('span', '', value));
+    return r;
+  }
+  function say(msg) {
+    status.textContent = msg;
+    status.focus();
+  }
+  function viewName() {
+    return view === 'simple' ? 'Simple' : view === 'advanced' ? 'Advanced' : 'YAML';
+  }
+
+  function render() {
+    box.textContent = '';
+    if (view === 'yaml') {
+      var text = steps.map(function (s, i) {
+        return '# step ' + (i + 1) + '\n- trigger: ' + s.entity + '\n  action: ' + s.service;
+      }).join('\n');
+      var pre = el('pre', 'yaml', text);
+      pre.tabIndex = 0;
+      box.appendChild(pre);
+      return;
+    }
+    steps.forEach(function (s, i) {
+      var block = el('section', 'blk');
+      block.setAttribute('aria-label', 'Step ' + (i + 1));
+      var head = el('div', 'blk-h');
+      var left = el('div', 'row');
+      left.appendChild(el('span', 'num', String(i + 1)));
+      left.appendChild(el('strong', '', 'Step ' + (i + 1)));
+      head.appendChild(left);
+      var del = el('button', 'text', 'Delete');
+      del.setAttribute('aria-label', 'Delete step ' + (i + 1));
+      del.addEventListener('click', function () { remove(i); });
+      head.appendChild(del);
+      block.appendChild(head);
+      if (view === 'simple') {
+        block.appendChild(row('When', s.when));
+        block.appendChild(row('Then', s.then));
+      } else {
+        block.appendChild(row('Trigger', s.entity + ' changes'));
+        block.appendChild(row('Action', s.service));
+      }
+      box.appendChild(block);
+    });
+  }
+
+  function remove(i) {
+    steps.splice(i, 1);
+    render();
+    say('Step ' + (i + 1) + ' deleted. The steps below closed up. ' + steps.length + ' steps left.');
+  }
+
+  pills.forEach(function (b) {
+    b.addEventListener('click', function () {
+      view = b.getAttribute('data-view');
+      pills.forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      render();
+      say(viewName() + ' view. ' + steps.length + ' steps.');
+    });
+  });
+
+  document.getElementById('ae-add').addEventListener('click', function () {
+    steps.push({ when: 'Choose a trigger', then: 'Choose an action', entity: 'choose', service: 'choose' });
+    render();
+    say('Step ' + steps.length + ' added at the end.');
+  });
+
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    steps = JSON.parse(JSON.stringify(START));
+    view = 'simple';
+    pills.forEach(function (x) { x.setAttribute('aria-pressed', String(x.getAttribute('data-view') === 'simple')); });
+    render();
+    say('Simple view. 3 steps.');
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
