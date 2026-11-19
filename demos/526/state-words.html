@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: state words follow the language mode</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.modes { display: flex; flex-wrap: wrap; gap: 8px; }
+.modes button { min-height: 48px; }
+.modes button[aria-pressed="true"] { background: var(--sc); color: var(--on-sc); border-color: transparent; font-weight: 500; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin-top: 16px; }
+.tile { min-height: 72px; flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; text-align: left; min-width: 0; }
+.tile[aria-pressed="true"] { background: var(--sc); color: var(--on-sc); border-color: transparent; }
+.tile .name { font-weight: 500; overflow-wrap: anywhere; }
+.tile .state { font-size: 14px; overflow-wrap: anywhere; }
+.days { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="state-words">
+  <h1>State words follow the language mode</h1>
+  <p class="muted">Press 廣東話 or Both, then press a tile to change its state and read the word it shows.</p>
+
+  <div class="modes" role="group" aria-label="Language">
+    <button type="button" data-mode-btn="yue" aria-pressed="false">廣東話</button>
+    <button type="button" data-mode-btn="both" aria-pressed="false">Both</button>
+    <button type="button" data-mode-btn="en" aria-pressed="true">English</button>
+  </div>
+
+  <div class="tiles" role="group" aria-label="Pretend tiles"></div>
+
+  <div class="card stack" style="margin-top: 16px;">
+    <p class="small muted">Weather sheet, next three days</p>
+    <div class="days" id="days"></div>
+  </div>
+
+  <p class="small" id="said" aria-live="polite">English mode shows the same words as before.</p>
+  <p class="note warn small">Still English in this build: about a hundred attribute names, long dates, and values that only one integration uses. The Cantonese has not been read by a native reader.</p>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var words = {
+    on: ['On', '開'], off: ['Off', '關'],
+    open: ['Open', '打開'], closed: ['Closed', '閂咗'],
+    home: ['Home', '喺屋企'], away: ['Away', '出咗街'],
+    heating: ['Heating', '加熱緊'], idle: ['Idle', '閒置']
+  };
+  var start = [
+    { name: 'Kitchen light', states: ['on', 'off'], at: 0 },
+    { name: 'Front door', states: ['closed', 'open'], at: 0 },
+    { name: 'Phone', states: ['home', 'away'], at: 0 },
+    { name: 'Hallway heat', states: ['heating', 'idle'], at: 0 },
+    { name: 'Fan mode', states: ['off', 'on'], at: 0, own: true }
+  ];
+  var days = [['Monday', '星期一'], ['Tuesday', '星期二'], ['Wednesday', '星期三']];
+  var tiles = [];
+  var mode = 'en';
+  var box = document.querySelector('.tiles');
+  var said = document.getElementById('said');
+  var modeBtns = document.querySelectorAll('[data-mode-btn]');
+
+  function word(pair) {
+    if (mode === 'en') return pair[0];
+    if (mode === 'yue') return pair[1];
+    return pair[0] + ' ' + pair[1];
+  }
+  function draw() {
+    box.innerHTML = '';
+    tiles.forEach(function (t, i) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'tile';
+      var key = t.states[t.at];
+      b.setAttribute('aria-pressed', String(key === 'on' || key === 'open' || key === 'home' || key === 'heating'));
+      var n = document.createElement('span'); n.className = 'name'; n.textContent = t.name;
+      var s = document.createElement('span'); s.className = 'state'; s.textContent = word(words[key]);
+      b.appendChild(n); b.appendChild(s);
+      b.addEventListener('click', function () {
+        t.at = (t.at + 1) % t.states.length;
+        draw();
+        var w = word(words[t.states[t.at]]);
+        said.textContent = t.name + ' now shows ' + w + (t.own ? '. This word came from the integration itself and borrows the common Cantonese word.' : '.');
+        box.children[i].focus();
+      });
+      box.appendChild(b);
+    });
+    var d = document.getElementById('days');
+    d.innerHTML = '';
+    days.forEach(function (p) { var c = document.createElement('span'); c.className = 'badge'; c.textContent = word(p); d.appendChild(c); });
+  }
+  function setMode(m) {
+    mode = m;
+    modeBtns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-mode-btn') === m)); });
+    draw();
+    said.textContent = m === 'en' ? 'English mode shows the same words as before.' : m === 'yue' ? 'Cantonese mode: the state words are in Cantonese.' : 'Both mode: each state word shows English and Cantonese together.';
+  }
+  function reset() {
+    tiles = start.map(function (t) { return { name: t.name, states: t.states, at: 0, own: t.own }; });
+    setMode('en');
+  }
+  modeBtns.forEach(function (b) { b.addEventListener('click', function () { setMode(b.getAttribute('data-mode-btn')); }); });
+  document.querySelector('[data-demo-reset]').addEventListener('click', reset);
+  reset();
+})();
+</script>
+</body>
+</html>

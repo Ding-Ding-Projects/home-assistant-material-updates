@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: tabbed settings pages follow the language mode</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.modes { display: flex; flex-wrap: wrap; gap: 8px; }
+.modes button, .tabs button { min-height: 48px; }
+.modes button[aria-pressed="true"] { background: var(--sc); color: var(--on-sc); border-color: transparent; font-weight: 500; }
+.frame { width: 100%; max-width: 560px; margin: 16px auto 0; padding: 0; overflow: hidden; }
+.crumb { padding: 12px 16px 0; font-size: 14px; color: var(--onv); overflow-wrap: anywhere; }
+.title { padding: 0 16px; margin: 4px 0 8px; font-size: 22px; overflow-wrap: anywhere; }
+.tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); background: var(--sl2); }
+.tabs button { border: 0; border-radius: 0; padding: 4px 2px; flex-direction: column; gap: 0; background: transparent; color: var(--onv); min-width: 0; }
+.tabs button[aria-pressed="true"] { background: var(--sc); color: var(--on-sc); font-weight: 500; }
+.bi { display: block; min-width: 0; overflow-wrap: anywhere; text-align: center; }
+.yue { font-size: 12px; line-height: 16px; }
+.body { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.body[hidden] { display: none; }
+.slider label { display: block; margin-bottom: 4px; }
+.slider input { width: 100%; min-height: 48px; }
+main[data-mode="en"] .yue { display: none; }
+main[data-mode="yue"] .en { display: none; }
+main[data-mode="yue"] .yue { font-size: inherit; line-height: inherit; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="settings-tabs-language" data-mode="en">
+  <h1>Tabbed settings pages follow the language mode</h1>
+  <p class="muted">Press 廣東話 or Both and read the tabs, the page title and the trail above it change, then try the slider and the test clip.</p>
+
+  <div class="modes" role="group" aria-label="Language">
+    <button type="button" data-mode-btn="yue" aria-pressed="false">廣東話</button>
+    <button type="button" data-mode-btn="both" aria-pressed="false">Both</button>
+    <button type="button" data-mode-btn="en" aria-pressed="true">English</button>
+  </div>
+
+  <div class="card frame">
+    <p class="crumb"><span class="en">Settings › Camera recording</span> <span class="yue">設定 › 鏡頭錄影</span></p>
+    <h2 class="title"><span class="en">Camera recording</span> <span class="yue">鏡頭錄影</span></h2>
+    <div class="tabs" role="group" aria-label="Page tabs">
+      <button type="button" data-tab="rec" aria-pressed="true"><span class="bi"><span class="en">Recording</span><span class="yue">錄影</span></span></button>
+      <button type="button" data-tab="places" aria-pressed="false"><span class="bi"><span class="en">Places</span><span class="yue">存放位置</span></span></button>
+      <button type="button" data-tab="check" aria-pressed="false"><span class="bi"><span class="en">Check</span><span class="yue">檢查</span></span></button>
+    </div>
+    <div class="body" data-panel="rec">
+      <div class="slider">
+        <label for="keep"><span class="en">Keep recordings for</span> <span class="yue">錄影保留</span> <span id="keep-val">7</span> <span class="en">days</span><span class="yue">日</span></label>
+        <input type="range" id="keep" min="1" max="30" value="7">
+      </div>
+      <p class="small muted"><span class="en">The label sits above the slider, not under it.</span> <span class="yue">標籤喺滑桿上面，唔會俾佢壓住。</span></p>
+    </div>
+    <div class="body" data-panel="places" hidden>
+      <p><span class="en">One pretend place: the recordings folder on this system.</span> <span class="yue">一個假想存放位置：呢部系統嘅錄影資料夾。</span></p>
+    </div>
+    <div class="body" data-panel="check" hidden>
+      <div class="row"><button type="button" class="filled" id="clip"><span class="en">Record a test clip</span> <span class="yue">錄一段測試片段</span></button></div>
+      <p id="clip-out" class="small"></p>
+    </div>
+  </div>
+
+  <p class="small" id="said" aria-live="polite">English mode. Showing the Recording tab.</p>
+  <p class="note warn small">Seen in a browser at phone width: the recording check. The Cantonese has not been read by a native reader.</p>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var main = document.querySelector('main');
+  var modeBtns = document.querySelectorAll('[data-mode-btn]');
+  var tabs = document.querySelectorAll('[data-tab]');
+  var panels = document.querySelectorAll('[data-panel]');
+  var said = document.getElementById('said');
+  var keep = document.getElementById('keep');
+  var keepVal = document.getElementById('keep-val');
+  var clipOut = document.getElementById('clip-out');
+  var tabNames = { rec: 'Recording', places: 'Places', check: 'Check' };
+  var modeNames = { en: 'English mode', yue: 'Cantonese mode', both: 'Both mode' };
+  var mode = 'en';
+  var tab = 'rec';
+
+  function announce() { said.textContent = modeNames[mode] + '. Showing the ' + tabNames[tab] + ' tab.'; }
+  function setMode(m) {
+    mode = m;
+    main.setAttribute('data-mode', m);
+    modeBtns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-mode-btn') === m)); });
+    announce();
+  }
+  function setTab(t) {
+    tab = t;
+    tabs.forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-tab') === t)); });
+    panels.forEach(function (p) { p.hidden = p.getAttribute('data-panel') !== t; });
+    announce();
+  }
+  modeBtns.forEach(function (b) { b.addEventListener('click', function () { setMode(b.getAttribute('data-mode-btn')); }); });
+  tabs.forEach(function (b) { b.addEventListener('click', function () { setTab(b.getAttribute('data-tab')); }); });
+  keep.addEventListener('input', function () {
+    keepVal.textContent = keep.value;
+    said.textContent = 'Recordings would be kept for ' + keep.value + ' days.';
+  });
+  document.getElementById('clip').addEventListener('click', function () {
+    clipOut.innerHTML = '<span class="en">The pretend test clip failed: the pretend camera did not answer.</span> <span class="yue">假想測試片段失敗：假想鏡頭冇回應。</span>';
+    said.textContent = 'The test clip failed. The reason is given once in each language.';
+  });
+  document.querySelector('[data-demo-reset]').addEventListener('click', function () {
+    keep.value = 7; keepVal.textContent = '7'; clipOut.innerHTML = '';
+    tab = 'rec'; setTab('rec'); setMode('en');
+  });
+})();
+</script>
+</body>
+</html>

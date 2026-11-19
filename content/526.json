@@ -1,0 +1,62 @@
+{
+  "build": 526,
+  "headline": "On, Off, Open and other state words follow the language mode, tabbed settings pages speak Cantonese, and ten small faults are fixed",
+  "summary": "Build 526 brings the last big group of English-only words into the language mode: On, Off, Open, Closed, Home, Heating and about 460 other states and names now follow the language you choose, and English mode shows exactly what it did before. Tabs, page titles and the trail above them on tabbed settings pages follow too, and ten page captions gain Cantonese. Ten small faults are fixed, from a History tab that jumped twice to a list search that found midnight when you typed light. The build also connects a set of new features that are off until they are set up and have not yet been seen in a browser: Toronto transit cards, media that lives at a web address, keeping live views and snapshots, sending recordings to a cloud drive, sending the problem log to a private repository, and a container registry as an encrypted place for recordings and backups. The Cantonese has not been read by a native reader.",
+  "summary_yue": "526 版將最後一大批淨係識講英文嘅字都交返畀語言模式：開、關、打開、閂咗、喺屋企、加熱緊，同埋另外大約 460 個狀態同屬性名，而家都會跟住你揀嘅語言，英文模式出嘅字同以前一模一樣。有分頁嘅設定頁，分頁標籤、頁面標題同上面嗰條路徑都跟埋，仲有十個頁面標題加咗廣東話。修好咗十個小問題，由歷史分頁彈兩次，到喺清單打 light 會搵到 midnight。今版亦接駁咗一批新功能，未設定之前係關閉嘅，亦未喺瀏覽器睇過：多倫多公共交通卡片、擺喺網址嘅媒體、留低直播同快照、錄影送去雲端硬碟、問題記錄送去私人儲存庫，同埋用容器登記處做加密存放位，放錄影同備份。廣東話未經母語人士讀過。",
+  "highlights": [
+    {
+      "id": "state-words",
+      "title": "On, Off, Open and other state words follow the language mode",
+      "areas": ["interface"],
+      "what": "The words every list and tile shows, such as On, Off, Open, Closed, Home and Heating, were the last group still speaking only English. They now follow the language mode, with a Cantonese table of about 460 states and names that a test checks against the server's own word lists. English mode shows exactly what it did before: 1,474 texts on the dashboard, lists and sheets were compared with the published build in a browser and none changed. Words an integration supplies itself, such as a fan mode that says Off, borrow the common Cantonese word when the English is the same, and groups, schedules, calendars and cameras now have Cantonese states. Weekday names in the weather sheet follow as well. Still in English: about a hundred attribute names, long dates, and values only one integration uses. The same work fixes ten small faults, listed in the second demo.",
+      "what_yue": "開、關、打開、閂咗、喺屋企、加熱緊：每張清單、每塊磚都見到嘅呢啲字，係最後一批淨係識講英文嘅。而家佢哋會跟語言模式，配一張大約 460 個狀態同屬性名嘅廣東話表，有測試對返伺服器自己嘅字表。英文模式出嘅字同以前一模一樣：喺瀏覽器將儀表板、清單同面板一共 1,474 段文字對返已發佈嘅版本，一個字都冇變。整合自己提供嘅字，例如風扇模式個「Off」，英文完全一樣嗰陣會借用通用嘅廣東話；群組、時間表、日曆同鏡頭而家都有廣東話狀態。天氣面板啲星期幾都跟埋。仲係英文嘅有：大約一百個屬性名、長日期，同埋得一個整合用嘅數值。同一輪工作仲修好咗十個小問題，第二個示範有齊。",
+      "why": "Someone who picks Cantonese sees On and Off on every tile, so a sheet in Cantonese with state words in English still feels half done.",
+      "try": [
+        "Press 廣東話 and read the state on each tile change.",
+        "Press a tile to change its state, then press Both and see both words together.",
+        "Press English and see the same words as before."
+      ],
+      "sha": ["6db767de3", "71824ce14"],
+      "demo": "demos/526/state-words.html",
+      "more_demos": [
+        {
+          "title": "Ten small faults",
+          "demo": "demos/526/small-faults.html",
+          "try": [
+            "Press one of the fault names and read what was fixed.",
+            "Press another fault and see the count change.",
+            "Read the note at the bottom about what was looked at in a browser."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "settings-tabs-language",
+      "title": "Tabbed settings pages follow the language mode, and new features are connected",
+      "areas": ["core", "interface"],
+      "what": "On settings pages with tabs, the tab labels, the page title and the trail above it now follow the language mode, and ten page captions gain Cantonese. On the camera recording page the sliders no longer sit on their own labels, and a failed test clip gives its reason once in each language instead of twice. The same build connects new work that was waiting: Toronto transit cards, a page and a dashboard entry; media that lives at a web address, in the media browser with two action editors; keeping live views and snapshots; sending recordings to a cloud drive; sending the problem log to a private repository; and a container registry as an encrypted place for recordings and backups, which stays off until it is set up and should stay off until its security review reports. The dashboard, lists, sheets, updates, defenders and the recording check were seen in a browser at phone width in all three language modes. Not yet seen: the transit cards, the problem log page, the registry pages, the linked media rows and much of the small-fix list, and nothing was tried on a real camera, drive, registry or speaker.",
+      "what_yue": "有分頁嘅設定頁，分頁標籤、頁面標題同上面嗰條路徑而家會跟語言模式，十個頁面標題加咗廣東話。鏡頭錄影頁嘅滑桿唔再壓住自己個標籤，測試片段失敗嗰句唔再每種語言講兩次原因。今版仲接駁咗等緊嘅新嘢：多倫多公共交通嘅卡片、頁面同儀表板入口；擺喺網址嘅媒體，喺媒體瀏覽器入面，連兩個動作編輯器；留低直播同快照；錄影送去雲端硬碟；問題記錄送去私人儲存庫；仲有用容器登記處做加密存放位，放錄影同備份，未設定之前係關閉嘅，保安審查未有結果之前都應該保持咁。儀表板、清單、詳情頁、更新、防護器同錄影檢查，喺瀏覽器用手機闊度、三種語言模式睇過。未睇過：公共交通卡片、問題記錄頁、登記處頁面、連結媒體嗰幾行，同埋好多小修正；亦冇喺真鏡頭、真硬碟、真登記處或者真喇叭試過。",
+      "why": "A settings page whose tabs and title stay in English while the rest is in Cantonese is hard to read for someone who chose Cantonese.",
+      "try": [
+        "Press 廣東話 and read the trail, the title and the tabs change.",
+        "Move the slider on the Recording tab and see the label stay above it.",
+        "Open the Check tab and record a test clip. The pretend failure gives its reason once in each language."
+      ],
+      "sha": ["a3cb56d37"],
+      "demo": "demos/526/settings-tabs-language.html"
+    }
+  ],
+  "other": [
+    { "title": "Design boards for English and Cantonese together on a phone, the camera recording check with its test clip, and the Updates page when the Supervisor has to go first", "sha": ["fda3d566c"] },
+    { "title": "Design boards for Toronto transit and for sending camera recordings to a cloud drive", "sha": ["a63eee5e8"] },
+    { "title": "A design board for starting live video by itself and keeping every live view and snapshot", "sha": ["91b74c3f7"] },
+    { "title": "A design board for a public container registry as a place for recordings and backups, with a password that cannot be skipped", "sha": ["76691f382"] },
+    { "title": "A design board for sending the problem log to a private repository", "sha": ["031411f5f"] },
+    { "title": "New files for sending camera recordings to a cloud drive, tested with pretend drives only", "sha": ["a7aa50fe8"] },
+    { "title": "New files for linked media and Toronto transit, tested with saved samples and with the network unplugged", "sha": ["7828de21b"] },
+    { "title": "New files for keeping live views and snapshots, tested with a pretend camera service only", "sha": ["71adeccd7"] },
+    { "title": "Linked media recognises live radio streams, hands files out from an allowed folder, and gains two action editors, not yet built or seen in a browser", "sha": ["da4a0abc8"] },
+    { "title": "Toronto transit shows vehicles near a stop, a line's last day and a dashboard that builds itself, with documentation, not yet seen in a browser", "sha": ["e33f1d2a0"] },
+    { "title": "New files for sending the problem log to a private repository, tested against a pretend host only", "sha": ["2a6ee4b53"] }
+  ]
+}
