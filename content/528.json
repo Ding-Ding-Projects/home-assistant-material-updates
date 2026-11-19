@@ -1,0 +1,45 @@
+{
+  "build": 528,
+  "headline": "Going back always makes a backup first, backups can be made delete proof, and a stored backup can shrink to a pointer",
+  "summary": "Build 528 adds three safety features around backups. Going back to an earlier build now makes and checks a backup before anything is installed; the Supervisor holds that rule, so it applies from the page and from the command line alike. A backup can be marked delete proof, after which nothing the system does can delete it until the mark is turned off with the two keys and the slider. And once a backup is stored in the container registry and read back in full, the copy on the disk can become a small pointer to save space. Seven small faults from the build 527 check are repaired. Seen in a browser on a test copy: updating to 528, a real going back to 527 with its backup made first, the same rule from the command line, and delete proof refusing a delete three different ways. Not yet seen in a browser: the four games, and pointers beyond the empty page. Three small faults were found and are listed below.",
+  "summary_yue": "528 版喺備份方面加咗三樣安全功能。返去舊版之前，而家一定會先做備份兼核對，先至裝任何嘢；呢條規矩由 Supervisor 守住，所以喺頁面或者指令列都一樣。備份可以標記做防刪除，之後系統做嘅任何嘢都刪唔到，直到用兩條鑰匙加滑桿熄咗個標記為止。另外，備份存咗入容器登記處兼成份讀返出嚟核對之後，磁碟上面嗰份可以變成一個細指標，慳返空間。527 版檢查搵到嘅七個細毛病亦修好咗。喺測試副本嘅瀏覽器度睇過：更新去 528、真正返去 527 而備份先做、指令列都守同一條規矩、防刪除用三種方法都拒絕刪除。未喺瀏覽器睇過：四個遊戲，同埋指標頁除咗空白狀態之外嘅嘢。搵到三個細毛病，列喺下面。",
+  "highlights": [
+    {
+      "id": "going-back-and-delete-proof",
+      "title": "Going back makes a backup first, and a backup can be made delete proof",
+      "areas": ["supervisor", "core", "interface"],
+      "what": "Asking for an older Core now starts with a backup. The Supervisor makes it, checks it, and only then installs; a backup that failed, timed out or was stopped means nothing is installed. On a test copy the backup was stamped 14:33:59 and the older build was running at 14:37; asked from the command line instead, the backup finished at 15:05:47.41 and the install began at 15:05:47.43. The one way past the backup is deliberate and slow: the two keys, the slider, then four small games (whack-a-mole, four in a row, a coin until heads, a cookie to 100). The games are a speed bump for a person, not a lock. Separately, any backup can be marked delete proof. The page's Delete is switched off, the server refuses a delete request, and the command line refuses too; turning the mark off needs the two keys and the slider. Known small faults in this build: the finished update card lets \"What's new\" run past its row for Core, the going back panel says the backup \"took 0:00\", the history line does not name the backup's time, and the delete proof switch has no spoken name and is too small to tap comfortably.",
+      "what_yue": "而家叫系統裝舊版 Core，第一步一定係備份。Supervisor 做備份、核對，之後先裝；備份失敗、逾時或者被停，就乜都唔裝。喺測試副本度，備份時間係 14:33:59，舊版 14:37 行返；改由指令列叫，備份 15:05:47.41 完成，15:05:47.43 先開始裝。唯一可以跳過備份嘅路係刻意整到好慢：兩條鑰匙、滑桿，再加四個小遊戲（打地鼠、四子棋、擲銀仔擲到公、撳曲奇撳到 100）。遊戲係畀人諗清楚嘅減速壆，唔係鎖。另外，任何備份都可以標記做防刪除：頁面嘅刪除掣會熄咗，伺服器拒絕刪除請求，指令列都拒絕；熄標記要兩條鑰匙加滑桿。呢版已知嘅細毛病：更新完成嗰張卡，Core 嗰行嘅「有咩新嘢」會凸出行外；返轉頭面板話備份「用咗 0:00」；歷史嗰行冇寫備份時間；防刪除開關冇讀屏名稱，亦太細難撳。",
+      "why": "Going back is the moment people most need a way home, and a backup you meant to keep should not be one tidy-up away from gone.",
+      "try": [
+        "Open Settings, Updates, and find the Update history card.",
+        "Choose an earlier build and read the card: a backup is made first, always.",
+        "When the backup finishes, press \"Make this backup delete proof\".",
+        "Open that backup under Settings, Backups: Delete is off until the mark is turned off."
+      ],
+      "sha": ["1e61499dd"],
+      "demo": "demos/528/going-back.html"
+    },
+    {
+      "id": "backup-pointers",
+      "title": "A backup stored in the registry can shrink to a pointer on the disk",
+      "areas": ["core", "interface"],
+      "what": "Under Settings, Backups there is a new page, Saving space. When a backup is also stored in the container registry, and has been read back in full with its size and checksum matching, the copy on the disk can be replaced by a small pointer. It is off by default, and the newest backup stays whole unless you say otherwise. Any doubt (no answer, a timeout, a part that differs) keeps the whole copy and records why. A pointer holds no key. A daily check notices a missing registry copy; it does not fetch the parts, so a damaged part is only found when bringing the backup back. This build also repairs seven faults from the build 527 check: registry setup steps end within 30 seconds with a plain reason, the recording page words an empty place correctly, built-in additions can carry their own icon, the first backup wizard lists its locations, the media player's slider fits a phone, \"What's new\" wraps in its row, and the Entities title follows the language mode. In a browser so far, only the empty Saving space page and the repaired pages have been seen; turning a backup into a pointer and bringing it back are still being checked.",
+      "what_yue": "設定、備份入面多咗一頁「慳空間」。備份如果同時存咗入容器登記處，而且成份讀返出嚟、大細同核對碼都啱，磁碟上面嗰份就可以換成一個細指標。預設關閉，最新嗰個備份會成個留低，除非你另有指示。只要有任何疑問（冇回應、逾時、某部分唔同），成份都會留低兼記低原因。指標入面冇鑰匙。每日檢查會發現登記處嗰份唔見咗；但唔會下載各部分，所以某部分壞咗要到攞返嗰陣先知。呢版亦修好咗 527 版檢查搵到嘅七個毛病：登記處設定每步三十秒內完兼講明原因、錄影頁對空存放位嘅字眼啱返、內置新增可以帶自己嘅圖示、第一次備份精靈會列出存放位、媒體播放器條滑桿喺手機放得落、「有咩新嘢」會喺自己嗰行換行、實體頁標題跟語言模式。瀏覽器暫時只睇過空白嘅「慳空間」頁同修好嘅頁面；將備份變指標同攞返仲檢查緊。",
+      "why": "Backups are large, and a copy that is proven safe elsewhere does not need to fill the disk as well.",
+      "try": [
+        "Open Settings, Backups, Saving space.",
+        "It asks for a registry place first; keep that off on a real system until you have tested it.",
+        "With a registry place set up on a test system, turn on \"Keep only a pointer here\" and watch which backups change."
+      ],
+      "sha": ["29c228dd7"],
+      "demo": "demos/528/pointers.html"
+    }
+  ],
+  "other": [
+    {
+      "title": "Design boards drawn before the code: going back, the four games, delete proof, and pointers",
+      "sha": ["1d156ad4a", "2b171bef6", "872e15cd1", "a60194fce"]
+    }
+  ]
+}

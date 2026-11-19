@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: a backup shrinks to a pointer</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.panel { width: 100%; max-width: 560px; margin: 16px auto 0; }
+.list { list-style: none; padding: 0; margin: 0 0 12px; }
+.list li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--outline, #8884); }
+.list span:last-child { text-align: right; }
+.row button { min-height: 48px; }
+.saved { font-weight: 600; font-size: 18px; margin: 0 0 8px; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="pointers">
+  <h1>A backup shrinks to a pointer</h1>
+  <p class="muted">A demonstration with three made-up backups. It does not touch any real backup, and nothing is saved or sent.</p>
+
+  <section class="panel card" aria-live="polite">
+    <p class="saved" id="saved">0 MB saved</p>
+    <ul class="list" id="list"></ul>
+    <div class="row">
+      <button type="button" class="tonal" id="toggle" aria-pressed="false">Keep only a pointer here</button>
+      <button type="button" class="chip" id="doubt" aria-pressed="false">Pretend one registry copy cannot be read back</button>
+    </div>
+    <p id="note" class="muted"></p>
+  </section>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+const backups = [
+  { name: "Wednesday", mb: 110 },
+  { name: "Tuesday", mb: 108 },
+  { name: "Monday", mb: 107 }
+];
+let on = false;
+let doubt = false;
+const list = document.getElementById("list");
+const saved = document.getElementById("saved");
+const note = document.getElementById("note");
+const toggle = document.getElementById("toggle");
+const doubtButton = document.getElementById("doubt");
+function show() {
+  let total = 0;
+  list.textContent = "";
+  backups.forEach((b, i) => {
+    let state = "whole here · " + b.mb + " MB";
+    if (on && i === 0) state = "whole here (newest) · " + b.mb + " MB";
+    if (on && i === 1 && doubt) state = "kept whole: registry copy not confirmed · " + b.mb + " MB";
+    if (on && i > 0 && !(i === 1 && doubt)) { state = "pointer · under 1 MB"; total += b.mb; }
+    const li = document.createElement("li");
+    const a = document.createElement("span");
+    const c = document.createElement("span");
+    a.textContent = b.name;
+    c.textContent = state;
+    li.append(a, c);
+    list.append(li);
+  });
+  saved.textContent = total + " MB saved";
+  toggle.setAttribute("aria-pressed", String(on));
+  doubtButton.setAttribute("aria-pressed", String(doubt));
+  note.textContent = on
+    ? "A copy only becomes a pointer after the registry copy has been read back in full and matches. Any doubt keeps the whole copy."
+    : "Off by default. Every backup stays whole on the disk.";
+}
+toggle.addEventListener("click", () => { on = !on; show(); });
+doubtButton.addEventListener("click", () => { doubt = !doubt; show(); });
+document.querySelector("[data-demo-reset]").addEventListener("click", () => { on = false; doubt = false; show(); });
+show();
+</script>
+</body>
+</html>

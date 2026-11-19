@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: going back makes a backup first</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.panel { width: 100%; max-width: 560px; margin: 16px auto 0; }
+.steps { list-style: none; padding: 0; margin: 0 0 12px; }
+.steps li { padding: 8px 0; border-bottom: 1px solid var(--outline, #8884); }
+.steps li[data-state="done"]::before { content: "\2713  "; }
+.steps li[data-state="now"] { font-weight: 600; }
+.steps li[data-state="wait"] { opacity: .6; }
+.row button { min-height: 48px; }
+.note { margin: 12px 0 0; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="going-back">
+  <h1>Going back makes a backup first</h1>
+  <p class="muted">A demonstration with fixed steps. It does not install anything, and nothing is saved or sent.</p>
+
+  <section class="panel card" aria-live="polite">
+    <p><strong id="title">Go back to build 527?</strong></p>
+    <ol class="steps" id="steps">
+      <li data-state="wait">Back up this system and check the backup</li>
+      <li data-state="wait">Install build 527</li>
+    </ol>
+    <p id="status" class="muted">A backup is made first, always.</p>
+    <div class="row">
+      <button type="button" class="tonal" id="go">Back up, then go back</button>
+      <button type="button" class="chip" id="mark" hidden>Make this backup delete proof</button>
+      <button type="button" class="chip" id="del" hidden>Try to delete the backup</button>
+    </div>
+    <p id="note" class="note muted"></p>
+  </section>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+const steps = document.querySelectorAll("#steps li");
+const status = document.getElementById("status");
+const note = document.getElementById("note");
+const go = document.getElementById("go");
+const mark = document.getElementById("mark");
+const del = document.getElementById("del");
+let stage = 0;
+let proof = false;
+function show() {
+  steps[0].dataset.state = stage === 0 ? "wait" : stage === 1 ? "now" : "done";
+  steps[1].dataset.state = stage < 2 ? "wait" : stage === 2 ? "now" : "done";
+  go.hidden = stage === 3;
+  mark.hidden = del.hidden = stage < 2;
+  go.textContent = ["Back up, then go back", "Finish the backup", "Finish the install"][stage] || "";
+  status.textContent = [
+    "A backup is made first, always.",
+    "Backing up. Nothing is installed until the backup has been checked.",
+    "Backup finished and checked, 108 MB. Now installing build 527.",
+    "Went back to build 527. The backup made beforehand is kept."
+  ][stage];
+}
+go.addEventListener("click", () => { stage = Math.min(3, stage + 1); show(); });
+mark.addEventListener("click", () => {
+  proof = !proof;
+  mark.textContent = proof ? "Turn off delete proof (two keys and the slider)" : "Make this backup delete proof";
+  note.textContent = proof ? "This backup is delete proof." : "The mark is off. In the real page this needs the two keys and the slider.";
+});
+del.addEventListener("click", () => {
+  note.textContent = proof
+    ? "Refused: this backup is delete proof. Turn off delete proof first."
+    : "Without the mark, a delete would go ahead after the usual confirmation.";
+});
+document.querySelector("[data-demo-reset]").addEventListener("click", () => {
+  stage = 0; proof = false; note.textContent = "";
+  mark.textContent = "Make this backup delete proof";
+  show();
+});
+show();
+</script>
+</body>
+</html>
