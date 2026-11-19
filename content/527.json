@@ -1,0 +1,29 @@
+{
+  "build": 527,
+  "headline": "The container registry place: its page now talks to the server, and weak passwords are refused",
+  "summary": "Build 527 repairs two faults in the container registry place that build 526 connected. Its settings page called commands the server did not have, so it could not load; it now uses the server's real commands, and a test on each side fails if they drift apart again. The password check was too kind: a word, a year and another word passed. It now recognises dictionary words, years and dates, keyboard runs, repeats and letter swaps, and refuses anything under 60 bits. Checked in a browser against a pretend registry only: the guided setup finished, a weak password was refused, a five-word one was accepted, and one backup was stored there. Still open: a one-word registry address makes Submit wait for ever, the recording page shows the place as not set up when no camera is recorded, and no real registry account has been used. Keep it off unless you are testing.",
+  "summary_yue": "527 版修好咗 526 版接駁嘅容器登記處存放位嘅兩個毛病。設定頁之前叫緊伺服器冇嘅指令，所以載入唔到；而家用返伺服器真係有嘅指令，兩邊各有測試，一走樣就會失敗。密碼檢查之前太鬆：一個字、一個年份、再一個字都過到。而家認得字典字、年份同日期、鍵盤連打、重複同換字母，60 位元以下一律拒絕。只係對住假登記處喺瀏覽器驗過：引導設定完成，弱密碼被拒，五個字嘅密碼通過，亦成功存咗一個備份。未解決：登記處地址得一個字嗰陣，提交會等到天荒地老；冇錄影鏡頭嘅話，錄影頁會顯示未設定；亦未用過真登記處帳戶。除非你係測試，否則請保持關閉。",
+  "highlights": [
+    {
+      "id": "registry-password-check",
+      "title": "The registry page uses the server's real commands, and the password check is stricter",
+      "areas": ["core", "interface"],
+      "what": "The settings page for the container registry place had been written against seven command names that did not exist on the server. It now uses the ten commands the server offers, and both sides hold the same hand-written list with a test. No command carries the password: changing it opens the integration's own flow. The password check now prices dictionary words, years and dates, keyboard runs, sequences, repeats and letter swaps, and takes the cheapest way to guess. A word, a year and another word scores about 33 bits and is refused; the bar is 60. Five uncommon words pass. Two unlisted words joined together can still pass.",
+      "what_yue": "容器登記處存放位嘅設定頁，之前係照住伺服器冇嘅七個指令名寫。而家用返伺服器提供嘅十個指令，兩邊各自有同一份人手寫嘅清單，有測試守住。冇任何指令會帶住密碼：改密碼會開整合自己嘅流程。密碼檢查而家會計字典字、年份同日期、鍵盤連打、順序、重複同換字母，再揀最平嘅估法。一個字加年份再加一個字大約 33 位元，會被拒絕；門檻係 60。五個冷門字過到。兩個唔喺清單嘅字連埋一齊仍然可能過到。",
+      "why": "Everything in this place is stored in a public repository, so the password is the only thing between a stranger and the contents.",
+      "try": [
+        "Open Settings, Camera recording, and find Container registry under the places.",
+        "In the setup flow, type a word, a year and another word as the password: it is refused.",
+        "Type five uncommon words with spaces: it is accepted."
+      ],
+      "sha": ["8b031b939"],
+      "demo": "demos/527/password-check.html"
+    }
+  ],
+  "other": [
+    {
+      "title": "Documentation now records build 526: what was seen in a browser, what was proven only against pretend hosts, and what nobody has looked at yet",
+      "sha": ["388955622"]
+    }
+  ]
+}
