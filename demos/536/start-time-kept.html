@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: the run's start time is kept</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.panel { width: 100%; max-width: 560px; margin: 16px auto 0; }
+.row button { min-height: 48px; }
+.rows { list-style: none; padding: 0; margin: 8px 0 12px; }
+.rows li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--outline, #8884); }
+.mono { font-family: ui-monospace, Consolas, monospace; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="start-time-kept">
+  <h1>The run's start time is kept</h1>
+  <p class="muted">A demonstration with made-up times. Nothing is checked, installed, saved or sent.</p>
+
+  <div class="row" role="group" aria-label="Which build behaves this way">
+    <button type="button" class="chip" id="before" aria-pressed="false">Build 535</button>
+    <button type="button" class="chip" id="after" aria-pressed="true">Build 536</button>
+  </div>
+
+  <section class="panel card" aria-live="polite">
+    <p><strong>What the watching browser shows</strong></p>
+    <ul class="rows">
+      <li><span>Run</span><span id="state">Not started</span></li>
+      <li><span>Started at</span><span class="mono" id="started">-</span></li>
+    </ul>
+    <div class="row"><button type="button" class="tonal" id="next">Start the run at 07:14</button></div>
+    <p id="note" class="muted">Press the button to step through the run.</p>
+  </section>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+let fixed = true;
+let step = 0;
+const before = document.getElementById("before");
+const after = document.getElementById("after");
+const state = document.getElementById("state");
+const started = document.getElementById("started");
+const note = document.getElementById("note");
+const next = document.getElementById("next");
+function show() {
+  if (step === 0) {
+    state.textContent = "Not started";
+    started.textContent = "-";
+    note.textContent = "Press the button to step through the run.";
+    next.textContent = "Start the run at 07:14";
+    next.disabled = false;
+  } else if (step === 1) {
+    state.textContent = "Updating 1 of 2";
+    started.textContent = "07:14";
+    note.textContent = "The server keeps a small record of the run in memory.";
+    next.textContent = "Core restarts at 07:18";
+  } else {
+    state.textContent = "Finished";
+    started.textContent = fixed ? "07:14" : "07:18";
+    note.textContent = fixed
+      ? "The record was lost in the restart, but the next report carried the real start time."
+      : "The record was lost in the restart, and the next report made a new one with a new start. This is the fault that was found.";
+    next.textContent = "Finished";
+    next.disabled = true;
+  }
+}
+function pick(value) {
+  fixed = value;
+  before.setAttribute("aria-pressed", String(!fixed));
+  after.setAttribute("aria-pressed", String(fixed));
+  step = 0;
+  show();
+}
+before.addEventListener("click", () => pick(false));
+after.addEventListener("click", () => pick(true));
+next.addEventListener("click", () => { step += 1; show(); });
+document.querySelector("[data-demo-reset]").addEventListener("click", () => pick(true));
+show();
+</script>
+</body>
+</html>

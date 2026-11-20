@@ -1,0 +1,24 @@
+{
+  "build": 536,
+  "headline": "Four small repairs: the update run's start time, a steady Saving space row, empty lists on a phone, and Cantonese punctuation",
+  "summary": "Build 536 repairs four small things found while build 535 was checked in a browser. None of them touched data, updates or backups. A browser watching an update run now shows when the run really started. On the Saving space page, a place that could not be reached no longer flicks back to \"still checking\". On a phone, the headline of an empty list wraps inside the screen and there is one create button, not two. In Cantonese mode, one more breadcrumb and two count lines are right. Python and interface tests pass at their known baselines. A browser check of this build on a test copy was still under way when these notes were written.",
+  "summary_yue": "536 版修正 535 版喺瀏覽器檢查嗰陣搵到嘅四樣細嘢，全部都唔關資料、更新或者備份事。睇住更新進度嘅瀏覽器，而家會顯示真正嘅開始時間。慳位頁上面，連唔到嘅地方唔會再彈返去「仲檢查緊」。喺手機，空清單嘅標題識喺螢幕入面轉行，新增掣得返一個，唔再有兩個。廣東話模式多咗一條路徑同兩句數量句子啱返。Python 同介面測試喺已知基準通過。寫呢份說明嗰陣，呢版喺測試副本嘅瀏覽器檢查仲進行緊。",
+  "highlights": [
+    {
+      "id": "four-small-repairs",
+      "title": "The run's real start time, and three tidy-ups",
+      "areas": ["core", "interface"],
+      "what": "Update run: when Core updates itself it restarts, and the small record of the run that the server keeps for other browsers is held in memory, so it was lost in the middle of the run. The next report made a new record with a new start time, and a watching browser then said the run had started at the time of the restart. The browser that drives the run now sends the run's start time with every report. The server keeps it when it is believable: it must carry a time zone, be no older than a day and not be in the future. Otherwise the server uses its own clock as before. Saving space: once a place has been shown as \"could not be reached\", it stays that way while a later check runs, and changes only when a check ends with a different answer. A first load still says \"still checking\". Empty lists on a phone: a rule for narrow rows was winning over the empty-state cell and keeping the headline on one line, so it ran off both sides of the screen. It now wraps. Where a page has a floating create button, the second create button under the headline is hidden on narrow screens. This applies to every list page built on the shared layout. Cantonese mode: the breadcrumb that plain subpages build for themselves now follows the language mode, and the count lines on the automations and devices lists use each language's own punctuation. Not done: the same punctuation on four other count lines, and one page that builds its own breadcrumb.",
+      "what_yue": "更新進度：Core 更新自己嗰陣會重新啟動，而伺服器留畀其他瀏覽器睇嗰份細記錄係放喺記憶體，所以做到一半就冇咗。下一次匯報會開一份新記錄，開始時間亦變咗做新嘅，結果睇住嗰個瀏覽器就話個進度係喺重新啟動嗰刻開始。而家負責推進嘅瀏覽器每次匯報都會報埋開始時間。伺服器覺得可信就會照用：要有時區、唔可以舊過一日、唔可以喺未來；否則照舊用自己個鐘。慳位頁：一個地方顯示咗「連唔到」之後，之後再檢查嗰陣會保持咁，要等檢查完而且答案唔同先會變。第一次載入仍然會寫「仲檢查緊」。手機上面嘅空清單：之前窄行嘅規則蓋過咗空狀態嗰格，令標題迫住一行，兩邊都走出螢幕。而家識轉行。如果頁面有浮動嘅新增掣，窄螢幕就會收起標題下面第二個新增掣。所有用同一個版面嘅清單頁都受惠。廣東話模式：普通分頁自己砌嘅路徑而家跟語言模式，自動化同裝置清單嘅數量句子會用返各自語言嘅標點。未做：另外四句數量句子嘅標點，同埋一個自己砌路徑嘅頁面。",
+      "why": "Small wrong details on a page that reports on updates and backups make the right details harder to trust.",
+      "try": [
+        "On a phone, open a list page that has nothing in it yet, such as Helpers on a new system: the headline wraps and there is one create button.",
+        "Watch an update run from a second browser: after it ends, the start time matches when you pressed the button.",
+        "In Cantonese mode, open the Automations list: the count line uses Chinese punctuation."
+      ],
+      "sha": ["37b882b19"],
+      "demo": "demos/536/start-time-kept.html"
+    }
+  ],
+  "other": []
+}
