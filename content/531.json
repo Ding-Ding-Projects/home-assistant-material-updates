@@ -1,0 +1,33 @@
+{
+  "build": 531,
+  "headline": "The problem log can pick or create its private repository, and its name hiding is repaired",
+  "summary": "Build 531 works on sending the problem log, after a real log was read for the first time. Once signed in, you can pick one of your private repositories from a searchable list or have a new private one made; public ones are refused. A switch lets your own wording file be used in the log's headings. The step that hides names is repaired in both directions: it had been rewriting the names of programs, and it had missed entity ids inside one kind of text. The build also repairs \"Export the list\" on the Integrations page, which failed in build 530, and leaves the problem log's sign-in out of backups. Python tests: the suites for these areas pass, except the newest problem log connection tests, which were not run. A browser check of this build on a test copy was still under way when these notes were written.",
+  "summary_yue": "531 版處理傳送問題記錄，係第一次有真正記錄可以讀之後做嘅。登入之後，你可以喺有搜尋嘅清單揀自己嘅私人儲存庫，或者叫系統開一個新嘅私人儲存庫；公開嘅一律拒絕。有個開關可以令記錄嘅標題用你自己嘅用字檔案。遮名嗰一步兩邊都修好：之前會改寫程式嘅名，又會漏咗某類文字入面嘅實體 ID。呢版亦修好咗 530 版整合頁「匯出清單」失敗嘅問題，同埋令問題記錄嘅登入資料唔入備份。Python 測試：相關範圍通過，除咗問題記錄最新嘅連線測試未行。寫呢份說明嗰陣，呢版喺測試副本嘅瀏覽器檢查仲進行緊。",
+  "highlights": [
+    {
+      "id": "problem-log-repository-and-hiding",
+      "title": "Problem log: choose where it goes, use your own wording, and names are hidden properly",
+      "areas": ["core", "interface"],
+      "what": "After signing in, the page lists your repositories with a search box. Private ones can be chosen; public ones are shown as unusable and the server refuses them as well. \"Make a new one\" creates a private repository behind the two keys and reads it back to confirm it is private before using it. A repository that already holds other files gets the log in its own folder. No sign-in client ID is built in; the setting explains what one is and where to get it. A switch, off by default and shown when your wording file is loaded, uses that file in the log's own headings and labels; log lines, program names and code stay exact, and the stored copy is private, left out of backups and deleted when the switch goes off. The hiding step is repaired: names you gave to things were being matched anywhere, so a thing named like a program rewrote that program's name throughout the log. Program text is now set aside before hiding. In the other direction, entity ids of things that no longer exist were not hidden inside condition text; every entity id is now replaced by a label. One trade-off: a thing's name written in lowercase inside ordinary prose is no longer hidden, because names now match as you typed them. People and places still match in any case.",
+      "what_yue": "登入之後，頁面會列出你嘅儲存庫，有搜尋欄。私人嘅可以揀；公開嘅會顯示為用唔到，伺服器亦一樣拒絕。「開一個新嘅」會過兩條鑰匙之後開一個私人儲存庫，開完會讀返確認係私人先用。本身有其他檔案嘅儲存庫，記錄會放喺自己個資料夾。冇內置任何登入用嘅 client ID；設定會解釋佢係乜、喺邊度攞。有個開關，預設關閉，載入咗你嘅用字檔案先會出現，開咗之後記錄自己嘅標題同標籤會用嗰個檔案；記錄行、程式名同程式碼原封不動，儲存嘅副本係私人嘅、唔入備份、熄咗開關就刪除。遮名嗰步修好咗：之前你幫嘢改嘅名喺任何位置都會配對，所以一樣同程式同名嘅嘢會令成份記錄入面嗰個程式名被改寫。而家會先將程式文字抽起先遮。另一邊，已經唔存在嘅嘢，佢哋嘅實體 ID 喺條件文字入面之前冇遮；而家所有實體 ID 都會換成標籤。一個取捨：嘢嘅名如果用細楷寫喺普通句子入面，而家唔會再遮，因為名會照你打嘅樣配對。人名同地方名仍然唔分大細楷。",
+      "why": "A log is only useful to whoever helps you if program names can be read, and only safe to send if your own names cannot.",
+      "try": [
+        "Open Settings, System, Problem log, and the sending page.",
+        "Sign in, then type in the search box to find one of your private repositories, or make a new one.",
+        "Send, then open the repository: logger names read normally, and your things appear as labels such as \"light 1\"."
+      ],
+      "sha": ["623f898a8"],
+      "demo": "demos/531/hiding-names.html"
+    }
+  ],
+  "other": [
+    {
+      "title": "\"Export the list\" on the Integrations page works again on core 2026.11.2, and the problem log's sign-in is left out of backups",
+      "sha": ["738b1243e"]
+    },
+    {
+      "title": "Design board drawn before the code: problem log sign-in, choosing a repository, wording",
+      "sha": ["111cf5bae"]
+    }
+  ]
+}

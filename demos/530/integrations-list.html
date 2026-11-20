@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: export the list of integrations</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.panel { width: 100%; max-width: 560px; margin: 16px auto 0; }
+.row button { min-height: 48px; }
+pre { white-space: pre-wrap; overflow-wrap: anywhere; font-family: ui-monospace, Consolas, monospace; font-size: 13px; margin: 0; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="integrations-list">
+  <h1>Export the list of integrations</h1>
+  <p class="muted">A demonstration with three made-up integrations. It reads nothing from a real system, and nothing is saved or sent.</p>
+
+  <div class="row" role="group" aria-label="What to include">
+    <button type="button" class="chip" id="names" aria-pressed="false">Names you gave</button>
+    <button type="button" class="chip" id="counts" aria-pressed="true">How many of each</button>
+  </div>
+
+  <section class="panel card" aria-live="polite">
+    <p><strong>What goes in the file</strong></p>
+    <pre id="preview"></pre>
+  </section>
+  <p class="muted">Never in the file, whatever you choose: sign-ins, settings, addresses, states.</p>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+const data = [
+  { domain: "mqtt", source: "built in", title: "Kitchen hub", kinds: { light: 6, sensor: 41, switch: 9 } },
+  { domain: "met", source: "built in", title: "Home", kinds: { weather: 1 } },
+  { domain: "my_heater", source: "added by you, 1.4.0", title: "Hall heater", kinds: { climate: 2, sensor: 4 } }
+];
+let names = false;
+let counts = true;
+const preview = document.getElementById("preview");
+const namesButton = document.getElementById("names");
+const countsButton = document.getElementById("counts");
+function show() {
+  namesButton.setAttribute("aria-pressed", String(names));
+  countsButton.setAttribute("aria-pressed", String(counts));
+  preview.textContent = data.map((item) => {
+    const kinds = Object.entries(item.kinds).map(([kind, count]) => counts ? kind + " " + count : kind).join(" · ");
+    const title = names ? "\n  named: " + item.title : "";
+    return item.domain + " · " + item.source + title + "\n  " + kinds;
+  }).join("\n\n");
+}
+namesButton.addEventListener("click", () => { names = !names; show(); });
+countsButton.addEventListener("click", () => { counts = !counts; show(); });
+document.querySelector("[data-demo-reset]").addEventListener("click", () => { names = false; counts = true; show(); });
+show();
+</script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: hiding names in the problem log</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.panel { width: 100%; max-width: 620px; margin: 16px auto 0; }
+.row button { min-height: 48px; }
+pre { white-space: pre-wrap; overflow-wrap: anywhere; font-family: ui-monospace, Consolas, monospace; font-size: 13px; margin: 0 0 12px; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="hiding-names">
+  <h1>Hiding names in the problem log</h1>
+  <p class="muted">A demonstration with invented names and fixed text. It does not run the real hiding step, and nothing is saved or sent.</p>
+
+  <div class="row" role="group" aria-label="Which version of the hiding step">
+    <button type="button" class="chip" data-v="raw" aria-pressed="true">As recorded</button>
+    <button type="button" class="chip" data-v="old" aria-pressed="false">Sent before</button>
+    <button type="button" class="chip" data-v="new" aria-pressed="false">Sent now</button>
+  </div>
+
+  <section class="panel card" aria-live="polite">
+    <pre id="text"></pre>
+    <p id="note" class="muted"></p>
+  </section>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+const versions = {
+  raw: [
+    "Logger: recorder.storage\nMessage: Willow lamp did not answer\nCondition: entity_id light.willow_lamp is off\nIntegrations: sun, recorder",
+    "On the system. A tracker here happens to be named \"recorder\" and another thing is named \"sun\"."
+  ],
+  old: [
+    "Logger: [device tracker 1].storage\nMessage: [light 1] did not answer\nCondition: entity_id light.willow_lamp is off\nIntegrations: [sensor 1], [device tracker 1]",
+    "Program names were rewritten because things shared their names, and the entity id of a removed thing was left readable."
+  ],
+  new: [
+    "Logger: recorder.storage\nMessage: [light 1] did not answer\nCondition: entity_id [light 1] is off\nIntegrations: sun, recorder",
+    "Program names stay exact. Your own names and every entity id become labels."
+  ]
+};
+const buttons = document.querySelectorAll("[data-v]");
+function show(key) {
+  buttons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === key)));
+  document.getElementById("text").textContent = versions[key][0];
+  document.getElementById("note").textContent = versions[key][1];
+}
+buttons.forEach((b) => b.addEventListener("click", () => show(b.dataset.v)));
+document.querySelector("[data-demo-reset]").addEventListener("click", () => show("raw"));
+show("raw");
+</script>
+</body>
+</html>

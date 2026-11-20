@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: checking only looks</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.panel { width: 100%; max-width: 560px; margin: 16px auto 0; }
+.rows { list-style: none; padding: 0; margin: 0 0 12px; }
+.rows li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--outline, #8884); }
+.row button { min-height: 48px; }
+.mono { font-family: ui-monospace, Consolas, monospace; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="check-only-looks">
+  <h1>Checking only looks</h1>
+  <p class="muted">A demonstration with made-up version numbers. It does not check or install anything, and nothing is saved or sent.</p>
+
+  <div class="row" role="group" aria-label="Which build behaves this way">
+    <button type="button" class="chip" id="before" aria-pressed="false">Before this build</button>
+    <button type="button" class="chip" id="after" aria-pressed="true">This build</button>
+  </div>
+
+  <section class="panel card" aria-live="polite">
+    <ul class="rows">
+      <li><span>Automatic updates</span><span>Off</span></li>
+      <li><span>Supervisor installed</span><span class="mono" id="installed">100</span></li>
+      <li><span>Supervisor available</span><span class="mono" id="available">100</span></li>
+    </ul>
+    <div class="row"><button type="button" class="tonal" id="check">Check for updates</button></div>
+    <p id="note" class="muted">Press the button.</p>
+  </section>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+let fixed = true;
+const before = document.getElementById("before");
+const after = document.getElementById("after");
+const installed = document.getElementById("installed");
+const available = document.getElementById("available");
+const note = document.getElementById("note");
+function reset() {
+  installed.textContent = "100";
+  available.textContent = "100";
+  note.textContent = "Press the button.";
+}
+function pick(value) {
+  fixed = value;
+  before.setAttribute("aria-pressed", String(!fixed));
+  after.setAttribute("aria-pressed", String(fixed));
+  reset();
+}
+before.addEventListener("click", () => pick(false));
+after.addEventListener("click", () => pick(true));
+document.getElementById("check").addEventListener("click", () => {
+  available.textContent = "101";
+  if (fixed) {
+    installed.textContent = "100";
+    note.textContent = "A newer Supervisor was found. Nothing was installed: it waits for you to press Update.";
+  } else {
+    installed.textContent = "101";
+    note.textContent = "A newer Supervisor was found, and it installed itself although automatic updates were off. This is the fault that was reported.";
+  }
+});
+document.querySelector("[data-demo-reset]").addEventListener("click", () => pick(true));
+</script>
+</body>
+</html>

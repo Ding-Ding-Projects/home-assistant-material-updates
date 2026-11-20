@@ -1,0 +1,44 @@
+{
+  "build": 530,
+  "headline": "Checking for updates no longer installs anything, the upstream sources move to core 2026.11.2, and integrations can be exported and imported",
+  "summary": "Build 530 is the first build on upstream core 2026.11.2 and frontend 20261028.6, and it also carries the repairs from the build 528 check that build 529 was made from. The owner reported that pressing \"Check for updates\" installed an update even with automatic updates switched off. The cause was a self-update setting inside the Supervisor that the page's switches never reached; it is now off, and a check only looks. The Integrations page gains export and import, for the list of what is installed and for each integration's own settings. Known fault in this build: \"Export the list\" fails with an error while counts are on, which is the default; it is repaired in build 531, so prefer that build. Python tests for these changes passed after the repair; nothing in this build was seen in a browser before it was published.",
+  "summary_yue": "530 版係第一個用上游 core 2026.11.2 同 frontend 20261028.6 嘅版本，亦包埋 529 版嗰批由 528 版檢查搵出嚟嘅修正。擁有人報告：自動更新熄咗，撳「檢查更新」竟然照裝。原因係 Supervisor 入面有個自我更新設定，頁面嘅開關從來掂唔到佢；而家已經熄咗，檢查就只係睇。整合頁加咗匯出同匯入：成張已安裝清單，同埋每個整合自己嘅設定。呢版已知毛病：「匯出清單」喺數量開住（即係預設）嗰陣會出錯；531 版已經修好，所以建議用 531。相關嘅 Python 測試喺修正之後通過；呢版出街之前冇喺瀏覽器睇過。",
+  "highlights": [
+    {
+      "id": "off-means-off",
+      "title": "With automatic updates off, checking only looks",
+      "areas": ["supervisor", "core", "interface"],
+      "what": "The Supervisor had a self-update setting of its own, on by default. It fired after every refresh of the version list, which is what \"Check for updates\" does, and also at its own start, on its daily reload and when the channel changed. The switches on the Updates page are stored elsewhere and never wrote it. Now there is one way each part gets installed: you press Update, or you turned on that part's own switch and it runs inside its window with its waiting days and backup choice. The Supervisor's own setting defaults to off, Core turns it off on existing systems at every refresh, and if Core cannot confirm that, the check skips the step that could install. The page warns, with \"Turn off now\", if the Supervisor still reports its own setting as on. Two side effects, on purpose: Supervisor plug-ins update as part of an install someone started rather than on a schedule, and restoring a backup made by a newer Supervisor asks you to update the Supervisor first. Until this build's Core has run once, an existing system can still update its Supervisor by itself one last time.",
+      "what_yue": "Supervisor 自己有個自我更新設定，預設係開。每次重新整理版本清單（即係「檢查更新」做嘅嘢）、自己啟動、每日重新載入、轉頻道之後都會發動。更新頁嘅開關儲喺第二度，從來冇寫過呢個設定。而家每個部分只有一個安裝途徑：你撳「更新」，或者你開咗嗰個部分自己嘅開關，佢就喺指定時段、過咗等候日數同備份選擇之後先裝。Supervisor 自己個設定預設關閉，Core 每次重新整理都會幫舊系統熄咗佢；Core 確認唔到嘅話，檢查會跳過可能會安裝嗰一步。如果 Supervisor 仲話自己個設定係開，頁面會出警告同「即刻閂咗佢」。兩個刻意嘅副作用：Supervisor 插件唔再定時更新，而係跟住有人發起嘅安裝一齊更新；還原由較新 Supervisor 做嘅備份，會叫你先更新 Supervisor。呢版嘅 Core 行過一次之前，舊系統仲有機會最後一次自己更新 Supervisor。",
+      "why": "A switch that says off has to mean nothing installs behind your back, including when all you did was look.",
+      "try": [
+        "Open Settings, Updates, and make sure the automatic switches for Core, Supervisor and the operating system are off.",
+        "Press \"Check for updates\" and wait a few minutes.",
+        "The versions shown do not change until you press Update yourself."
+      ],
+      "sha": ["901ed4ab4"],
+      "demo": "demos/530/check-only-looks.html"
+    },
+    {
+      "id": "integrations-export-import",
+      "title": "Export and import: the list of integrations, and each one's settings",
+      "areas": ["core", "interface"],
+      "what": "On the Integrations page, More now has \"Export the list\" and \"Import a list\". The list names what is installed and the kinds of entity each integration makes; it holds no sign-in, setting, address or state, and the preview is exactly what is saved. Importing only compares: it shows what is not here yet, what is already here and what cannot be added, and \"Set up\" opens each integration's own setup, one at a time. Each integration's menu also has \"Export its settings\" and \"Import its settings\". Sign-ins are left out by default, by a filter that treats anything doubtful as a sign-in. Including them needs the two keys and a strong password, and the file is then always encrypted. An import fits only the integration it names, lists every change by name first, applies after the two keys, keeps the earlier settings for Undo, and restores them by itself if the integration fails to load. It never creates a new entry. For a locked file, the password travels over your signed-in connection for that one call; it is never stored or logged. In this build, \"Export the list\" fails while counts are on; build 531 repairs it.",
+      "what_yue": "整合頁嘅「更多」而家有「匯出清單」同「匯入清單」。清單會寫明裝咗啲乜、每個整合會整出邊類實體；入面冇登入資料、設定、地址或者狀態，預覽就係實際儲存嘅內容。匯入只係比較：會顯示邊啲未有、邊啲已經有、邊啲加唔到；「設定」會逐個打開嗰個整合自己嘅設定流程。每個整合嘅選單亦有「匯出設定」同「匯入設定」。登入資料預設唔放，個過濾器遇到有懷疑嘅一律當登入資料。要放嘅話，要過兩條鑰匙加一個夠強嘅密碼，檔案一定加密。匯入只啱返佢寫明嗰個整合，會先逐項列出改動嘅名稱，過咗兩條鑰匙先套用，之前嘅設定會留低畀你還原；整合載入唔到會自己還原。永遠唔會新增項目。鎖住嘅檔案，密碼喺嗰一次呼叫會經你已登入嘅連線傳送；唔會儲存或者寫入記錄。呢版「匯出清單」喺數量開住嗰陣會失敗，531 版已修好。",
+      "why": "The list shows which editors are worth designing first, and moving one integration's settings between systems no longer means retyping them.",
+      "try": [
+        "Open Settings, Devices and services, then More, then \"Export the list\" (use build 531).",
+        "Read the preview, then press \"Save file\".",
+        "Open one integration's menu and choose \"Export its settings\": sign-ins are left out unless you turn them on."
+      ],
+      "sha": ["d020d1276"],
+      "demo": "demos/530/integrations-list.html"
+    }
+  ],
+  "other": [
+    {
+      "title": "Design board drawn before the code: export and import for integrations",
+      "sha": ["4ea84e6d6"]
+    }
+  ]
+}
