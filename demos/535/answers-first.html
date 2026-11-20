@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: what is on this disk answers first</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.panel { width: 100%; max-width: 560px; margin: 16px auto 0; }
+.row button { min-height: 48px; }
+.rows { list-style: none; padding: 0; margin: 8px 0 12px; min-height: 96px; }
+.rows li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--outline, #8884); }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="answers-first">
+  <h1>What is on this disk answers first</h1>
+  <p class="muted">A demonstration with two made-up backups and a pretend registry that never answers. The seconds are shortened. Nothing is read, saved or sent.</p>
+
+  <div class="row" role="group" aria-label="Which build behaves this way">
+    <button type="button" class="chip" id="before" aria-pressed="false">Build 534</button>
+    <button type="button" class="chip" id="after" aria-pressed="true">Build 535</button>
+  </div>
+
+  <section class="panel card" aria-live="polite">
+    <div class="row"><button type="button" class="tonal" id="open">Open the page</button></div>
+    <p id="clock" class="muted">Not opened yet.</p>
+    <ul class="rows" id="rows"></ul>
+  </section>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+let fixed = true;
+let timers = [];
+const before = document.getElementById("before");
+const after = document.getElementById("after");
+const rows = document.getElementById("rows");
+const clock = document.getElementById("clock");
+function clear() {
+  timers.forEach((t) => clearTimeout(t));
+  timers = [];
+  rows.replaceChildren();
+  clock.textContent = "Not opened yet.";
+}
+function row(name, text) {
+  const li = document.createElement("li");
+  const left = document.createElement("span");
+  const right = document.createElement("span");
+  left.textContent = name;
+  right.textContent = text;
+  li.append(left, right);
+  return li;
+}
+function paint(seconds, list) {
+  clock.textContent = "After " + seconds + " seconds.";
+  rows.replaceChildren(...list.map(([name, text]) => row(name, text)));
+}
+function pick(value) {
+  fixed = value;
+  before.setAttribute("aria-pressed", String(!fixed));
+  after.setAttribute("aria-pressed", String(fixed));
+  clear();
+}
+before.addEventListener("click", () => pick(false));
+after.addEventListener("click", () => pick(true));
+document.getElementById("open").addEventListener("click", () => {
+  clear();
+  clock.textContent = "Loading.";
+  const whole = ["Sunday backup", "Whole here"];
+  if (fixed) {
+    timers.push(setTimeout(() => paint(2, [whole, ["Friday backup", "Pointer, still checking with the registry"]]), 600));
+    timers.push(setTimeout(() => paint(10, [whole, ["Friday backup", "Pointer, the registry could not be reached"]]), 3000));
+  } else {
+    timers.push(setTimeout(() => paint(10, [whole, ["Friday backup", "Pointer, the registry could not be reached"]]), 3000));
+  }
+});
+document.querySelector("[data-demo-reset]").addEventListener("click", () => pick(true));
+</script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "build": 535,
+  "headline": "Backups on this disk list in two seconds, and more of the interface follows the language mode",
+  "summary": "Build 535 repairs six things found while build 534 was checked in a browser. Build 534 promised that backups on this disk would list at once on the Saving space page when the registry is not answering; in the check they still took about ten seconds, and that is now really repaired. Summary lines under Settings section titles, the \"Blueprints\" tab and the \"Last triggered\" times follow the language mode. A change of language mode is saved to your account at once. Titles no longer break a word on very narrow screens, and the read-only update run card shows a tick when the run is done. Python and interface tests pass at their known baselines. A browser check of this build on a test copy was still under way when these notes were written.",
+  "summary_yue": "535 版修正 534 版喺瀏覽器檢查嗰陣搵到嘅六樣嘢。534 版講過，登記處冇回應嗰陣，慳位頁會即刻列出呢個磁碟上面嘅備份；但檢查嗰陣仍然要等成十秒，而家先係真正修好。設定各分頁標題下面嗰行摘要、「藍圖」頁籤、同「上次觸發」嘅時間，都會跟語言模式。轉語言模式會即刻存入你個帳戶。標題喺好窄嘅螢幕唔會再斷開一個字，唯讀嘅更新進度卡做完會顯示剔號。Python 同介面測試喺已知基準通過。寫呢份說明嗰陣，呢版喺測試副本嘅瀏覽器檢查仲進行緊。",
+  "highlights": [
+    {
+      "id": "local-backups-in-two-seconds",
+      "title": "Saving space: what is on this disk answers first",
+      "areas": ["core", "interface"],
+      "what": "The quick answer about backups on this disk was being held until the slow answer about every place had finished or given up, so with a silent registry both arrived together after about ten seconds. The command now answers two seconds after it starts with whatever is on this disk. Places that have not answered yet are named as still being checked, and the pointer row says so. The full listing carries on in the background under its own ten second limit, and the page asks again until it is in. A place is called unreachable only once that limit has really passed, so a slow registry is not reported as a dead one. Restore and Bring back stay available while a place is being checked. Elsewhere: the summary line under each Settings section title now follows the language mode, as the title and breadcrumb already did. The \"Blueprints\" tab has its Cantonese name. The \"Last triggered\" column for automations, scripts and scenes shows relative times in the chosen language; other relative times around the interface sit inside sentences that are built per language and were left alone. A change of language mode used to reach your account a few seconds later, so reloading straight after switching could load the old mode; it is now saved at once and again when the page is left. Page titles shrink one step on screens about 320 pixels wide instead of breaking a word. The read-only update run card shows the finished tick when the run is done.",
+      "what_yue": "之前關於呢個磁碟上面備份嘅快答案，要等埋關於所有地方嗰個慢答案做完或者放棄先一齊出，所以登記處冇回應嗰陣，兩樣都要等成十秒。而家個指令開始兩秒就會答呢個磁碟有乜。未回應嘅地方會標明仲檢查緊，指標嗰行亦會咁寫。完整清單會喺背景繼續行，有自己嘅十秒上限，頁面會再問到有結果為止。真係過咗上限先會叫做連唔到，所以慢嘅登記處唔會被當成死咗。檢查緊嗰陣，「還原」同「攞返」照樣用得。其他：設定每個分頁標題下面嗰行摘要而家跟語言模式，同上面嘅標題同路徑一樣。「藍圖」頁籤有廣東話名。自動化、腳本、場景嘅「上次觸發」會用你揀嘅語言顯示相對時間；介面其他相對時間係嵌喺按語言砌出嚟嘅句子入面，今次冇郁。轉語言模式之前要過幾秒先去到帳戶，所以轉完即刻重新載入有機會載返舊模式；而家即刻儲存，離開頁面嗰陣再存一次。頁面標題喺大約 320 像素闊嘅螢幕會縮細一級，唔會斷開一個字。唯讀嘅更新進度卡做完會顯示剔號。",
+      "why": "The backups you can restore right now are the ones on this disk, and a registry that is slow to answer should not hide them.",
+      "try": [
+        "Open Settings, System, Backups, then Saving space.",
+        "Backups on this disk appear within a couple of seconds.",
+        "If the registry is slow, its rows say \"still checking\" and then settle."
+      ],
+      "sha": ["73a735503"],
+      "demo": "demos/535/answers-first.html"
+    }
+  ],
+  "other": []
+}
