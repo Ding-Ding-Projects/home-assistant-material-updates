@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: names are hidden first</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.panel { width: 100%; max-width: 620px; margin: 16px auto 0; }
+.row button { min-height: 48px; }
+pre { white-space: pre-wrap; overflow-wrap: anywhere; font-family: ui-monospace, Consolas, monospace; font-size: 13px; margin: 0 0 12px; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="names-first">
+  <h1>Names are hidden first</h1>
+  <p class="muted">A demonstration with an invented name and fixed text. It does not run the real hiding step, and nothing is saved or sent.</p>
+
+  <div class="row" role="group" aria-label="Which build's order">
+    <button type="button" class="chip" data-v="raw" aria-pressed="true">As recorded</button>
+    <button type="button" class="chip" data-v="old" aria-pressed="false">Build 531</button>
+    <button type="button" class="chip" data-v="new" aria-pressed="false">Build 532</button>
+  </div>
+
+  <section class="panel card" aria-live="polite">
+    <pre id="text"></pre>
+    <p id="note" class="muted"></p>
+  </section>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+const versions = {
+  raw: [
+    "Logger: camera_recording\nMessage: Front door clip lost\nIntegrations: door, camera_recording",
+    "On the system. A camera here is named \"Front door\", and \"door\" is also the name of a built-in integration."
+  ],
+  old: [
+    "Logger: camera_recording\nMessage: Front door clip lost\nIntegrations: door, camera_recording",
+    "The word \"door\" was set aside as a program name before names were looked for, so \"Front door\" no longer matched and stayed readable."
+  ],
+  new: [
+    "Logger: camera_recording\nMessage: [camera 1] clip lost\nIntegrations: door, camera_recording",
+    "Your names are hidden first. Program names are set aside afterwards and stay exact."
+  ]
+};
+const buttons = document.querySelectorAll("[data-v]");
+function show(key) {
+  buttons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === key)));
+  document.getElementById("text").textContent = versions[key][0];
+  document.getElementById("note").textContent = versions[key][1];
+}
+buttons.forEach((b) => b.addEventListener("click", () => show(b.dataset.v)));
+document.querySelector("[data-demo-reset]").addEventListener("click", () => show("raw"));
+show("raw");
+</script>
+</body>
+</html>

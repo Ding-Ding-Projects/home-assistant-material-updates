@@ -1,0 +1,29 @@
+{
+  "build": 532,
+  "headline": "Repairs from the build 531 check, and a gap closed in how the problem log hides names",
+  "summary": "Build 531 was checked in a browser on a test copy and then put on the running system. The check found nine faults, none of which could harm data; build 532 repairs all nine. Two more were found when the newest problem log tests were run for the first time. The important one: a thing whose name contains the name of a built-in program, such as \"Front door\", could stay readable in what the problem log sends. That is repaired. Sending is off unless you turned it on, and it only ever goes to a private repository you chose. Python and interface tests pass at their known baselines. A browser check of this build on a test copy was still under way when these notes were written.",
+  "summary_yue": "531 版喺測試副本用瀏覽器檢查過，之後先放上運行緊嘅系統。檢查搵到九個毛病，全部都唔會傷到資料；532 版九個都修好。最新嘅問題記錄測試第一次行，又搵多兩個。最緊要嗰個：一樣嘢個名如果包住內置程式嘅名，例如「Front door」，喺問題記錄送出去嘅內容入面有機會仲睇到。呢個已經修好。傳送預設係關閉，而且只會去你揀嘅私人儲存庫。Python 同介面測試喺已知基準通過。寫呢份說明嗰陣，呢版喺測試副本嘅瀏覽器檢查仲進行緊。",
+  "highlights": [
+    {
+      "id": "repairs-after-531-check",
+      "title": "Problem log names are hidden again, and the nine repairs from the build 531 check",
+      "areas": [
+        "core",
+        "interface"
+      ],
+      "what": "Build 531 set program words aside before hiding your names, so that a thing named like a program could not rewrite that program's name. A side effect went unnoticed: this version of the core has a built-in integration called \"door\", so in the name \"Front door\" the word \"door\" was set aside first and the whole name no longer matched. It stayed readable. Names are now hidden first, and program words are set aside afterwards. A thing named exactly like a program is still left alone, which is what the build 531 repair was for. Builds 530 and 531 are affected, for names that contain an integration's or a library's name as a separate word. If you sent a log from one of those builds, look through the repository for names you expected to be hidden. Separately, the command that stores your wording file on the server now uses a field that debug logging always hides, so the file's contents cannot appear in a debug log. Saving space: When the registry could not be reached, a pointer backup was shown as having no registry copy, with \"cannot be restored or brought back\" and no Bring back button. Nothing was lost, but the page said otherwise. The row now says the registry could not be reached, with a hint to try again, and Bring back stays available. The page waits at most 10 seconds for a silent registry instead of showing a spinner for close to a minute, then lists what is stored locally. After a successful bring back the page shows a line saying the backup was brought back and checked. The registry integration's own start-up check is limited to 30 seconds, where one attempt could previously sit for about four minutes. How long it waits between retries is unchanged, so after a long outage it can still take a few minutes to reconnect by itself. Going back: four in a row fits all seven columns on a phone, focus stays inside the games after Start and after a drop, and the super confirmation has a Cancel button and answers Escape. Integrations: the group chips in \"Import a list\" wrap on narrow screens, and the Sign-ins switch is disabled when an integration has no sign-in settings. Docs: how to run the Python test suites, and the reasons a bring back can fail.",
+      "what_yue": "531 版係先抽起程式字眼，然後先遮你改嘅名，為嘅係同程式同名嘅嘢唔好改寫咗程式個名。但有個副作用冇留意到：呢個 core 版本有個內置整合叫「door」，所以「Front door」入面個「door」俾人抽起咗先，成個名就配對唔到，結果照樣睇得到。而家改為先遮名，之後先抽起程式字眼。同程式一模一樣名嘅嘢仍然唔會郁，531 版嗰個修正就係為咗呢樣。530 同 531 版受影響，範圍係名入面有整合或者函式庫名做獨立字嘅嘢。如果你用呢兩版送過記錄，去儲存庫搵下有冇應該遮咗但仲見到嘅名。另外，將你嘅用字檔案存上伺服器嗰個指令，而家用咗一個除錯記錄一定會遮嘅欄位，檔案內容唔會出現喺除錯記錄。慳位頁：登記處連唔到嗰陣，指標備份會顯示成冇登記處副本，仲寫住「還原唔到、攞唔返」，連「攞返」掣都冇埋。其實乜都冇唔見，只係頁面講錯。而家嗰行會話連唔到登記處，提你遲啲再試，「攞返」掣留喺度。登記處冇回應，頁面最多等十秒，唔使再對住個轉圈差唔多一分鐘，之後會列出本機有嘅嘢。成功攞返之後，頁面會有一行講明已經攞返同檢查過。登記處整合自己嘅啟動檢查限三十秒，之前一次嘗試可以擺成四分鐘。重試之間等幾耐冇變，所以長時間斷線之後，仍然可能要幾分鐘先自己連返。返舊版：四子棋喺手機闊度七行齊晒，開始同落子之後焦點留喺遊戲入面，超級確認有「取消」掣，撳 Escape 都得。整合：「匯入清單」嘅分組標籤喺窄螢幕識轉行；冇登入設定嘅整合，登入資料開關會停用。文件：點樣行 Python 測試，同埋攞返失敗嘅原因。",
+      "why": "The whole point of the hiding step is that your own names do not leave the house, and a repair that protects program names must not cost that.",
+      "try": [
+        "Open Settings, System, Problem log, and the sending page.",
+        "Press the preview: nothing is sent by looking.",
+        "Names such as \"Front door\" appear as labels like \"camera 1\", while logger and integration names read normally."
+      ],
+      "sha": [
+        "9c1c5a66b"
+      ],
+      "demo": "demos/532/names-first.html"
+    }
+  ],
+  "other": []
+}
