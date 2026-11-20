@@ -1,0 +1,24 @@
+{
+  "build": 533,
+  "headline": "Escape closes the super confirmation at once, and page names follow the language mode",
+  "summary": "Build 533 is a small build of repairs found while build 532 was checked in a browser. The super confirmation shown before going back without a backup now takes keyboard focus when it opens, so Escape closes it straight away. Page names in the top strip and the phone bar follow the language mode. A bilingual page title breaks at its separator on a narrow screen. The Saving space page shows a loading state instead of a lone pointer row while the backup list loads. Interface tests pass at their known baseline. Nothing in this build was seen in a browser before it was published; it was checked together with build 534.",
+  "summary_yue": "533 版係一個細版本，修正 532 版喺瀏覽器檢查嗰陣搵到嘅嘢。唔做備份就返舊版之前出嘅超級確認，而家一開就攞到鍵盤焦點，所以撳 Escape 即刻閂到。頂部頁籤同手機底欄嘅頁面名會跟語言模式。雙語頁面標題喺窄螢幕會喺分隔號度斷行。慳位頁喺備份清單載入緊嗰陣會顯示載入中，唔再得一行指標。介面測試喺已知基準通過。呢版出街之前冇喺瀏覽器睇過，係同 534 版一齊檢查。",
+  "highlights": [
+    {
+      "id": "escape-and-page-names",
+      "title": "Escape works at once, and page names speak the chosen language",
+      "areas": ["interface"],
+      "what": "The super confirmation listened for Escape on itself while keyboard focus was still on the page behind it, so the key did nothing until Tab was pressed once. Focus now moves to the first key when it opens, and Escape is heard anywhere on the page for as long as it is open. Cancel was already there and is unchanged. Page names: every Cantonese name was already written, but the top strip and the phone bar built their names from the plain English lookup without asking which language mode was on. They now use the language mode. The default order of pages is still sorted by the English name, so pages do not move when you change mode. Bilingual titles such as \"Integrations · 整合\" now break before the separator on a narrow screen rather than in the middle of a word. On the Saving space page, while the list of backups is still loading, the list shows a loading state; before, it showed only the pointer row, which read as if there were no whole backups.",
+      "what_yue": "超級確認之前係喺自己身上聽 Escape，但鍵盤焦點仲留喺後面嗰頁，所以要撳一次 Tab 個掣先有反應。而家一開焦點就落喺第一條鑰匙，開住嗰陣成頁任何位置撳 Escape 都聽到。「取消」掣本身已經有，冇變。頁面名：廣東話名一早寫齊，但頂部頁籤同手機底欄係用純英文查表，冇問過而家係咩語言模式。而家會跟語言模式。頁面預設次序仍然照英文名排，轉模式唔會搬位。好似「Integrations · 整合」呢類雙語標題，喺窄螢幕會喺分隔號前面斷行，唔會斷開一個字。慳位頁喺備份清單未載入完嗰陣會顯示載入中；之前淨係見到指標嗰行，睇落好似冇完整備份咁。",
+      "why": "A dialog that guards a risky step must be easy to back out of, with the key everyone reaches for first.",
+      "try": [
+        "Switch the language mode to Cantonese in your profile.",
+        "Look at the page names along the top, or along the bottom on a phone: they are in Cantonese, in the same order as before.",
+        "Open any Settings page on a phone in bilingual mode: the title breaks between the two languages."
+      ],
+      "sha": ["6978140c2"],
+      "demo": "demos/533/escape-at-once.html"
+    }
+  ],
+  "other": []
+}

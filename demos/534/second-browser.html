@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: an update run seen from a second browser</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.panels { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); width: 100%; max-width: 720px; margin: 16px auto 0; }
+.row button { min-height: 48px; }
+.steps { list-style: none; padding: 0; margin: 8px 0 12px; }
+.steps li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--outline, #8884); }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="second-browser">
+  <h1>An update run seen from a second browser</h1>
+  <p class="muted">A demonstration with two made-up updates. Nothing is checked, installed, saved or sent.</p>
+
+  <div class="panels" aria-live="polite">
+    <section class="card">
+      <p><strong>Computer (started the run)</strong></p>
+      <p id="a-line">Not started.</p>
+      <ul class="steps" id="a-steps"></ul>
+      <div class="row">
+        <button type="button" class="tonal" id="next">Start the run</button>
+      </div>
+    </section>
+    <section class="card">
+      <p><strong>Phone (opened later)</strong></p>
+      <p id="b-line">Nothing is running.</p>
+      <ul class="steps" id="b-steps"></ul>
+      <p class="muted" id="b-note"></p>
+    </section>
+  </div>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+const names = ["Supervisor", "Core"];
+let position = 0;
+const aLine = document.getElementById("a-line");
+const bLine = document.getElementById("b-line");
+const aSteps = document.getElementById("a-steps");
+const bSteps = document.getElementById("b-steps");
+const bNote = document.getElementById("b-note");
+const next = document.getElementById("next");
+function row(name, text) {
+  const li = document.createElement("li");
+  const left = document.createElement("span");
+  const right = document.createElement("span");
+  left.textContent = name;
+  right.textContent = text;
+  li.append(left, right);
+  return li;
+}
+function show() {
+  aSteps.replaceChildren();
+  bSteps.replaceChildren();
+  if (position === 0) {
+    aLine.textContent = "Not started.";
+    bLine.textContent = "Nothing is running.";
+    bNote.textContent = "";
+    next.textContent = "Start the run";
+    next.disabled = false;
+    return;
+  }
+  const done = position > names.length;
+  names.forEach((name, index) => {
+    const step = index + 1;
+    const here = step < position ? "Installed" : step === position && !done ? "Updating" : done ? "Installed" : "Waiting";
+    const there = step < position ? "Finished" : step === position && !done ? "Updating" : done ? "Finished" : "Waiting";
+    aSteps.append(row(name, here));
+    bSteps.append(row(name, there));
+  });
+  const line = done ? "Finished 2 of 2." : "Updating " + position + " of 2.";
+  aLine.textContent = line;
+  bLine.textContent = line;
+  bNote.textContent = "This run was started in another browser. There is nothing to press here.";
+  next.textContent = done ? "Finished" : "Next step";
+  next.disabled = done;
+}
+next.addEventListener("click", () => { position += 1; show(); });
+document.querySelector("[data-demo-reset]").addEventListener("click", () => { position = 0; show(); });
+show();
+</script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "build": 534,
+  "headline": "An update run can be watched from any browser, and backups on this disk list at once",
+  "summary": "Build 534 lets every signed-in administrator's browser see an \"Update everything\" run, not only the browser that started it. The other browsers get a read-only view. The Saving space page now lists the backups held on this disk straight away, even when the registry is not answering. A state such as the Backup Manager's \"Idle\" now has a Cantonese word. Python and interface tests pass at their known baselines. A browser check of this build on a test copy was still under way when these notes were written. One fault is still open: the Automations page title can stay in English at phone width in Cantonese mode, and its cause has not been found.",
+  "summary_yue": "534 版令每個已登入管理員嘅瀏覽器都睇到「全部更新」嘅進度，唔再淨係開始嗰個瀏覽器先見到。其他瀏覽器見到嘅係唯讀畫面。慳位頁而家會即刻列出呢個磁碟上面嘅備份，就算登記處冇回應都一樣。好似備份管理員「Idle」呢類狀態，而家有廣東話。Python 同介面測試喺已知基準通過。寫呢份說明嗰陣，呢版喺測試副本嘅瀏覽器檢查仲進行緊。仲有一個毛病未解決：廣東話模式喺手機闊度，自動化頁嘅標題有機會仲係英文，原因未搵到。",
+  "highlights": [
+    {
+      "id": "update-run-everywhere",
+      "title": "Watch an update run from another browser",
+      "areas": ["core", "interface"],
+      "what": "Until now the list of chosen updates, their order and the current position lived only in the browser that pressed \"Update everything\". Opening the Updates page on a phone during a run showed nothing. The server now keeps a small record of the run for display: which updates, in what order, where it is, and how it ended. The browser that started the run still drives it and reports each step. Any other administrator's browser shows the same card with \"Updating 2 of 2\", the current item, the start time and a line saying the run was started in another browser. That view has no Stop, Skip or Try again, and it does not offer its own \"Update everything\" while a run is going. Steps the run has passed are shown as finished, never as installed, because the second browser cannot know more than the record says. The record is kept in memory only, disappears two hours after its last change or when Core restarts, accepts only existing update entities (50 at most), and has no way to start, reorder or cancel an install. On the Saving space page, the command that describes pointers now also returns the name, date and size of backups on this disk, so those rows appear at once and are replaced by the full list when it arrives. In language mode, a state that reuses one of the core's shared words now has a Cantonese word; 35 of them were added.",
+      "what_yue": "之前揀咗邊啲更新、次序同而家做到邊度，全部淨係存喺撳「全部更新」嗰個瀏覽器。更新途中用手機開更新頁，乜都見唔到。而家伺服器會留一份細細嘅記錄，純粹用嚟顯示：邊啲更新、咩次序、做到邊度、點樣收場。開始嗰個瀏覽器照舊負責推進，同埋匯報每一步。其他管理員嘅瀏覽器會見到同一張卡，有「更新緊 2 之 2」、而家嗰項、開始時間，同一行講明係喺另一個瀏覽器開始。呢個畫面冇「停止」、「跳過」或者「再試」，更新進行緊嗰陣亦唔會畀你自己再撳「全部更新」。行過嘅步驟只會顯示做完，唔會話裝咗，因為第二個瀏覽器知道嘅唔會多過記錄。記錄只喺記憶體，最後一次改動之後兩個鐘或者 Core 重新啟動就冇咗，只接受真係存在嘅更新實體（最多 50 個），冇辦法用嚟開始、改次序或者取消安裝。慳位頁方面，講指標嗰個指令而家會連埋呢個磁碟上面備份嘅名、日期同大細一齊畀，嗰啲行即刻出現，完整清單到咗就會換上。語言模式方面，借用核心共用字眼嘅狀態而家有廣東話，加咗 35 個。",
+      "why": "An update can take minutes, and you should not have to walk back to the computer that started it to see how it is going.",
+      "try": [
+        "On a computer, open Settings, Updates, and start \"Update everything\" when updates are waiting.",
+        "On your phone, sign in and open the same page: the run shows with its position, and no controls.",
+        "When it ends, close the card on the phone; that only hides it there."
+      ],
+      "sha": ["bc8e277f9"],
+      "demo": "demos/534/second-browser.html"
+    }
+  ],
+  "other": []
+}
