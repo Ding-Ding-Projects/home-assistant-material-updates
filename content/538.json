@@ -1,0 +1,29 @@
+{
+  "build": 538,
+  "headline": "Lists scroll cleanly, the tools float, and search says how many rows it hides",
+  "summary": "Build 538 is a polish and repair pass on the interface. No control was removed. List pages now have one scroller, and the space at the end of each list is measured from the floating bar, so the last row is never hidden under it. Long names wrap, the tools on list pages open from a floating pill, more pages have a search bar, and a search says how many rows it hides. Dramatic motion is limited to actions that finish, fail, save or delete a row. The interface tests passed at their known baseline when this build was committed. It has not been seen in a browser yet. The three other commits in this build change only design board files and design rules, not the app.",
+  "summary_yue": "538 版係介面嘅執靚同修正，一樣掣都冇減。清單頁而家淨係有一條捲軸，尾位嘅空間會跟浮動列嘅高度量度，所以最後一行唔會俾佢遮住。長名會轉行，清單頁嘅工具收埋入浮動藥丸掣，多咗幾個頁面有搜尋欄，搜尋會講收埋咗幾多行。誇張嘅動畫淨係用喺做完、失敗、儲存或者刪除一行嗰啲動作。寫呢份說明嗰陣，介面測試喺已知基準通過。呢版仲未喺瀏覽器睇過。另外三個提交只改咗設計畫板同設計規矩，唔改 app 本身。",
+  "highlights": [
+    {
+      "id": "scroll-and-search",
+      "title": "Lists scroll cleanly, with floating tools and search that counts",
+      "areas": ["interface"],
+      "what": "A list page has one scroller now. The space at the end of the list is measured from the floating bar, the create button and any bulk bar, so the last row is never underneath them. Long row names wrap to two lines, with the full name shown on hover or focus. The tools on list pages sit in a floating pill that shows the names of its tools on a desktop when you hover or focus it. Search bars were added to more pages, including System, Connectivity, Zones, People and four filter panels. A search only hides rows, and it says how many it hides. Dialogs and sheets keep their title and buttons in place, so only the middle part scrolls. A blueprint filter that could tick the wrong blueprint after one failed to load is fixed.",
+      "what_yue": "清單頁而家淨係有一條捲軸。清單尾位嘅空間，會跟浮動列、新增掣同批量列嘅高度量度，所以最後一行唔會俾佢哋遮住。長名會轉兩行，指住或者對焦就見到全名。清單頁嘅工具放入一個浮動嘅藥丸掣，喺桌面指住或者對焦，就會顯示工具名。系統、連線、區域、成員同四個篩選板都加咗搜尋；搜尋淨係收埋行，並且講明收埋咗幾多行。對話框同底部面板嘅標題同掣會留喺原位，淨係中間部分捲動。藍圖篩選之前會因為某個藍圖載入失敗而剔錯藍圖，今次已經修好。",
+      "why": "On a phone, a last row hidden under a bar, or a name cut off with no way to read it, makes a list hard to use. A search that hides rows without saying so is easy to misread.",
+      "try": [
+        "On a narrow window, open a long list and scroll to the last row. It sits clear of the floating create button.",
+        "Type part of a name in a search field. The line under it says how many rows are hidden.",
+        "On a desktop, hover over the floating tools pill and read the names of its tools."
+      ],
+      "sha": ["77a7687e5"],
+      "demo": "demos/538/scroll-and-search.html"
+    }
+  ],
+  "other": [
+    {
+      "title": "Design board work for the next pass: boards and rules for the design canvas, with no change to the app",
+      "sha": ["bfaa003b0", "0b888e38f", "5e31bd095"]
+    }
+  ]
+}

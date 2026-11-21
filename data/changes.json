@@ -1,9 +1,213 @@
 {
  "format": 1,
- "generated": "2026-11-20T13:44:37Z",
+ "generated": "2026-11-21T07:36:55Z",
  "repository": "Ding-Ding-Projects/home-assistant-material",
- "newest_build": 536,
+ "newest_build": 544,
  "releases": [
+  {
+   "build": 544,
+   "core": "2026.11.2.544",
+   "supervisor": "2026.11.0.544",
+   "os": "18.5.544",
+   "tag": null,
+   "source": "f762c285c",
+   "date": "2026-11-21T01:55:57-05:00",
+   "previous_build": 543,
+   "changes": [
+    {
+     "sha": "f762c285c",
+     "date": "2026-11-21T01:55:57-05:00",
+     "title": "Repairs from the build 542 browser check: entity names on phones, search drop-down [skip ci]",
+     "areas": [
+      "interface"
+     ],
+     "detail": "A browser check of build 542 said no to moving the owner's instance. These are the repairs. The look does not change and no control was removed.\n\nBlockers - Entities list on a phone: the new quick-control column crushed names to a few letters at 390 px and to nothing at 320 px. The row now keeps at least 150 px for the name; when the control does not fit beside it, the control moves to its own line. The slider, colour button and quick action live in the row's detail row on a phone. - Search drop-down: pressing a light's slider or colour button emptied the whole list, and the colour picker never opened. The drop-down reacted to show and close events bubbling up from overlays inside it. It now acts only on its own events, and it closes when the app moves to another page.\n\nSmaller - Details no longer break one letter per line in narrow places: the label stacks above the value when the panel is narrow. - On wide list pages the remaining filter chips sit at the start again, and the group and sort pills show the current choice without hover. - Escape cancels a confirmation, as its text says. The two-key confirmation itself is untouched. - Phone search rows put the slider and buttons on t",
+     "detail_yue": "542 版瀏覽器檢查之後嘅修正：手機上嘅實體名同搜尋下拉。 樣冇變，冇減任何掣。 手機實體清單：新加嗰欄控制掣之前將個名迫到得返幾個字，320 闊度 直頭睇唔到。而家個名最少有 150 像素；控制掣擺唔落就自己落一行。 搜尋下拉：撳盞燈嘅滑桿或者揀色掣會成個清單冇晒，揀色器又開唔到， 因為下拉連入面浮層嘅開關事件都當係自己嘅。而家只理自己嘅事件， 轉頁亦會自己收埋。 其他：詳細資料唔再一個字一行；闊螢幕嘅篩選標籤返返去開頭； Escape 真係取消確認；更新頁每一行都有「顯示更多資料」。 仲未喺瀏覽器睇過。"
+    }
+   ]
+  },
+  {
+   "build": 543,
+   "core": "2026.11.2.543",
+   "supervisor": "2026.11.0.543",
+   "os": "18.5.543",
+   "tag": "v2026.11.2.543",
+   "source": "16eeae26e",
+   "date": "2026-11-21T00:23:35-05:00",
+   "previous_build": 542,
+   "changes": [
+    {
+     "sha": "16eeae26e",
+     "date": "2026-11-21T00:23:35-05:00",
+     "title": "Handoff: the wall_tablet translation message is a test-copy artifact [skip ci]",
+     "areas": [
+      "docs"
+     ],
+     "detail": "The last note called a missing translation in wall_tablet an open fault. It is not one. strings.json has the string; the generated translations file is ignored on purpose and was absent in the test copy. The handoff and the closeout now say how to generate it before running that test folder.",
+     "detail_yue": "交接更正：wall_tablet 欠翻譯嗰句唔係源碼出錯。 strings.json 本身有嗰句；產生出嚟嘅翻譯檔係特登唔入庫，測試副本 啱啱冇產生到。交接同收工提示而家寫明行測試之前點樣產生。"
+    },
+    {
+     "sha": "7f4e4fe0a",
+     "date": "2026-11-21T00:21:21-05:00",
+     "title": "Quick action server tests run: 12 pass after one test is corrected [skip ci]",
+     "areas": [
+      "docs",
+      "core"
+     ],
+     "detail": "The tests that could not run at the last checkpoint have now run.\n\n- core/tests/components/quick_action: 12 passed. One test fired the stop event and then kept using its websocket, which that event had just closed. It now reads the runner directly. The feature did not change. - core/tests/components/default_config: the start-up test passes with quick_action loaded. Its teardown reports a missing translation, services.wake.name, in the older wall_tablet component. That is not from this work and is left open, recorded in the handoff.\n\nHANDOFF.md and CLOSEOUT_PROMPT.md now say this instead of \"not run\".",
+     "detail_yue": "快速動作嘅伺服器測試行咗：改正一個測試之後十二個全過。 上次存檔嗰陣行唔到嘅測試，而家行咗。 有一個測試發出「停止」事件之後仲用緊個已經俾事件關咗嘅連線， 而家改為直接讀返執行器。功能本身冇改。 預設載入嘅啟動測試，載入埋新元件都過；收尾嗰陣報舊元件 wall_tablet 欠一句翻譯，唔關今次事，寫咗落交接度，未修。"
+    },
+    {
+     "sha": "a3346c646",
+     "date": "2026-11-21T00:02:49-05:00",
+     "title": "Checkpoint: stop a running quick action, details in more places; server tests not run [skip ci]",
+     "areas": [
+      "docs",
+      "core",
+      "interface"
+     ],
+     "detail": "A recovery checkpoint at the end of a session. The work below is written and passes the frontend checks. It is NOT finished: the new server tests were never run and nothing here has been seen in a browser.\n\n- A running quick action can be listed and stopped. A small in-memory server component, quick_action, tracks each run: run, list, stop and subscribe, administrators only, at most 20 runs, nothing written to disk, and no run survives a restart. The dialog has a Stop button and a \"Running quick actions\" list, also shown in the Actions tool. - The shared data table can open a detail row under a row. Automations, scripts, helpers and entities use it for \"Show more details\". - Quick buttons and details in more lists: logbook rows, the area and device pages' automation, script and scene lists, labels, floors, zones, people, users, dashboards, blueprints, tags, repairs and backups. A user's details show only safe fields, and a test proves no password or credential can appear. - The states tool opens on one entity when the link names it. - HANDOFF.md and CLOSEOUT_PROMPT.md describe the state at the stop.\n\nNot run: core/tests/components/quick_action and default_config. The container engi",
+     "detail_yue": "收工存檔：行緊嘅快速動作可以停，更多地方有詳細資料；伺服器測試未行。 呢個係收工前嘅存檔。下面嘅嘢寫好咗，介面檢查都過，但係未完： 新嘅伺服器測試一次都未行過，亦未喺瀏覽器睇過。 行緊嘅快速動作而家列得出、停得到：有個細嘅伺服器元件喺記憶體 記住每次執行，只限管理員，最多二十個，唔寫入硬碟，重新啟動就冇。 共用表格可以喺一行下面打開詳細資料；記錄、區域同裝置頁、標籤、 樓層、區域、成員、用戶、儀表板、藍圖、標籤卡、維修同備份都有。 用戶資料只顯示安全欄位，有測試證明密碼同憑證唔會出現。 未行：伺服器嗰兩個測試資料夾，因為部機嘅容器引擎冇反應。 起版之前一定要行咗先。"
+    }
+   ]
+  },
+  {
+   "build": 542,
+   "core": "2026.11.2.542",
+   "supervisor": "2026.11.0.542",
+   "os": "18.5.542",
+   "tag": "v2026.11.2.542",
+   "source": "33e099f91",
+   "date": "2026-11-20T13:45:29-05:00",
+   "previous_build": 538,
+   "changes": [
+    {
+     "sha": "33e099f91",
+     "date": "2026-11-20T13:45:29-05:00",
+     "title": "Control things where they are listed, run a quick action, show more details [skip ci]",
+     "areas": [
+      "interface"
+     ],
+     "detail": "Three additions the owner asked for. The look of the app does not change and no control was removed.\n\nControls in place - Wherever an entity is listed by name it can be controlled right there: a switch gets its toggle, a dimmer a slider, a colour light a colour button, a button or scene a press, a sensor its value. This is in the search drop-down, the Entities list (a column that can be hidden), the area page, and related lists. - Locks, alarms, valves, sirens and garage, gate and door covers ask first with the app's own two-key confirmation. Locks and alarms still ask for their code exactly as before. - A control uses the same service call as the full page. It never writes a state itself.\n\nRun a quick action - A dialog with guided steps (do this, wait, do this on another thing) and, for administrators, a YAML tab kept in sync both ways. It runs once and nothing is stored. \"Keep as a script\" opens the script editor prefilled; nothing is written until the person saves there. - Honest limit, said in the dialog: a running quick action cannot be stopped from the page. For an administrator, steps after a wait still run if the page is closed.\n\nShow more details - In place on an entity: e",
+     "detail_yue": "即場控制、行個快速動作、顯示更多資料：三樣屋主要嘅新嘢。 樣冇變，冇減任何掣。 即場控制：喺搜尋下拉、實體清單、區域頁同相關清單，開關有開關、 調光有滑桿、彩燈有揀色掣、感應器顯示數值。門鎖、警報、閥、警號 同車房閘門要用兩條鎖匙確認先；門鎖同警報照舊要輸入密碼。 快速動作：有引導步驟，管理員仲有 YAML 分頁，兩邊同步。行一次， 乜都唔儲；「留做腳本」會開腳本編輯器，要自己撳儲存先會寫入。 老實講明：行緊嘅快速動作喺頁面度停唔到。 更多資料：實體編號、裝置、整合、原始狀態、準確時間、所有屬性， 可以複製。管理員可以人手改狀態，要確認先，兼講明部裝置唔會收到。 未做：自動化、腳本同場景行嘅展開，仲有揀選器、卡片同歷史入面嘅掣。 呢批改動仲未喺瀏覽器睇過。"
+    },
+    {
+     "sha": "fc5d13aae",
+     "date": "2026-11-20T13:30:16-05:00",
+     "title": "Site polish: welcome band, a live build line, a change row that fills itself",
+     "areas": [
+      "build",
+      "docs"
+     ],
+     "detail": "The public site keeps its look. This is polish, and one fix so it stops going stale.\n\n- The first-visit welcome no longer opens as a dialog over the headline. It is a slim band with the same three steps, and the full welcome is still in Settings. - The badge that said the interface was only begun is replaced by a line with the newest product build and its date, read from the releases at publish time. When nothing is found it links to the releases page; a number is never made up. - \"New in the latest builds\": four cards taken from the change list by a rule in the generator, never written by hand. - The hero can show a real capture per theme once the files exist. None was drawn or invented. - Buttons respond to hover and press, sections rise once, and the tab row shows where it scrolls. All of it stops under reduced motion. - The publish workflow now regenerates the page's data, in a mode that touches no picture, and republishes when a release is published. It uses the same read-only token as before: no new secret, permission or action. - The site's scripts read and write UTF-8 explicitly, so they run on Windows.\n\nLooked at from the local files at 320, 390 and 1440 px: no dialog on a",
+     "detail_yue": "網站執靚咗：個樣冇變，仲整返好一樣嘢，等佢唔會再過期。 第一次嚟嘅歡迎唔再用對話框遮住大標題，變成一條幼帶，三個步驟 照舊，完整版仲喺設定度。 以前嗰個話「介面啱啱開始」嘅徽章換成一行：最新版本同日期，發佈 嗰陣由發佈資料讀出嚟；搵唔到就連去發佈頁，絕對唔會作個數字出嚟。 「最新版本有乜新嘢」四張卡由更改清單自動填，唔係人手寫。 發佈流程而家會重新產生頁面資料（唔會郁任何圖片），有新版本發佈 亦會重新出一次，用返同一個唯讀權杖。 喺本機檔案用 320、390 同 1440 闊度睇過：冇對話框彈出、幼帶見到、 冇橫向捲動、冇頁面錯誤。公開網址嗰邊仲未睇。"
+    },
+    {
+     "sha": "be773d9be",
+     "date": "2026-11-20T13:14:24-05:00",
+     "title": "Site: facts brought up to date, claims cut back to what is proven",
+     "areas": [
+      "docs"
+     ],
+     "detail": "The public site said a few things that were no longer true, or were never proven.\n\n- The version line now matches the current upstream version. - Tabs, the command palette, the pattern builder and navigation said \"built\". They now say which parts have been seen working and which are built but not yet seen. - Two hard-coded counts are gone (\"38 places\", \"616 boards on 40 canvases\"). Both were already stale. - The download fallback no longer says a first release is on its way. It points at the releases page.\n\nNothing about recent builds was added unless the project's own records show it was seen working. The look of the site is unchanged.",
+     "detail_yue": "網站：資料更新，講過龍嘅嘢收返。 版本行跟返而家嘅上游版本。分頁、指令面板、樣式工具同導覽之前寫 「做好」，而家寫明邊部分睇過得、邊部分做咗但未睇過。 兩個寫死嘅數字（「38 處」同「616 塊畫板」）刪走，因為早就唔啱。 下載後備字句唔再話「第一個版本就嚟到」，而係指去發佈頁。 近期版本嘅嘢，除非項目自己嘅記錄話睇過得，否則一律唔加。 網站個樣冇變。"
+    },
+    {
+     "sha": "ab302a59a",
+     "date": "2026-11-20T13:09:45-05:00",
+     "title": "Canvas 42 redrawn to today's look, plus quick controls, details and the site [skip ci]",
+     "areas": [
+      "design"
+     ],
+     "detail": "The owner asked for today's look with a polish, not a new look. The bolder boards are removed. Every page board was redrawn from a real picture of today's build: automations list, front door, entity sheet, automation editor and Updates.\n\nNew boards for three things the owner asked for: - controls in place wherever a thing is listed (toggle, slider, colour button), with risky things asking first; - \"Run a quick action\": guided steps or YAML, runs once, kept only if asked; - \"Show more details\" in place, with edit behind a confirmation.\n\nAnd one board for the project's public site in its own look.\n\nReview pictures for every board are under design/frames. The quick controls, quick action, details and site polish are not built yet.",
+     "detail_yue": "畫布 42 照返而家個樣重畫，再加埋即場控制、詳細資料同網站。 屋主要嘅係「而家個樣，執靚啲」，唔係新造型，所以大膽嗰批畫板刪走， 每一頁都照住今日個 build 嘅真圖重畫：自動化清單、首頁、單件面板、 自動化編輯器同更新頁。 新加三樣：喺清單度即場控制（開關、滑桿、揀色），危險嘢要問先； 「行個快速動作」，有引導步驟亦可以寫 YAML，行一次就掉，除非話要留； 「顯示更多資料」，即場睇晒，改嘢要確認先。 仲有一塊畫板畀個公開網站。 每塊畫板都有圖放喺 design/frames。新嗰幾樣未起。"
+    },
+    {
+     "sha": "b46466d28",
+     "date": "2026-11-20T13:00:39-05:00",
+     "title": "Repairs from the browser hunt: blank area page, stacked titles, covered buttons [skip ci]",
+     "areas": [
+      "interface"
+     ],
+     "detail": "A browser pass over 82 pages of build 536 found fourteen faults. These are the repairs. The look of the app does not change and no control was removed.\n\n- Area pages were completely blank. The page handed its title code an icon-and-name template where plain text was expected, and the title code called a text method on it. The page now passes text and shows the icon beside the name, and the title code no longer falls over on a value that is not text. - Page titles on Lights, Climate, Security, Media sources and History stacked one letter per line on phones and tablets. The title had no width of its own in the top bar and collapsed to nothing. - The surprise card sat on top of the create button on phones and took its tap. It now measures the floating controls under it and rises above them. - Lights and Climate scrolled far past their content. Helpers gave its list about one row of room. Dashboards and Automations cut text at 320 px. The home media card was squeezed on tablets. Entities crushed names beside a status chip. Settings lost its scroll place on return. - Phone menu: one scroller, so no row hides under the bottom block. - Text that was 10 px is at least 11 px. In the two-key",
+     "detail_yue": "瀏覽器巡查 82 頁之後嘅修正，樣冇變，冇減任何掣。 區域頁之前係全白：頁面將「圖示加名」當純文字交咗畀標題程式， 標題程式就跌低。而家交返文字，圖示擺喺名隔籬，標題程式遇到唔係 文字嘅嘢都唔會再跌。 燈、冷暖、保安、媒體、歷史頁喺手機同平板，標題一個字一行： 而家返返一行。 驚喜卡之前壓住新增掣兼搶咗下撳：而家識量度下面嘅浮動掣再升高避開。 燈同冷暖頁捲過龍、輔助工具清單得一行位、320 闊度切字、平板媒體卡 迫到變形、設定頁返轉頭唔記得捲到邊，全部修正。 十像素嘅字最少十一像素；兩條鎖匙確認只改咗說明字嘅大細同轉行。 呢批改動仲未喺瀏覽器睇過。"
+    }
+   ]
+  },
+  {
+   "build": 538,
+   "core": "2026.11.2.538",
+   "supervisor": "2026.11.0.538",
+   "os": "18.5.538",
+   "tag": "v2026.11.2.538",
+   "source": "77a7687e5",
+   "date": "2026-11-20T11:42:35-05:00",
+   "previous_build": 537,
+   "changes": [
+    {
+     "sha": "77a7687e5",
+     "date": "2026-11-20T11:42:35-05:00",
+     "title": "Polish pass: scrolling and fit repairs, floating tool pills, more search bars, action moments [skip ci]",
+     "areas": [
+      "interface"
+     ],
+     "detail": "The interface keeps today's look. This is a polish and repair pass, and no control was removed.\n\nScrolling and fit - List pages have one scroller. The end of the list is measured from the floating bar, the create button and any bulk bar, so the last row is never underneath them. - Row names wrap to two lines, with the full name on hover or focus. A table wider than its card scrolls inside the card. Lists stop at 1200 px on wide windows. - Dialogs and sheets keep their title and buttons in place; only the middle scrolls. The sheet's header and footer used to scroll away with the content. - Long names, identifiers and labels wrap on the device page, the entity settings, the front door and the Updates page at 320 px.\n\nTools and search - Page tools on list pages sit in a floating pill. On a desktop an item shows its name on hover or focus and menus open on hover; a tap opens them on a phone. Selection actions float the same way. - Search with the pattern builder on the System page, Connectivity, Zones, People, and four filter panels. Settings search also finds words inside the pages it lists. Search only hides rows and says how many it hides. - Fixed: the blueprint filter could tick th",
+     "detail_yue": "翻新一轉：樣仲係而家個樣，冇減任何掣。 捲動同排版：清單頁得返一條捲軸，頁尾會量度浮動列同新增掣嘅高度， 最後一行唔會再俾遮住；名太長會轉兩行；闊過卡片嘅表格喺卡片入面捲； 對話框同底部面板嘅標題同掣唔會跟住捲走。 工具同搜尋：清單頁嘅工具放入浮動藥丸掣，桌面一指就打開；系統頁、 連線、區域、成員同四個篩選板都加咗搜尋，設定搜尋仲識搵頁面入面嘅字。 搜尋只會收埋，仲會講收埋咗幾多。 動畫：誇張效果只留畀「做完、失敗、刪除」呢啲動作，頁面只係有轉場。 修正：一個藍圖載入失敗之後，篩選有機會剔錯藍圖。 呢批改動仲未喺瀏覽器睇過。"
+    },
+    {
+     "sha": "bfaa003b0",
+     "date": "2026-11-20T11:23:27-05:00",
+     "title": "Canvas 42: drama and graphics are for actions only, cards stay familiar [skip ci]",
+     "areas": [
+      "design"
+     ],
+     "detail": "The owner's decision, recorded on the canvas and in its notes so nobody builds the wrong thing from the pictures:\n\n- Dramatic animations and graphics apply only to actions: something finished, failed, was deleted or was saved. - The interface itself gets animations and transitions only. No decorative pictures, no decorative shapes, no looping motion on resting pages. - Dashboard cards stay close to how they look today.\n\nThe boards are still read for colour, type, layout and transitions. The pictures and shapes drawn on resting pages are not to be built.",
+     "detail_yue": "畫布 42：誇張動畫同圖畫只用喺「動作」度，卡片唔好變到唔認得。 屋主話事，寫埋落畫布同說明度，費事有人照住張圖起錯： 誇張動畫同圖畫，只限做完、失敗、刪除、儲存呢啲動作； 介面本身只要動畫同轉場，唔要裝飾圖、唔要裝飾形狀、 靜止嘅頁面唔好有循環郁動；儀表板卡片保持返而家咁上下。 畫板仍然用嚟睇顏色、字體、排版同轉場。"
+    },
+    {
+     "sha": "0b888e38f",
+     "date": "2026-11-20T11:11:54-05:00",
+     "title": "Design canvas 42 grows to the whole app, with review pictures [skip ci]",
+     "areas": [
+      "design"
+     ],
+     "detail": "The first draft of this canvas was flatter than the app it was meant to improve. It is redrawn in the app's own bold look and pushed further, and this time every board was rendered and looked at before being called done.\n\n- Five new boards for the whole app: the front door as a colour scene, the sheet for one thing with a giant slider, the automation editor as a path of colour blocks, updates and backups as a big ring with steps, and dashboard cards with moving pictures of their data. - The list boards: colour hero with a huge count, shaped icons, coloured statistic tiles. The create button moved beside the floating bar, because the picture showed it covering a row's switch. - Review pictures for all thirteen boards under design/frames.\n\nStill a design. Building has started; nothing from it has been seen in a browser.",
+     "detail_yue": "設計畫布 42 擴大到成個 app，仲加埋檢視用嘅圖。 第一稿仲平淡過個 app 本身，所以照返 app 大膽嘅風格重畫，再推前。 今次每塊畫板都真係出咗圖睇過先算數。 新加五塊：有畫面嘅首頁、有巨型滑桿嘅單件面板、變成彩色路線嘅 自動化編輯器、用大圓環同步驟顯示嘅更新同備份、同埋資料識郁嘅 儀表板卡片。 清單畫板：新增掣搬去浮動列隔籬，因為張圖見到佢遮住咗一行嘅開關。 十三塊畫板嘅圖放喺 design/frames。 仍然只係設計，未喺瀏覽器睇過。"
+    },
+    {
+     "sha": "5e31bd095",
+     "date": "2026-11-20T10:49:13-05:00",
+     "title": "Design canvas 42: modern polish 2, scrolling and fit, pills, motion [skip ci]",
+     "areas": [
+      "design"
+     ],
+     "detail": "Eight boards drawn before any code for the next modernising pass. They keep the app's bold look and push it: a colour hero with a moving picture and a huge count, shaped icons on rows, coloured statistic tiles, floating pills that open on hover on a desktop, five dramatic moments with pictures, a search bar on pages and filter sheets that lacked one, and the rules for scrolling and fit (one scroller, nothing wider than the screen, the end of a page clears every floating thing, text wraps instead of being sliced). One rule sits above the rest: nothing is removed.\n\nNot built yet. The boards were not rendered to pictures in this pass.",
+     "detail_yue": "設計畫布 42：新一輪翻新，全部畫咗先，未寫任何程式。 保留返個 app 本身大膽嘅樣，再推前一步：有圖畫識郁嘅彩色頭版同 巨型數字、列嘅圖示有形狀、彩色統計磚、喺桌面一指就打開嘅浮動 藥丸掣、五個有畫面嘅誇張時刻、之前冇搜尋欄嘅頁面同篩選板加返、 同埋捲動同排版嘅規矩：一頁一條捲軸、唔可以闊過螢幕、頁尾要避開 所有浮動嘢、文字轉行唔切斷。最大條規矩：一樣功能都唔減。 仲未起，今次亦未有將畫板變做圖片。"
+    }
+   ]
+  },
+  {
+   "build": 537,
+   "core": "2026.11.2.537",
+   "supervisor": "2026.11.0.537",
+   "os": "18.5.537",
+   "tag": "v2026.11.2.537",
+   "source": "d6523e045",
+   "date": "2026-11-20T10:39:37-05:00",
+   "previous_build": 536,
+   "changes": [
+    {
+     "sha": "d6523e045",
+     "date": "2026-11-20T10:39:37-05:00",
+     "title": "Updates page fails soft after a restart, Cantonese separators, OS switch off with no OS [skip ci]",
+     "areas": [
+      "interface"
+     ],
+     "detail": "From the build 536 browser check. The Updates page could sit on a spinner after Core changed version. The cause is NOT established from source; this change makes the page fail soft instead of pretending.\n\n- Updates page: after a reconnect, once Core is running, the page asks its own server whether the build it loaded is still served. If it is gone the page reloads itself once, never twice for the same build, and never while there are unsaved changes, an open dialog or focus in a field or slider. After 60 seconds disconnected it shows a plain line with a Reload button. The saved queue result survives the reload. No confirmation changed and the run record is still display only. - Cantonese mode: breadcrumbs join their parts with the language's own separator, the identity page's breadcrumb follows the language mode, and three more count lines use the right punctuation. - Automatic updates: on a system with no managed operating system the operating system switch is disabled with a reason line. A switch that is already on can still be turned off.\n\nNot done: the performance page's count line (English only by design). Leads left for the next browser check are in the hand-off notes.\n\nTests",
+     "detail_yue": "更新頁喺重新啟動之後唔再淨係轉圈：原因未搵到，所以老實啲，頁面自己 問伺服器「我載入嗰版仲喺唔喺度」，唔喺度就自己重新載入一次，只此一次， 而且有未儲存嘢、開緊對話框或者手指仲喺滑桿度就等。斷線六十秒會出一句 說明同一個重新載入掣。 廣東話模式：路徑用返中文分隔符號，身份頁嘅路徑跟語言模式，多三句 數量句子標點啱返。 自動更新：冇受管理作業系統嘅機，作業系統個掣會停用兼講原因；已經 開咗嘅仲可以熄。 呢批改動仲未喺瀏覽器睇過。"
+    }
+   ]
+  },
   {
    "build": 536,
    "core": "2026.11.2.536",

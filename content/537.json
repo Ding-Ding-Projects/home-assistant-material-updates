@@ -1,0 +1,24 @@
+{
+  "build": 537,
+  "headline": "The Updates page recovers on its own after a restart, with two small fixes alongside",
+  "summary": "Build 537 changes what the Updates page does when Core restarts. The page now asks its own server whether the version it loaded is still served, reloads itself once if it is not, and shows a plain line with a Reload button when the connection stays lost for 60 seconds. The cause of the endless spinner was not found in the source, so this build makes the page fail soft rather than claiming a confirmed fix. Two smaller changes come with it: in Cantonese mode, breadcrumbs and some count lines use Cantonese punctuation, and on a system with no managed operating system the operating system switch is disabled with a line that gives the reason. The interface tests passed at their known baseline when this build was committed. It has not been seen in a browser yet.",
+  "summary_yue": "537 版改咗更新頁喺 Core 重新啟動之後嘅做法。頁面會問自己嘅伺服器，載入緊嗰個版本仲有冇提供；如果冇咗，就會自動重新載入一次。如果斷線超過六十秒，頁面會顯示一句講明嘅字，附埋一個「重新載入」掣。轉圈嘅原因喺源碼入面未搵到，所以今次係令頁面識得失敗，唔係假裝已經修好真正原因。另外兩樣細改動：廣東話模式下，路徑同部分數量句子跟返廣東話嘅標點；冇受管理作業系統嘅機，作業系統開關會停用，並且講明原因。介面測試喺已知基準通過。呢版仲未喺瀏覽器睇過。",
+  "highlights": [
+    {
+      "id": "updates-page-recovers",
+      "title": "The Updates page recovers after Core restarts",
+      "areas": ["interface"],
+      "what": "When Core restarts while the Updates page is open, the page no longer waits on a spinner for ever. Once Core is running again, the page asks its own server whether the version it loaded is still being served. If it is gone, the page reloads itself once. It never reloads twice for the same version, and it waits while there are unsaved changes, an open dialog, or focus in a field or slider. If the connection stays lost for 60 seconds, the page shows a plain line with a Reload button. The saved result of a queued update survives the reload. The cause of the spinner was not found in the source, so this is a fail-soft change rather than a confirmed fix. The run record on the page still only displays progress; no confirmation changed.",
+      "what_yue": "Core 喺更新頁開住嘅時候重新啟動，頁面而家唔會一直轉圈等落去。Core 再運行之後，頁面會問自己嘅伺服器，載入緊嗰個版本仲有冇提供。如果冇咗，頁面就會自動重新載入一次，同一個版本唔會重覆重載。如果有未儲存嘅嘢、開緊對話框，或者焦點喺某個欄位或者滑桿度，就會等。斷線超過六十秒，頁面會顯示一句講明嘅字，附埋一個「重新載入」掣。排隊更新嘅結果喺重新載入之後仍然保留。轉圈嘅原因喺源碼入面未搵到，所以呢個改動係失敗時識得講，唔係已經確認修好。頁面上嘅更新記錄仍然只係用嚟顯示進度，確認方式冇改。",
+      "why": "A page that waits for ever after a restart leaves the owner unsure whether an update finished. It should say what is happening instead.",
+      "try": [
+        "Open Settings, then Updates, and keep the page open while Core restarts.",
+        "Wait for the page to recover on its own. If the connection stays lost for a minute, the Reload button appears.",
+        "Leave unsaved changes on the page: the automatic reload waits until they are dealt with."
+      ],
+      "sha": ["d6523e045"],
+      "demo": "demos/537/updates-page-recovers.html"
+    }
+  ],
+  "other": []
+}

@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: the search drop-down keeps its list</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.panel { width: 100%; max-width: 620px; margin: 16px auto 0; }
+.row button { min-height: 48px; }
+.drop { border: 1px solid var(--out); border-radius: 16px; background: var(--sl0); margin-top: 8px; padding: 4px 0; }
+.hit { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 8px 14px; min-height: 56px; border-top: 1px solid var(--outv); }
+.hit:first-child { border-top: none; }
+.hit .label { flex: 1 1 150px; min-width: 150px; }
+.hit input[type="range"] { width: 140px; min-height: 48px; }
+.palette { display: none; gap: 8px; flex-wrap: wrap; width: 100%; }
+.palette.open { display: flex; }
+.palette button { min-height: 48px; min-width: 48px; border-radius: 24px; border: 1px solid var(--out); }
+.empty { padding: 14px; color: var(--onv); }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="search-drop-down-keeps-list">
+  <h1>The search drop-down keeps its list</h1>
+  <p class="muted">A demonstration with four made-up lights. Type to search, then press a light's slider or colour button.</p>
+
+  <div class="row" role="group" aria-label="Which build behaves this way">
+    <button type="button" class="chip" id="before" aria-pressed="false">Build 543</button>
+    <button type="button" class="chip" id="after" aria-pressed="true">Build 544</button>
+  </div>
+
+  <section class="panel card" aria-live="polite">
+    <label class="field" for="q">Search lights</label>
+    <input type="search" id="q" value="" placeholder="Type part of a name" autocomplete="off">
+    <div class="drop" id="drop"></div>
+    <p class="note" id="result">Type a word to see the lights.</p>
+  </section>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var lights = [
+    { name: "Hall ceiling light", level: 60 },
+    { name: "Hall stair light", level: 20 },
+    { name: "Kitchen light", level: 80 },
+    { name: "Hallway night light", level: 5 }
+  ];
+  var oldBuild = false;
+  var q = document.getElementById("q");
+  var drop = document.getElementById("drop");
+  var result = document.getElementById("result");
+  var before = document.getElementById("before");
+  var after = document.getElementById("after");
+
+  function matches() {
+    var words = q.value.trim().toLowerCase();
+    if (!words) return [];
+    return lights.filter(function (light) {
+      return light.name.toLowerCase().indexOf(words) !== -1;
+    });
+  }
+
+  function draw(list) {
+    drop.replaceChildren();
+    if (!q.value.trim()) {
+      result.textContent = "Type a word to see the lights.";
+      return;
+    }
+    if (list.length === 0) {
+      var empty = document.createElement("p");
+      empty.className = "empty";
+      empty.textContent = "No lights match.";
+      drop.append(empty);
+      result.textContent = "No lights match.";
+      return;
+    }
+    list.forEach(function (light) {
+      var row = document.createElement("div");
+      row.className = "hit";
+      var label = document.createElement("span");
+      label.className = "label";
+      label.textContent = light.name;
+      var slider = document.createElement("input");
+      slider.type = "range";
+      slider.min = "0";
+      slider.max = "100";
+      slider.value = String(light.level);
+      slider.setAttribute("aria-label", light.name + " brightness");
+      var value = document.createElement("span");
+      value.textContent = light.level + "%";
+      var colour = document.createElement("button");
+      colour.type = "button";
+      colour.className = "tonal";
+      colour.textContent = "Colour";
+      colour.setAttribute("aria-expanded", "false");
+      var palette = document.createElement("div");
+      palette.className = "palette";
+      ["Warm", "Cool", "Green"].forEach(function (name) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.textContent = name;
+        b.addEventListener("click", function () {
+          result.textContent = light.name + " set to " + name.toLowerCase() + " (pretend).";
+        });
+        palette.append(b);
+      });
+      colour.addEventListener("click", function () {
+        var open = palette.classList.toggle("open");
+        colour.setAttribute("aria-expanded", String(open));
+      });
+      slider.addEventListener("input", function () {
+        light.level = Number(slider.value);
+        value.textContent = light.level + "%";
+        if (oldBuild) {
+          drop.replaceChildren();
+          var gone = document.createElement("p");
+          gone.className = "empty";
+          gone.textContent = "No lights match.";
+          drop.append(gone);
+          result.textContent = "Build 543: pressing the slider emptied the whole list (pretend).";
+        } else {
+          result.textContent = light.name + " set to " + light.level + " percent (pretend). The list stays.";
+        }
+      });
+      row.append(label, slider, value, colour, palette);
+      drop.append(row);
+    });
+    if (!oldBuild) {
+      result.textContent = list.length + " lights match. Pressing a control changes only that light.";
+    }
+  }
+
+  function render() {
+    before.setAttribute("aria-pressed", String(oldBuild));
+    after.setAttribute("aria-pressed", String(!oldBuild));
+    draw(matches());
+  }
+
+  q.addEventListener("input", render);
+  before.addEventListener("click", function () { oldBuild = true; render(); });
+  after.addEventListener("click", function () { oldBuild = false; render(); });
+  document.querySelector("[data-demo-reset]").addEventListener("click", function () {
+    q.value = "";
+    lights.forEach(function (light, i) { light.level = [60, 20, 80, 5][i]; });
+    oldBuild = false;
+    render();
+  });
+  render();
+})();
+</script>
+</body>
+</html>

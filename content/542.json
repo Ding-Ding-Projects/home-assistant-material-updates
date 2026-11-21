@@ -1,0 +1,48 @@
+{
+  "build": 542,
+  "headline": "Blank area pages, stacked titles and covered buttons are repaired, and lists gain controls in place",
+  "summary": "Build 542 repairs fourteen faults that a browser pass found over 82 pages of build 536. Area pages that were blank now show their name and icon, page titles on phones and tablets no longer stack one letter per line, and the surprise card rises above the floating create button. The build also adds controls where entities are listed, a guided quick action with a YAML tab for administrators, and a Show more details view. Not done in this build: the details view on automation, script and scene rows, the quick buttons inside pickers, dashboard cards, and the logbook and history. Two faults that came with the new controls, entity names squeezed on a phone and the search drop-down emptying when a slider or colour button is pressed, are repaired in build 544. The frontend tests passed apart from their three known failures. It has not been seen in a browser yet.",
+  "summary_yue": "542 版修正咗瀏覽器巡查 536 版 82 頁時搵到嘅十四個毛病。區域頁之前全白，而家會顯示名同圖示；手機同平板嘅頁面標題唔再一個字一行；驚喜卡會升高，避開浮動嘅新增掣。呢版仲加咗實體清單即場控制、引導式快速動作（管理員有 YAML 分頁），同埋「顯示更多資料」。未做嘅有：自動化、腳本同場景行嘅詳細資料，選擇器入面嘅快速掣，儀表板卡片，日誌同歷史。新控制帶嚟兩個毛病：手機嘅實體名被壓到得幾個字，同撳滑桿或者顏色掣會令搜尋下拉清空；呢兩個喺 544 版修好。前端測試除咗三個已知失敗之外都過咗。呢版仲未喺瀏覽器睇過。",
+  "highlights": [
+    {
+      "id": "browser-check-repairs",
+      "title": "Blank area pages, stacked titles and covered buttons are repaired",
+      "areas": ["interface"],
+      "what": "A browser pass over 82 pages found that area pages were completely blank. The page passed an icon-and-name template where the title code expected plain text, so the title code failed. The page now passes text and shows the icon beside the name. Page titles on Lights, Climate, Security, Media sources and History stacked one letter per line on phones and tablets, and now stay on one line. On a phone, the surprise card sat on top of the create button and took its taps. It now measures the floating controls below it and rises above them. Lights and Climate no longer scroll far past their content, the Helpers list has room for its rows, and Settings keeps its scroll place when you come back to it. Text that was 10 pixels is at least 11 pixels, and tap areas for row checkboxes and switches are larger. Not done: the empty space beside automation names at 320 pixels is only partly recovered.",
+      "what_yue": "一次瀏覽器巡查 82 頁，搵到區域頁全白。原因係頁面將「圖示加名」嘅模板交畀標題程式，但標題程式預期係純文字，所以跌低咗。而家交返文字，圖示擺喺名隔籬。燈、冷暖、保安、媒體來源同歷史頁，喺手機同平板嘅標題會一個字一行，而家返返一行。驚喜卡之前喺手機壓住新增掣，仲搶咗佢嘅撳；而家會量度下面嘅浮動掣，升高避開。燈同冷暖頁唔會捲到超出內容嘅位置，輔助工具清單都有位放得落幾行，返返去設定頁會記得之前捲到邊。十像素嘅字而家最少十一像素，行嘅勾選框同開關嘅撳位都大咗。未做：320 像素下自動化名隔籬嘅空位，只係部分改善。",
+      "why": "A blank page, or a title that breaks into single letters, makes the app unusable on a phone even when the data underneath is right.",
+      "try": [
+        "Open any area page. Its name and icon show at the top.",
+        "On a phone-width window, open Lights. The page title stays on one line.",
+        "On a phone, open a page with a create button and a surprise card. The card no longer covers the button."
+      ],
+      "sha": ["b46466d28"],
+      "demo": "demos/542/narrow-titles.html"
+    },
+    {
+      "id": "controls-in-place",
+      "title": "Controls sit where entities are listed, with details on request",
+      "areas": ["interface"],
+      "what": "Wherever an entity is listed by name, it can now be controlled in that place. A switch gets a toggle, a dimmer gets a slider, a colour light gets a colour button, a button or scene gets a press, and a sensor shows its value. This appears in the search drop-down, the Entities list, area pages and related lists. Locks, alarms, valves, sirens, and covers for garages, gates and doors ask first with the app's own two-key confirmation. Locks and alarms still ask for their code. Each entity can also show its details in place: entity ID, device, integration, area, raw state, exact times and every attribute, with copy buttons. Administrators can set a state or an attribute by hand, after a confirmation that says the device is not told and that its next report replaces the value. The controls use the same service calls as the full page and never write a state themselves.",
+      "what_yue": "凡係用名列出嘅實體，而家可以即場控制：開關有開關掣，調光有滑桿，彩燈有顏色掣，按鈕同場景撳一下就得，感應器會顯示數值。呢個適用於搜尋下拉、實體清單、區域頁同相關清單。門鎖、警報、閥、警號，同車房、閘門、門嘅蓋，會先用 app 自己嘅兩條鎖匙確認；門鎖同警報照舊要輸入密碼。每個實體都可以即場顯示詳細資料：實體編號、裝置、整合、區域、原始狀態、準確時間同所有屬性，附有複製掣。管理員可以人手改狀態或者屬性，但要先確認；確認嗰句會講明部裝置唔會收到，而佢下一次報嘅數值會蓋過人手改嘅值。呢啲控制用嘅係同完整頁面一樣嘅服務呼叫，唔會自己寫入狀態。",
+      "why": "Opening a full page just to switch one light, or to read one attribute, is slow. Seeing the details where you are also makes it clearer what the app is doing.",
+      "try": [
+        "In the search drop-down, turn a light on or off without leaving the search.",
+        "Press Show more details on an entity row. The raw state and attributes appear in place.",
+        "Press the control on a lock. It asks you to confirm with two keys before it does anything."
+      ],
+      "sha": ["33e099f91"],
+      "demo": "demos/542/controls-in-place.html"
+    }
+  ],
+  "other": [
+    {
+      "title": "Public site: the welcome band, a live build line, and facts brought up to date",
+      "sha": ["fc5d13aae", "be773d9be"]
+    },
+    {
+      "title": "Design canvas 42 redrawn to today's look, with boards for the new controls, quick action and details",
+      "sha": ["ab302a59a"]
+    }
+  ]
+}

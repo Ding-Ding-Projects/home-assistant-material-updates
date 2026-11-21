@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: the Updates page recovers after a restart</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.panel { width: 100%; max-width: 560px; margin: 16px auto 0; }
+.row button { min-height: 48px; }
+.opts { display: flex; flex-direction: column; gap: 4px; }
+.opts label { display: flex; align-items: center; gap: 12px; min-height: 48px; }
+.opts input { width: 24px; height: 24px; }
+.status { font-size: 16px; font-weight: 500; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="updates-page-recovers">
+  <h1>The Updates page recovers after a restart</h1>
+  <p class="muted">A demonstration with pretend data. Cut the connection, wait, then bring it back and see what the page does.</p>
+
+  <div class="row" role="group" aria-label="Which build behaves this way">
+    <button type="button" class="chip" id="before" aria-pressed="false">Build 536</button>
+    <button type="button" class="chip" id="after" aria-pressed="true">Build 537</button>
+  </div>
+
+  <section class="panel card" aria-live="polite">
+    <div class="row">
+      <button type="button" class="tonal" id="drop">Connection drops</button>
+      <button type="button" class="tonal" id="wait" disabled>Wait 20 seconds</button>
+      <button type="button" class="tonal" id="back" disabled>Connection returns</button>
+    </div>
+    <div class="opts">
+      <label><input type="checkbox" id="newer" checked> Core came back with a newer version</label>
+      <label><input type="checkbox" id="unsaved"> Unsaved changes, or a dialog is open</label>
+    </div>
+    <p class="status" id="line">Connected.</p>
+    <p class="muted" id="detail"></p>
+    <div class="row" id="reloadRow" hidden><button type="button" class="filled" id="reload">Reload</button></div>
+  </section>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var build = 537;
+  var connected = true;
+  var lost = 0;
+  var reloads = 0;
+
+  var before = document.getElementById("before");
+  var after = document.getElementById("after");
+  var drop = document.getElementById("drop");
+  var wait = document.getElementById("wait");
+  var back = document.getElementById("back");
+  var newer = document.getElementById("newer");
+  var unsaved = document.getElementById("unsaved");
+  var line = document.getElementById("line");
+  var detail = document.getElementById("detail");
+  var reloadRow = document.getElementById("reloadRow");
+  var reload = document.getElementById("reload");
+
+  function render() {
+    var old = build === 536;
+    reloadRow.hidden = true;
+    wait.disabled = connected;
+    back.disabled = connected;
+    drop.disabled = !connected;
+
+    if (!connected) {
+      if (lost >= 60 && !old) {
+        line.textContent = "Core has not come back after 60 seconds.";
+        detail.textContent = "The page shows this plain line and a Reload button, not a spinner.";
+        reloadRow.hidden = false;
+      } else {
+        line.textContent = "Connection lost for " + lost + " seconds. Waiting for Core.";
+        detail.textContent = old
+          ? "Build 536 keeps the spinner with no message and no way out."
+          : "Waiting. Core has not answered yet.";
+      }
+      return;
+    }
+
+    if (old) {
+      line.textContent = "Connected, but the page is still showing a spinner.";
+      detail.textContent = "Build 536 did not ask its server whether the version it loaded was still served.";
+      return;
+    }
+    if (unsaved.checked) {
+      line.textContent = "Connected.";
+      detail.textContent = "Waiting. Unsaved changes, an open dialog or a focused field stop the automatic reload.";
+      return;
+    }
+    if (!newer.checked) {
+      line.textContent = "Connected. The version is the same, so nothing needs reloading.";
+      detail.textContent = "";
+      return;
+    }
+    if (reloads === 0) {
+      reloads = 1;
+      line.textContent = "The version changed, so the page reloaded itself once.";
+      detail.textContent = "Pretend reload. It happens once for this version and not again.";
+      return;
+    }
+    line.textContent = "Connected. The page already reloaded once for this version, so it stays here.";
+    detail.textContent = "";
+  }
+
+  function setBuild(value) {
+    build = value;
+    before.setAttribute("aria-pressed", String(value === 536));
+    after.setAttribute("aria-pressed", String(value === 537));
+    reset();
+  }
+
+  function reset() {
+    connected = true;
+    lost = 0;
+    reloads = 0;
+    newer.checked = true;
+    unsaved.checked = false;
+    render();
+  }
+
+  drop.addEventListener("click", function () {
+    connected = false;
+    lost = 0;
+    render();
+  });
+  wait.addEventListener("click", function () {
+    lost = Math.min(lost + 20, 120);
+    render();
+  });
+  back.addEventListener("click", function () {
+    connected = true;
+    lost = 0;
+    render();
+  });
+  reload.addEventListener("click", function () {
+    connected = true;
+    lost = 0;
+    reloads = 1;
+    line.textContent = "Reloaded (pretend). The saved result of the queued update is still here.";
+    detail.textContent = "";
+    reloadRow.hidden = true;
+    wait.disabled = true;
+    back.disabled = true;
+  });
+  newer.addEventListener("change", render);
+  unsaved.addEventListener("change", render);
+  before.addEventListener("click", function () { setBuild(536); });
+  after.addEventListener("click", function () { setBuild(537); });
+  document.querySelector("[data-demo-reset]").addEventListener("click", function () {
+    setBuild(537);
+  });
+  render();
+})();
+</script>
+</body>
+</html>

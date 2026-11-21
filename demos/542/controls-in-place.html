@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: controls where entities are listed</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.panel { width: 100%; max-width: 620px; margin: 16px auto 0; }
+.row button { min-height: 48px; }
+.entity { border-top: 1px solid var(--outv); padding: 10px 0; display: flex; flex-direction: column; gap: 8px; }
+.entity:first-child { border-top: none; }
+.line { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; min-height: 48px; }
+.name { flex: 1 1 160px; min-width: 150px; }
+.details { background: var(--sl2); border-radius: 12px; padding: 8px 12px; font-size: 14px; }
+.details dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; margin: 0; }
+.details dt { color: var(--onv); }
+.details dd { margin: 0; }
+.slider { width: 160px; min-height: 48px; }
+.confirm { display: flex; gap: 8px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="controls-in-place">
+  <h1>Controls sit where entities are listed</h1>
+  <p class="muted">A demonstration with three made-up entities. Change a control, show the details, or try the lock.</p>
+
+  <section class="panel card" aria-live="polite">
+    <div class="entity">
+      <div class="line">
+        <span class="name">Kitchen light</span>
+        <input type="checkbox" class="switch" id="kitchen" role="switch" aria-label="Kitchen light on or off">
+        <span id="kitchenState">Off</span>
+      </div>
+      <div class="line">
+        <button type="button" class="text" aria-expanded="false" aria-controls="kitchenDetails" data-details="kitchen">Show more details</button>
+      </div>
+      <div class="details" id="kitchenDetails" hidden>
+        <dl>
+          <dt>Entity ID</dt><dd class="mono">light.demo_kitchen</dd>
+          <dt>Raw state</dt><dd class="mono" id="kitchenRaw">off</dd>
+          <dt>Last changed</dt><dd>07:14</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="entity">
+      <div class="line">
+        <span class="name">Living room dimmer</span>
+        <input type="range" class="slider" id="dimmer" min="0" max="100" step="5" value="40" aria-label="Living room dimmer brightness">
+        <span id="dimmerValue">40%</span>
+      </div>
+      <div class="line">
+        <button type="button" class="text" aria-expanded="false" aria-controls="dimmerDetails" data-details="dimmer">Show more details</button>
+      </div>
+      <div class="details" id="dimmerDetails" hidden>
+        <dl>
+          <dt>Entity ID</dt><dd class="mono">light.demo_living_room</dd>
+          <dt>Raw state</dt><dd class="mono" id="dimmerRaw">on, brightness 102</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="entity">
+      <div class="line">
+        <span class="name">Front door lock</span>
+        <button type="button" class="tonal" id="unlock">Unlock</button>
+        <span id="lockState">Locked</span>
+      </div>
+      <div class="confirm" id="confirm" hidden>
+        <p>Unlock the front door? Confirm to continue.</p>
+        <button type="button" class="filled" id="yes">Confirm unlock</button>
+        <button type="button" class="tonal" id="no">Cancel</button>
+      </div>
+    </div>
+
+    <p class="note" id="result">Nothing has been changed yet.</p>
+  </section>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var kitchen = document.getElementById("kitchen");
+  var kitchenState = document.getElementById("kitchenState");
+  var kitchenRaw = document.getElementById("kitchenRaw");
+  var dimmer = document.getElementById("dimmer");
+  var dimmerValue = document.getElementById("dimmerValue");
+  var dimmerRaw = document.getElementById("dimmerRaw");
+  var unlock = document.getElementById("unlock");
+  var lockState = document.getElementById("lockState");
+  var confirm = document.getElementById("confirm");
+  var yes = document.getElementById("yes");
+  var no = document.getElementById("no");
+  var result = document.getElementById("result");
+
+  function say(text) { result.textContent = text; }
+
+  function paintKitchen() {
+    kitchenState.textContent = kitchen.checked ? "On" : "Off";
+    kitchenRaw.textContent = kitchen.checked ? "on" : "off";
+  }
+  function paintDimmer() {
+    dimmerValue.textContent = dimmer.value + "%";
+    var raw = Math.round(dimmer.value * 2.55);
+    dimmerRaw.textContent = "on, brightness " + raw;
+  }
+
+  kitchen.addEventListener("change", function () {
+    paintKitchen();
+    say("Kitchen light set to " + kitchenState.textContent.toLowerCase() + " (pretend).");
+  });
+  dimmer.addEventListener("input", function () {
+    paintDimmer();
+    say("Living room dimmer set to " + dimmer.value + " percent (pretend).");
+  });
+
+  document.querySelectorAll("[data-details]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      var panel = document.getElementById(button.getAttribute("aria-controls"));
+      var open = button.getAttribute("aria-expanded") === "true";
+      button.setAttribute("aria-expanded", String(!open));
+      button.textContent = open ? "Show more details" : "Hide details";
+      panel.hidden = open;
+    });
+  });
+
+  unlock.addEventListener("click", function () {
+    confirm.hidden = false;
+    unlock.disabled = true;
+    say("Unlock needs a confirmation first.");
+    yes.focus();
+  });
+  no.addEventListener("click", function () {
+    confirm.hidden = true;
+    unlock.disabled = false;
+    say("Unlock cancelled. The lock is still locked.");
+    unlock.focus();
+  });
+  yes.addEventListener("click", function () {
+    confirm.hidden = true;
+    unlock.disabled = false;
+    lockState.textContent = "Unlocked";
+    say("Front door unlocked (pretend). Nothing was sent to a real lock.");
+  });
+  confirm.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") no.click();
+  });
+
+  document.querySelector("[data-demo-reset]").addEventListener("click", function () {
+    kitchen.checked = false;
+    dimmer.value = 40;
+    lockState.textContent = "Locked";
+    confirm.hidden = true;
+    unlock.disabled = false;
+    document.querySelectorAll("[data-details]").forEach(function (button) {
+      button.setAttribute("aria-expanded", "false");
+      button.textContent = "Show more details";
+      document.getElementById(button.getAttribute("aria-controls")).hidden = true;
+    });
+    paintKitchen();
+    paintDimmer();
+    say("Nothing has been changed yet.");
+  });
+
+  paintKitchen();
+  paintDimmer();
+})();
+</script>
+</body>
+</html>

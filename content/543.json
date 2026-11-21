@@ -1,0 +1,33 @@
+{
+  "build": 543,
+  "headline": "A running quick action can now be stopped, and more lists show their details",
+  "summary": "Build 543 lets an administrator see a quick action that is still running, and stop it. The runs are kept in a small in-memory record, at most 20 of them, and nothing survives a restart. Stopping cancels the steps that have not run yet; a step that was already sent is not undone. More lists now offer Show more details and quick buttons. Build 543 does not repair the two known faults from build 542: entity names squeezed on a phone, and the search drop-down emptying when a slider or colour button is pressed. Build 544 repairs them. The quick action server tests passed after one test was corrected, and the frontend tests passed apart from their known failures. Nothing in this build has been seen in a browser yet.",
+  "summary_yue": "543 版令管理員睇得到仲喺行緊嘅快速動作，亦都可以停低佢。執行紀錄只係一份細嘅記憶體記錄，最多二十次，重新啟動就冇晒。停低會取消未行嘅步驟；已經送出嘅步驟唔會撤回。更多清單而家有「顯示更多資料」同快速掣。呢版冇修 542 版嗰兩個已知毛病：手機嘅實體名被壓縮，同撳滑桿或者顏色掣會令搜尋下拉清空；要等 544 版先修好。快速動作嘅伺服器測試改正咗一個測試之後全部通過，前端測試除咗已知失敗之外都過咗。呢版仲未喺瀏覽器睇過。",
+  "highlights": [
+    {
+      "id": "quick-action-stop",
+      "title": "A running quick action can be listed and stopped",
+      "areas": ["interface", "core"],
+      "what": "A quick action that is still running can be listed and stopped. The quick action dialog has a Stop button, and a Running quick actions list also appears in the Actions tool. A small server component keeps the record of each run in memory, for administrators only. It holds at most 20 runs, writes nothing to disk, and no run survives a restart. Stopping cancels the steps that have not run yet; a step already sent to a device is not undone. The same change adds Show more details and quick buttons to more lists, including logbook rows, areas, devices, labels, floors, zones, people, users, dashboards, blueprints, tags, repairs and backups. A user's details show only safe fields, and a test checks that no password or credential can appear. A link that names one entity opens the states tool on that entity.",
+      "what_yue": "而家可以列出同停低一個仲喺行緊嘅快速動作。快速動作對話框有「停止」掣，「動作」工具入面亦會出現「行緊嘅快速動作」清單。伺服器有一個細嘅元件，喺記憶體記住每次執行，只限管理員睇，最多二十次，唔寫入硬碟，重新啟動就冇晒。停低會取消未行嘅步驟；已經送去裝置嘅步驟唔會撤回。更多清單都有「顯示更多資料」同快速掣，包括日誌行、區域、裝置、標籤、樓層、分區、成員、用戶、儀表板、藍圖、標記、維修同備份。用戶嘅詳細資料淨係顯示安全欄位，有測試證明密碼同憑證唔會出現。連結指明某個實體嗰陣，狀態工具會直接打開嗰個實體。",
+      "why": "A quick action you cannot stop is a worry. Details in more places also save a trip to the full page.",
+      "try": [
+        "Start a quick action that has a wait step, then press Stop while the wait is running.",
+        "Open the Actions tool and find the Running quick actions list.",
+        "Open an area page and press Show more details on one of its automation rows."
+      ],
+      "sha": ["a3346c646"],
+      "demo": "demos/543/quick-action-stop.html"
+    }
+  ],
+  "other": [
+    {
+      "title": "Test notes: the quick action server tests passed (12) after one test was corrected",
+      "sha": ["7f4e4fe0a"]
+    },
+    {
+      "title": "Handoff correction: a missing translation in an older component is caused by the test copy",
+      "sha": ["16eeae26e"]
+    }
+  ]
+}

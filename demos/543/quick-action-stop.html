@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: stop a running quick action</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.panel { width: 100%; max-width: 620px; margin: 16px auto 0; }
+.row button { min-height: 48px; }
+.steps { list-style: none; padding: 0; margin: 8px 0 12px; }
+.steps li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--outline, #8884); }
+.running { background: var(--sl2); border-radius: 12px; padding: 10px 12px; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="quick-action-stop">
+  <h1>Stop a running quick action</h1>
+  <p class="muted">A demonstration with a made-up three-step quick action. Run it, then press Stop while the wait is running.</p>
+
+  <section class="panel card" aria-live="polite">
+    <p><strong>Quick action: Evening lights</strong></p>
+    <ol class="steps" id="steps">
+      <li><span>1. Turn on the hall light</span><span id="s0">Not run</span></li>
+      <li><span>2. Wait 3 seconds</span><span id="s1">Not run</span></li>
+      <li><span>3. Set the thermostat to 21 degrees</span><span id="s2">Not run</span></li>
+    </ol>
+    <div class="row">
+      <button type="button" class="filled" id="run">Run the quick action</button>
+      <button type="button" class="tonal" id="stop" disabled>Stop</button>
+    </div>
+    <p id="result" class="note">Not running.</p>
+    <div class="running" id="listBox" hidden>
+      <p><strong>Running quick actions</strong></p>
+      <p id="listLine">None.</p>
+    </div>
+  </section>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var steps = [
+    { label: "Turn on the hall light", ms: 800 },
+    { label: "Wait 3 seconds", ms: 3000 },
+    { label: "Set the thermostat to 21 degrees", ms: 800 }
+  ];
+  var run = document.getElementById("run");
+  var stop = document.getElementById("stop");
+  var result = document.getElementById("result");
+  var listBox = document.getElementById("listBox");
+  var listLine = document.getElementById("listLine");
+  var timer = null;
+  var index = 0;
+  var active = false;
+
+  function mark(i, text) {
+    document.getElementById("s" + i).textContent = text;
+  }
+
+  function resetSteps() {
+    for (var i = 0; i < steps.length; i += 1) mark(i, "Not run");
+  }
+
+  function finish(text) {
+    active = false;
+    timer = null;
+    run.disabled = false;
+    stop.disabled = true;
+    result.textContent = text;
+    listBox.hidden = true;
+    listLine.textContent = "None.";
+  }
+
+  function next() {
+    if (index >= steps.length) {
+      finish("Finished. All 3 steps ran (pretend).");
+      return;
+    }
+    mark(index, "Running");
+    listLine.textContent = "Evening lights: step " + (index + 1) + " of 3, running.";
+    timer = setTimeout(function () {
+      mark(index, "Done");
+      index += 1;
+      next();
+    }, steps[index].ms);
+  }
+
+  run.addEventListener("click", function () {
+    if (active) return;
+    active = true;
+    index = 0;
+    resetSteps();
+    run.disabled = true;
+    stop.disabled = false;
+    listBox.hidden = false;
+    result.textContent = "Running. Press Stop to cancel the steps that have not run yet.";
+    next();
+  });
+
+  stop.addEventListener("click", function () {
+    if (!active) return;
+    clearTimeout(timer);
+    for (var i = index; i < steps.length; i += 1) {
+      mark(i, i === index ? "Stopped while running" : "Cancelled, not run");
+    }
+    var stopped = steps.length - index;
+    finish("Stopped. " + stopped + " step" + (stopped === 1 ? "" : "s") + " did not run. Steps already done are not undone (pretend).");
+    listLine.textContent = "None. The run was stopped.";
+  });
+
+  document.querySelector("[data-demo-reset]").addEventListener("click", function () {
+    clearTimeout(timer);
+    active = false;
+    index = 0;
+    resetSteps();
+    run.disabled = false;
+    stop.disabled = true;
+    listBox.hidden = true;
+    result.textContent = "Not running.";
+  });
+
+  resetSteps();
+})();
+</script>
+</body>
+</html>

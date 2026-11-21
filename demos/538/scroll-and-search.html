@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: lists scroll cleanly, with floating tools and a counting search</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.panel { width: 100%; max-width: 560px; margin: 16px auto 0; }
+.row button { min-height: 48px; }
+.stage { position: relative; }
+.stage .list { padding-bottom: 0; }
+.stage.reserve .list { padding-bottom: 72px; }
+.stage .list > li[hidden] { display: none; }
+.float { position: absolute; left: 8px; right: 8px; bottom: 8px; display: flex; justify-content: flex-end; }
+.pill { display: inline-flex; align-items: center; gap: 4px; min-height: 48px; padding: 0 12px; border-radius: 24px; background: var(--sc); color: var(--on-sc); border: 0; font: inherit; }
+.more { display: inline-flex; gap: 6px; max-width: 0; overflow: hidden; white-space: nowrap; transition: max-width .2s; }
+.pill:hover .more, .pill:focus-within .more { max-width: 320px; }
+.more button { min-height: 40px; padding: 0 10px; border-radius: 20px; border: 1px solid var(--out); background: var(--sl0); color: var(--on); font: inherit; }
+.count { font-size: 14px; color: var(--onv); }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="scroll-and-search">
+  <h1>Lists scroll cleanly, with floating tools and a counting search</h1>
+  <p class="muted">A demonstration with eight made-up lights. Choose a build, then scroll to the last row and try the search.</p>
+
+  <div class="row" role="group" aria-label="Which build behaves this way">
+    <button type="button" class="chip" id="before" aria-pressed="false">Build 537</button>
+    <button type="button" class="chip" id="after" aria-pressed="true">Build 538</button>
+  </div>
+
+  <section class="panel card">
+    <label class="field" for="q">Search lights</label>
+    <input type="search" id="q" placeholder="Type part of a name" autocomplete="off">
+    <p class="count" id="count" aria-live="polite"></p>
+
+    <div class="stage" id="stage">
+      <ul class="list" id="list">
+        <li data-name="Hall ceiling light"><span>Hall ceiling light</span></li>
+        <li data-name="Kitchen counter strip"><span>Kitchen counter strip</span></li>
+        <li data-name="Living room lamp"><span>Living room lamp</span></li>
+        <li data-name="Bedroom bedside lamp"><span>Bedroom bedside lamp</span></li>
+        <li data-name="Porch light"><span>Porch light</span></li>
+        <li data-name="Garage work light"><span>Garage work light</span></li>
+        <li data-name="Study desk lamp"><span>Study desk lamp</span></li>
+        <li data-name="Landing night light"><span>Landing night light</span></li>
+      </ul>
+      <div class="float">
+        <div class="pill" id="pill">
+          <span aria-hidden="true">Tools</span>
+          <span class="more">
+            <button type="button" data-tool="Refresh">Refresh</button>
+            <button type="button" data-tool="Filter">Filter</button>
+            <button type="button" data-tool="Sort">Sort</button>
+          </span>
+        </div>
+      </div>
+    </div>
+    <p class="muted" id="toolLine" aria-live="polite">Hover or focus the Tools pill to see its buttons.</p>
+  </section>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var before = document.getElementById("before");
+  var after = document.getElementById("after");
+  var stage = document.getElementById("stage");
+  var input = document.getElementById("q");
+  var count = document.getElementById("count");
+  var items = Array.prototype.slice.call(document.querySelectorAll("#list > li"));
+  var toolLine = document.getElementById("toolLine");
+
+  function applySearch() {
+    var words = input.value.trim().toLowerCase();
+    var shown = 0;
+    items.forEach(function (li) {
+      var match = !words || li.getAttribute("data-name").toLowerCase().indexOf(words) !== -1;
+      li.hidden = !match;
+      if (match) shown += 1;
+    });
+    var hidden = items.length - shown;
+    if (!words) {
+      count.textContent = "Showing all " + items.length + " lights.";
+    } else if (shown === 0) {
+      count.textContent = "No lights match. " + hidden + " hidden by the search.";
+    } else {
+      count.textContent = "Showing " + shown + " of " + items.length + ". " + hidden + " hidden by the search.";
+    }
+  }
+
+  function setBuild(reserve) {
+    stage.classList.toggle("reserve", reserve);
+    before.setAttribute("aria-pressed", String(!reserve));
+    after.setAttribute("aria-pressed", String(reserve));
+  }
+
+  document.querySelectorAll("[data-tool]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      toolLine.textContent = button.getAttribute("data-tool") + " pressed (pretend). Nothing is changed.";
+    });
+  });
+
+  input.addEventListener("input", applySearch);
+  before.addEventListener("click", function () { setBuild(false); });
+  after.addEventListener("click", function () { setBuild(true); });
+  document.querySelector("[data-demo-reset]").addEventListener("click", function () {
+    input.value = "";
+    toolLine.textContent = "Hover or focus the Tools pill to see its buttons.";
+    setBuild(true);
+    applySearch();
+  });
+
+  setBuild(true);
+  applySearch();
+})();
+</script>
+</body>
+</html>

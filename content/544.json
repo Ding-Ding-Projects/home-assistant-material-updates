@@ -1,0 +1,35 @@
+{
+  "build": 544,
+  "headline": "Entity names stay readable on phones, and the search drop-down keeps its list",
+  "summary": "Build 544 repairs the two faults that the browser check of build 542 found. In the Entities list on a phone, each name keeps at least 150 pixels, and a control that does not fit beside it moves to its own line. In the search drop-down, pressing a light's slider or colour button no longer empties the list, and the colour picker opens. Smaller repairs cover details on narrow screens, filter panels, phone search rows, Escape on a confirmation, and Show more details on Updates rows. The frontend tests passed with their three known failures. A browser check of this build was still under way when these notes were written, so the phone and search fixes are not yet confirmed in a browser.",
+  "summary_yue": "544 版修正咗 542 版瀏覽器檢查搵到嘅兩個毛病，仲有幾樣細嘢。手機嘅實體清單，每個名最少有 150 像素；控制掣放唔落，就自己落一行。搜尋下拉入面撳滑桿或者顏色掣，清單唔會再清空，顏色選擇器亦都開得到。細修正包括窄螢幕嘅詳細資料、篩選板、手機搜尋行、Escape 取消確認，同更新頁每一行嘅「顯示更多資料」。前端測試除咗三個已知失敗之外都過咗。寫呢份說明嗰陣，呢版嘅瀏覽器檢查仲進行緊，所以手機同搜尋嗰兩個修正仲未喺瀏覽器確認。",
+  "highlights": [
+    {
+      "id": "entity-names-on-phones",
+      "title": "Entity names keep their room on phones",
+      "areas": ["interface"],
+      "what": "The browser check of build 542 found that the new quick-control column in the Entities list squeezed names to a few letters on a phone, and at 320 pixels left them no room at all. Each name now keeps at least 150 pixels. When a control does not fit beside the name, it moves to its own line under the row. The same build also repairs a second fault: in the search drop-down, pressing a light's slider or colour button emptied the whole list, and the colour picker never opened. The drop-down now reacts only to its own events and closes when the app moves to another page. Smaller repairs in this build: details no longer break one letter per line in narrow places, Escape cancels a confirmation as its text says, search rows on a phone put the slider and buttons on their own line, and each row on the Updates page has Show more details.",
+      "what_yue": "瀏覽器檢查 542 版，搵到兩個要先修好新控制先用得嘅毛病。第一，實體清單入面新加嗰欄控制掣，喺手機將個名壓到得幾個字，320 像素幾乎冇位。而家每個名最少有 150 像素；控制掣擺唔落，就自己落返一行。第二，搜尋下拉入面撳盞燈嘅滑桿或者顏色掣，成個清單會冇晒，顏色選擇器仲開唔到。而家下拉淨係理自己嘅事件，轉去另一頁就會收埋。同一版仲有：窄位嘅詳細資料唔會一個字一行；Escape 真係取消確認；手機搜尋行嘅滑桿同掣會自己一行；更新頁每一行有「顯示更多資料」。",
+      "why": "A name you cannot read on a phone, or a search that empties when you touch one of its controls, makes the new controls unusable exactly where people need them.",
+      "try": [
+        "On a phone-width window, open the Entities list. Each name keeps its room, and a control that does not fit sits on its own line.",
+        "Open the search drop-down and press a light's slider. The list stays, and only that light changes.",
+        "Start a two-key confirmation and press Escape. It cancels, as its text says."
+      ],
+      "sha": ["f762c285c"],
+      "demo": "demos/544/entity-names-on-phones.html",
+      "more_demos": [
+        {
+          "title": "The search drop-down keeps its list",
+          "demo": "demos/544/search-drop-down-keeps-list.html",
+          "try": [
+            "Type a word in the search field so that several lights are listed.",
+            "Press a light's slider, then its colour button. The list stays in place.",
+            "Use Before and After to compare with build 543, where the list emptied."
+          ]
+        }
+      ]
+    }
+  ],
+  "other": []
+}

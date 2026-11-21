@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: entity names on a phone</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.panel { width: 100%; max-width: 560px; margin: 16px auto 0; }
+.row button { min-height: 48px; }
+.frame { max-width: 100%; border: 1px dashed var(--out); border-radius: 16px; padding: 8px; background: var(--sl1); margin: 0 auto; }
+.entity { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px 0; border-top: 1px solid var(--outv); }
+.entity:first-child { border-top: none; }
+.name { overflow-wrap: anywhere; min-width: 0; }
+.slider { width: 160px; min-height: 48px; }
+.frame.after .name { flex: 1 1 150px; min-width: 150px; }
+.frame.before .name { flex: 0 0 40px; width: 40px; }
+.frame.after .entity { flex-wrap: wrap; }
+.frame.after .slider { flex: 0 0 auto; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="entity-names-on-phones">
+  <h1>Entity names on a phone</h1>
+  <p class="muted">A demonstration with three made-up entities in a phone-width frame. Choose a build and a width.</p>
+
+  <div class="row" role="group" aria-label="Which build behaves this way">
+    <button type="button" class="chip" id="before" aria-pressed="false">Build 543</button>
+    <button type="button" class="chip" id="after" aria-pressed="true">Build 544</button>
+  </div>
+  <div class="row" role="group" aria-label="Screen width">
+    <button type="button" class="chip" id="w320" aria-pressed="true">320 px</button>
+    <button type="button" class="chip" id="w390" aria-pressed="false">390 px</button>
+  </div>
+
+  <section class="panel card">
+    <div class="frame after" id="frame">
+      <div class="entity">
+        <span class="name">Garage side door window contact</span>
+        <input type="range" class="slider" aria-label="Garage side door brightness" value="30">
+      </div>
+      <div class="entity">
+        <span class="name">North bedroom ceiling</span>
+        <input type="range" class="slider" aria-label="North bedroom ceiling brightness" value="70">
+      </div>
+      <div class="entity">
+        <span class="name">Hall</span>
+        <input type="range" class="slider" aria-label="Hall brightness" value="10">
+      </div>
+    </div>
+    <p class="muted" id="note" aria-live="polite"></p>
+  </section>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var before = document.getElementById("before");
+  var after = document.getElementById("after");
+  var w320 = document.getElementById("w320");
+  var w390 = document.getElementById("w390");
+  var frame = document.getElementById("frame");
+  var note = document.getElementById("note");
+  var oldBuild = false;
+  var width = 320;
+
+  function render() {
+    frame.style.width = width + "px";
+    frame.classList.toggle("before", oldBuild);
+    frame.classList.toggle("after", !oldBuild);
+    before.setAttribute("aria-pressed", String(oldBuild));
+    after.setAttribute("aria-pressed", String(!oldBuild));
+    w320.setAttribute("aria-pressed", String(width === 320));
+    w390.setAttribute("aria-pressed", String(width === 390));
+    if (oldBuild) {
+      note.textContent = "Build 543: the name column is squeezed to a few letters on a phone. At 320 px it has no room at all.";
+    } else {
+      note.textContent = "Build 544: each name keeps at least 150 pixels. A control that does not fit beside it moves to its own line.";
+    }
+  }
+
+  before.addEventListener("click", function () { oldBuild = true; render(); });
+  after.addEventListener("click", function () { oldBuild = false; render(); });
+  w320.addEventListener("click", function () { width = 320; render(); });
+  w390.addEventListener("click", function () { width = 390; render(); });
+  document.querySelector("[data-demo-reset]").addEventListener("click", function () {
+    oldBuild = false;
+    width = 320;
+    render();
+  });
+  render();
+})();
+</script>
+</body>
+</html>
