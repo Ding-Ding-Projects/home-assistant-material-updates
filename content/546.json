@@ -1,0 +1,24 @@
+{
+  "build": 546,
+  "headline": "A stranded update run frees itself, and the finished summary reaches watching browsers",
+  "summary": "Build 546 repairs the two Updates faults that the browser check of build 545 found. The browser that started Update everything now sends a heartbeat every 30 seconds. If it closes mid-run, a watching browser says so after five minutes of silence, shows what finished and what will not start, and offers Clear this run to administrators. Clearing removes only the notice, and an install in progress carries on. The server frees a silent record by itself after fifteen minutes, once nothing in it is still installing. After a run that restarted Core, the finished summary is now sent again until the server accepts it, so a report that arrived while Core was still starting is no longer lost. The cause of the lost summary is deduced from the code, not read from a log. The browser check of build 546 then said no. A watching browser still showed an empty card until reloaded by hand, and a new tab did not carry a run on, so build 546 did not pass. Build 547 repairs those faults.",
+  "summary_yue": "546 版修正 545 版瀏覽器檢查搵到嘅更新頁兩個毛病。撳「全部更新」嗰個瀏覽器而家每三十秒報到一次。如果佢中途熄咗，旁觀嘅瀏覽器靜咗五分鐘會老實講，列出邊啲完咗、邊啲唔會開始，管理員可以撳「清除呢次執行」。清除只係收起通知，安裝緊嘅嘢照做。冇嘢安裝緊而靜咗十五分鐘，伺服器會自己放。Core 重新啟動之後，最後嗰次「更新完成」報告俾新 Core 拒絕咗，之前唔會再送；而家會重送到收到為止。呢個原因係睇過代碼推斷出嚟，唔係睇過日誌。546 版嘅瀏覽器檢查話唔得：旁觀嗰邊要人手重新載入先見到摘要，而新分頁唔會接住行緊嘅更新，所以 546 版唔算過關，由 547 版修正。",
+  "highlights": [
+    {
+      "id": "stranded-run-frees-itself",
+      "title": "A stranded update run shows what happened, then frees itself",
+      "areas": ["core", "interface"],
+      "what": "If the browser that started Update everything closed mid-run, every other browser used to show Updating for up to two hours with no way out. The driving browser now sends a heartbeat every 30 seconds, and the server records when it last heard from it. After five minutes of silence, a watching browser says so plainly, lists what finished and what will not start, and offers Clear this run to administrators. Clearing removes only the notice. An install in progress carries on, and a browser that comes back picks the run up again. The server frees a silent record by itself after fifteen minutes, once nothing in it is still installing. The same build also repairs the finished summary: after a run that restarted Core, a watching browser could lose Updates finished, because the final report arrived while the new Core was still starting and was refused. A refused report is now sent again until it is accepted. The cause is deduced from the code and has not been read from a log. The run record still cannot start, order or cancel an install.",
+      "what_yue": "撳「全部更新」嗰個瀏覽器如果中途熄咗，其他瀏覽器以前會顯示「更新緊」成兩個鐘，冇得走。而家負責嗰個瀏覽器每三十秒報到一次，伺服器會記低最後一次聽到佢嘅時間。靜咗五分鐘，旁觀嗰邊會老實講，列出邊啲完咗、邊啲唔會開始，管理員有「清除呢次執行」掣。清除只係收起通知，安裝緊嘅嘢照做，返嚟嘅瀏覽器會接返個執行。冇嘢安裝緊而靜咗十五分鐘，伺服器會自己放。另外，Core 重新啟動之後，旁觀嗰邊可能唔見咗「更新完成」，因為最後嗰次報告喺新 Core 仲未齊就到，俾拒絕咗。而家拒絕咗嘅報告會重送，直到收到為止。呢個原因係睇過代碼推斷出嚟，唔係睇過日誌。執行記錄仲係淨係俾人睇，唔可以開始、排次序或者取消安裝。",
+      "why": "A run that stays Updating for two hours with no way out, or a summary that never arrives, leaves the owner unable to tell whether the update finished.",
+      "try": [
+        "In the demo, start a pretend run and close the starting browser. Press 5 minutes later and the watching browser says the run has gone silent.",
+        "Press Clear this run. The notice goes, and any install still in progress keeps going.",
+        "With nothing installing, press 10 more minutes until the total reaches 15. The silent record frees itself."
+      ],
+      "sha": ["c2e5b0256"],
+      "demo": "demos/546/stranded-run.html"
+    }
+  ],
+  "other": []
+}

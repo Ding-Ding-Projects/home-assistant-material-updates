@@ -1,9 +1,76 @@
 {
  "format": 1,
- "generated": "2026-11-21T07:36:55Z",
+ "generated": "2026-11-21T13:50:50Z",
  "repository": "Ding-Ding-Projects/home-assistant-material",
- "newest_build": 544,
+ "newest_build": 547,
  "releases": [
+  {
+   "build": 547,
+   "core": "2026.11.2.547",
+   "supervisor": "2026.11.0.547",
+   "os": "18.5.547",
+   "tag": null,
+   "source": "bb1702e32",
+   "date": "2026-11-21T08:27:38-05:00",
+   "previous_build": 546,
+   "changes": [
+    {
+     "sha": "bb1702e32",
+     "date": "2026-11-21T08:27:38-05:00",
+     "title": "Updates: watchers see the finished summary, a stranded run shows real states [skip ci]",
+     "areas": [
+      "interface"
+     ],
+     "detail": "A browser check of build 546 said no. These are the repairs. No confirmation changed, the run record is still display only, and a browser that only watches never starts an install by itself.\n\n- Watching browser: after a run that restarted Core, a watching browser reloaded itself and showed an empty card until reloaded by hand. The page subscribed to the run once, only if the signed-in user was already known, and gave up for good otherwise. It now subscribes whenever an administrator has the page open and the component is loaded, however late, again after every reconnect, with retries, and reads the record once on subscribing. - New tab: the queue belongs to one tab. The notice now says so, instead of promising that the browser carries on. For a stranded run with steps still waiting, administrators get \"Update the rest\", which goes through the same two-key confirmation as \"Update everything\" and only then clears the old record and starts a normal run. - Stranded view: each step now shows its real state. It said \"was installing\" and \"0 of 2 finished\" minutes after the install had finished. - A step that finished while the tab was away no longer counts the time away as its duration. -",
+     "detail_yue": "更新頁：旁觀嘅瀏覽器睇到完成摘要，卡住嘅更新顯示真實狀態。 546 版瀏覽器檢查唔過，呢批係修正。冇改任何確認步驟，記錄仍然 只係畀人睇，旁觀嘅瀏覽器絕對唔會自己開始安裝。 旁觀：Core 重新啟動之後，旁觀嗰邊自己重新載入完會見到空白卡， 要人手再載入先有。原因係頁面只訂閱一次，嗰刻未知邊個登入就永遠 放棄。而家幾時齊條件就幾時訂閱，重新連線又訂閱，仲會重試。 新分頁：排隊清單係跟分頁嘅，通知而家照直講。卡住而仲有步驟未做， 管理員有「更新餘下嘅」，照樣要兩條鎖匙確認先會開始。 卡住嗰個畫面每一步顯示返真實狀態。 藍圖頁喺手機「使用」同詳細資料掣一齊擺喺行尾。 仲未喺瀏覽器睇過。"
+    }
+   ]
+  },
+  {
+   "build": 546,
+   "core": "2026.11.2.546",
+   "supervisor": "2026.11.0.546",
+   "os": "18.5.546",
+   "tag": "v2026.11.2.546",
+   "source": "c2e5b0256",
+   "date": "2026-11-21T06:26:04-05:00",
+   "previous_build": 545,
+   "changes": [
+    {
+     "sha": "c2e5b0256",
+     "date": "2026-11-21T06:26:04-05:00",
+     "title": "Updates: a stranded run frees itself, watchers keep the finished summary [skip ci]",
+     "areas": [
+      "core",
+      "interface"
+     ],
+     "detail": "A browser check of build 545 said no because of the Updates page. These are the repairs. No confirmation changed, and the run record is still display only: it cannot start, order or cancel an install.\n\n- Stranded run: if the browser that started \"Update everything\" closed mid-run, every other browser showed \"Updating\" for up to two hours with no way out. The driving browser now sends a heartbeat every 30 seconds, and the server stamps when it last heard from it. After five minutes of silence a watching browser says so plainly, shows what finished and what will not start, and offers \"Clear this run\" to administrators. Clearing removes only the notice; an install in progress carries on. The server frees a silent record by itself after fifteen minutes once nothing in it is still installing. If the same browser comes back it carries on. - Finished summary: after a run that restarted Core, a watching browser lost \"Updates finished\". The page now loads sooner after a reload, so the final report could arrive while the new Core was still starting and be refused, and it was never sent again. A refused report is now sent again until it is accepted. This cause is deduced from the code, not re",
+     "detail_yue": "更新頁：卡住嘅更新會自己解除，旁觀嘅瀏覽器睇得返完成摘要。 545 版瀏覽器檢查唔過，就係因為更新頁。冇改任何確認步驟， 記錄仍然只係畀人睇，唔可以開始、排次序或者取消安裝。 卡住：撳「全部更新」嗰個瀏覽器中途熄咗，其他瀏覽器會顯示「更新緊」 成兩個鐘，冇得走。而家負責嗰個瀏覽器每三十秒報到一次；靜咗五分鐘， 旁觀嗰邊就會老實講，仲有「清除呢次執行」畀管理員撳。清除只係收起 通知，安裝緊嘅嘢照做。靜足十五分鐘而冇嘢安裝緊，伺服器會自己放。 完成摘要：Core 重新啟動之後，旁觀嗰邊唔見咗「更新完成」。最後嗰次 匯報俾新 Core 拒絕之後冇再送，而家會重送到收到為止。 藍圖頁喺手機個掣自己一行；標籤頁揀選模式個名留喺第一行。 仲未喺瀏覽器睇過。"
+    }
+   ]
+  },
+  {
+   "build": 545,
+   "core": "2026.11.2.545",
+   "supervisor": "2026.11.0.545",
+   "os": "18.5.545",
+   "tag": "v2026.11.2.545",
+   "source": "775a96382",
+   "date": "2026-11-21T04:06:41-05:00",
+   "previous_build": 544,
+   "changes": [
+    {
+     "sha": "775a96382",
+     "date": "2026-11-21T04:06:41-05:00",
+     "title": "Repairs from the build 544 browser check: names on phone lists, Updates page loading [skip ci]",
+     "areas": [
+      "interface"
+     ],
+     "detail": "Build 544 passed its browser check and runs on the owner's instance. These repair what that check still found. The look does not change and no control was removed.\n\n- Names on phone lists: Scripts, Automations, Dashboards, Backups, Labels, Helpers, Blueprints, Tags and Users lost most of the name's width to the new action and details columns. The shared column helpers now wrap by default, so a table that uses them cannot forget: the name keeps 150 px of text and the buttons move to their own line. Both row buttons stay one press away on a phone. - Updates page: after a run that updated the Supervisor and Core together, the reloaded page could sit on a spinner. Its loads only started if the backup and Supervisor parts were already there, and after such a reload they arrive later. The loads now start whenever those parts appear, with a time limit and retries, and after 30 seconds a plain line with a Reload button says what is still missing. A run that went back to an older build no longer shows as running. - Detail rows: Escape closes the row from its own toggle too, and focus returns to the toggle. - Details: a long label goes above its value and no longer runs into it. - The colour",
+     "detail_yue": "544 版瀏覽器檢查之後嘅修正：手機清單嘅名同更新頁載入。 544 版過咗檢查，而家喺屋主部機行緊。樣冇變，冇減任何掣。 手機清單：腳本、自動化、儀表板、備份、標籤、輔助工具等，個名俾 新加嘅掣迫到好窄。共用欄位而家預設識轉行：個名最少有 150 像素， 啲掣自己落一行，兩個掣喺手機都係一撳就到。 更新頁：Supervisor 同 Core 一齊更新之後，頁面重新載入可能係咁轉圈。 而家啲資料幾時到就幾時開始載入，有時限同重試，三十秒仲未齊就 出一句說明同重新載入掣。返去舊版之後唔會再顯示「行緊」。 詳細資料行撳 Escape 會收埋兼焦點返去個掣；標籤長就擺上面； 揀色板有返邊距；二十四小時制時間全部兩位數。 仲未喺瀏覽器睇過。"
+    }
+   ]
+  },
   {
    "build": 544,
    "core": "2026.11.2.544",

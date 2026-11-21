@@ -1,0 +1,28 @@
+{
+  "build": 547,
+  "headline": "Watching browsers see the finished summary, and a stranded run shows real states",
+  "summary": "Build 547 repairs what the browser check of build 546 found. A watching browser now subscribes to a run whenever an administrator has the Updates page open, after every reconnect, with retries, and it reads the record once when it subscribes. A page reloaded after Core restarts no longer shows an empty card. Each step of a stranded run shows its real state, and a step that finished while the tab was away no longer counts that time as its duration. The new-tab notice now says that the queue belongs to one tab. For a stranded run with steps still waiting, administrators get Update the rest, which uses the same two-key confirmation as Update everything. On a phone, Blueprints keep Use and the details button together at the row end, with the name keeping 170 pixels. The frontend tests passed with their three known failures. After these notes were first written, the build was checked in a browser on a test copy and passed: 80 pages loaded with no page errors, and a watching browser showed Updates finished by itself about three seconds after it reloaded. Three small faults are known. After an update that includes Core, the line that says how long the whole run took can read too short in the browser that ran it. Update the rest appears only when two or more steps are waiting. On some phone rows a wrapped button sits at the left while the others sit at the right.",
+  "summary_yue": "547 版修正 546 版瀏覽器檢查搵到嘅毛病。旁觀嘅瀏覽器而家只要管理員開住更新頁就會訂閱，重新連線之後亦會再訂閱，失敗會重試，訂閱時亦會即刻讀一次記錄。所以 Core 重新啟動之後，重新載入嘅頁面唔會再係空白卡。卡住嘅更新每一步顯示返真實狀態；喺分頁離開期間完成嘅步驟，唔會將離開嗰段時間計做時長。新分頁嘅通知而家講明隊列只屬於嗰個分頁。卡住而仲有步驟未做，管理員有「更新餘下嘅」，要同「全部更新」一樣兩條鎖匙確認。手機上嘅藍圖，「使用」同詳細資料掣擺喺行尾，名保留 170 像素。前端測試除咗三個已知失敗之外都過咗。呢份說明寫好之後，呢版喺測試副本用瀏覽器檢查過，過咗：八十頁載入都冇頁面錯誤，旁觀嘅瀏覽器重新載入之後大約三秒就自己顯示「更新完成」。已知有三個細毛病：更新入面有 Core 嗰陣，負責更新嗰個瀏覽器顯示嘅「成個過程用咗幾耐」有機會短過實際；「更新餘下嘅」要有兩個或以上步驟等緊先會出現；手機上有啲行轉行之後，有一個掣喺左邊，其他喺右邊。",
+  "highlights": [
+    {
+      "id": "watching-browser-sees-summary",
+      "title": "Watching browsers see the finished summary, and stranded steps show real states",
+      "areas": [
+        "interface"
+      ],
+      "what": "After a run that restarted Core, a watching browser could reload itself and show an empty card until it was reloaded by hand. The page had subscribed to the run only once, and only if the signed-in user was already known. It now subscribes whenever an administrator has the page open and the component is loaded, however late, again after every reconnect, with retries, and it reads the record once when it subscribes. Under a stranded run, each step now shows its real state. Before this build it could still say was installing, or 0 of 2 finished, minutes after the install had finished. A step that finished while the tab was away no longer counts that time as its duration. Where a run has steps still waiting, administrators get Update the rest. It uses the same two-key confirmation as Update everything, and only then clears the old record and starts a normal run. Build 547 has not been seen in a browser yet.",
+      "what_yue": "Core 重新啟動之後，旁觀嗰個瀏覽器自己重新載入，會見到空白卡，要人手再載入先見到嘢。原因係頁面只訂閱一次，而且要嗰刻已知道邊個登入。而家只要管理員開住頁面，幾時都會訂閱，重新連線又會再訂閱，失敗會重試，訂閱時讀一次記錄。卡住嘅更新，每一步顯示返真實狀態；之前可能到咗安裝完成之後，仲話「安裝緊」或者「0 之 2 完成」。喺分頁離開期間完成嘅步驟，唔會將離開嗰段時間計做時長。卡住而仲有步驟未做，管理員有「更新餘下嘅」，要同「全部更新」一樣兩條鎖匙確認，確認之後先會清除舊記錄同開始一個普通執行。呢版仲未喺瀏覽器睇過。",
+      "why": "A watching browser that goes blank just after the most important update, or a stuck view that still says Installing after the install ended, makes the owner doubt the result.",
+      "try": [
+        "Choose Build 546 in the demo and press Core restarts. The card stays empty until you press Reload this page.",
+        "Choose Build 547 and press Core restarts. The finished summary appears without a reload.",
+        "Read a stranded step in the demo. Its state matches what the run really did."
+      ],
+      "sha": [
+        "bb1702e32"
+      ],
+      "demo": "demos/547/watching-browser.html"
+    }
+  ],
+  "other": []
+}

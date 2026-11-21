@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: a watching browser after Core restarts</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.panel { width: 100%; max-width: 620px; margin: 16px auto 0; }
+.row button { min-height: 48px; }
+.card-view { border-radius: 16px; padding: 14px 16px; background: var(--sl2); min-height: 96px; }
+.card-view.empty { background: var(--sl1); border: 1px dashed var(--out); color: var(--onv); }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="watching-browser">
+  <h1>A watching browser after Core restarts</h1>
+  <p class="muted">A demonstration of a second browser that only watches the Updates page. Pick a build, then press the buttons in order. Nothing is installed.</p>
+
+  <div class="row" role="group" aria-label="Which build behaves this way">
+    <button type="button" class="chip" id="b546" aria-pressed="true">Build 546</button>
+    <button type="button" class="chip" id="b547" aria-pressed="false">Build 547</button>
+  </div>
+
+  <section class="panel card">
+    <div class="row">
+      <button type="button" class="filled" id="start">Start a pretend run</button>
+      <button type="button" id="restart">Core restarts</button>
+      <button type="button" id="reload">Reload this page</button>
+    </div>
+    <h2 class="small">What the watching browser shows</h2>
+    <div class="card-view" id="view" aria-live="polite"></div>
+    <p class="muted small" id="note"></p>
+  </section>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var build = 546;
+  var phase = "idle";   // idle, running, restarted
+  var reloaded = false;
+  var b546 = document.getElementById("b546");
+  var b547 = document.getElementById("b547");
+  var start = document.getElementById("start");
+  var restart = document.getElementById("restart");
+  var reload = document.getElementById("reload");
+  var view = document.getElementById("view");
+  var note = document.getElementById("note");
+
+  function showSummary() {
+    view.className = "card-view";
+    view.textContent = "Updates finished. Backup, Core and Supervisor finished. Pretend whole run: 12 minutes.";
+  }
+
+  function render() {
+    b546.setAttribute("aria-pressed", String(build === 546));
+    b547.setAttribute("aria-pressed", String(build === 547));
+    restart.disabled = phase !== "running";
+    start.disabled = phase !== "idle";
+
+    if (phase === "idle") {
+      view.className = "card-view";
+      view.textContent = "No run is being watched yet.";
+      note.textContent = "Press Start a pretend run to begin.";
+    } else if (phase === "running") {
+      view.className = "card-view";
+      view.textContent = "Updating. Backup finished. Core is installing.";
+      note.textContent = "Press Core restarts to see what the watching browser shows next.";
+    } else if (build === 547 || reloaded) {
+      showSummary();
+      note.textContent = build === 547
+        ? "Build 547: the watching browser subscribed on its own, so the summary arrives without a reload."
+        : "Build 546: the summary appeared only after Reload this page, which is what the build 547 check found.";
+    } else {
+      view.className = "card-view empty";
+      view.textContent = "";
+      note.textContent = "Build 546: the card stays empty after Core restarts. A reload by hand shows the summary.";
+    }
+    reload.disabled = phase !== "restarted" || build === 547;
+  }
+
+  b546.addEventListener("click", function () { build = 546; reloaded = false; render(); });
+  b547.addEventListener("click", function () { build = 547; reloaded = false; render(); });
+  start.addEventListener("click", function () { phase = "running"; render(); });
+  restart.addEventListener("click", function () {
+    if (phase !== "running") return;
+    phase = "restarted";
+    reloaded = false;
+    render();
+  });
+  reload.addEventListener("click", function () {
+    if (phase !== "restarted") return;
+    reloaded = true;
+    render();
+  });
+  document.querySelector("[data-demo-reset]").addEventListener("click", function () {
+    build = 546;
+    phase = "idle";
+    reloaded = false;
+    render();
+  });
+  render();
+})();
+</script>
+</body>
+</html>

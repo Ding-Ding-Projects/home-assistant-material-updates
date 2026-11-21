@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: a stranded update run frees itself</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.panel { width: 100%; max-width: 620px; margin: 16px auto 0; }
+.row { gap: 8px; }
+.row button { min-height: 48px; }
+.notice { border-radius: 16px; padding: 12px 16px; background: var(--sl2); }
+.notice.warn { background: var(--amberc); color: var(--amber); }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="stranded-run">
+  <h1>A stranded update run</h1>
+  <p class="muted">A demonstration of one pretend Update everything run. The buttons move a pretend clock and a pretend browser. Nothing is installed.</p>
+
+  <section class="panel card">
+    <h2 class="small">The browser that started the run</h2>
+    <div class="row">
+      <button type="button" class="filled" id="start">Update everything</button>
+      <button type="button" id="close">Close the starting browser</button>
+    </div>
+    <div class="row">
+      <button type="button" class="chip" id="installing" aria-pressed="false">Core is still installing</button>
+    </div>
+
+    <h2 class="small">A watching browser</h2>
+    <div class="notice" id="watch" aria-live="polite"></div>
+    <div class="row">
+      <button type="button" id="wait5">5 minutes later</button>
+      <button type="button" id="wait10">10 more minutes</button>
+      <button type="button" id="clear">Clear this run</button>
+    </div>
+    <p class="muted small" id="clock"></p>
+  </section>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var state = { phase: "idle", silent: 0, installing: false };
+  var start = document.getElementById("start");
+  var close = document.getElementById("close");
+  var installing = document.getElementById("installing");
+  var wait5 = document.getElementById("wait5");
+  var wait10 = document.getElementById("wait10");
+  var clear = document.getElementById("clear");
+  var watch = document.getElementById("watch");
+  var clock = document.getElementById("clock");
+
+  function minutesLine() {
+    return state.silent === 1 ? "1 minute" : state.silent + " minutes";
+  }
+
+  function render() {
+    var text;
+    if (state.phase === "idle") {
+      text = "No run is active.";
+    } else if (state.phase === "running") {
+      text = "Updating. The starting browser is sending its heartbeat.";
+    } else if (state.phase === "closed") {
+      if (state.silent < 5) {
+        text = "Updating. The starting browser last sent a heartbeat " + minutesLine() + " ago.";
+      } else {
+        text = "The browser that started this run has been silent for " + minutesLine() + ". " +
+          (state.installing ? "Installing: Core. Will not start: Supervisor. " : "Will not start: Core, Supervisor. ") +
+          "Administrators can clear this notice.";
+      }
+    } else if (state.phase === "cleared") {
+      text = state.installing
+        ? "Notice cleared. The install still in progress carries on."
+        : "Notice cleared. Nothing is installing.";
+    } else if (state.phase === "freed") {
+      text = "The server freed this silent run after 15 minutes, because nothing in it was installing.";
+    }
+    watch.textContent = text;
+    watch.className = "notice" + (state.phase === "closed" && state.silent >= 5 ? " warn" : "");
+
+    installing.setAttribute("aria-pressed", String(state.installing));
+    installing.textContent = state.installing ? "Core is still installing: yes" : "Core is still installing: no";
+
+    start.disabled = state.phase === "running" || state.phase === "closed";
+    close.disabled = state.phase !== "running";
+    wait5.disabled = state.phase !== "closed";
+    wait10.disabled = state.phase !== "closed";
+    clear.disabled = !(state.phase === "closed" && state.silent >= 5);
+
+    clock.textContent = state.phase === "closed"
+      ? "Pretend clock: " + minutesLine() + " since the starting browser closed."
+      : "";
+  }
+
+  // The server's own rule, applied to the pretend clock: a silent run with nothing installing frees itself after 15 minutes.
+  function tick(minutes) {
+    if (state.phase !== "closed" && state.phase !== "cleared") return;
+    state.silent += minutes;
+    if (state.silent >= 15 && !state.installing) state.phase = "freed";
+  }
+
+  start.addEventListener("click", function () {
+    state = { phase: "running", silent: 0, installing: false };
+    render();
+  });
+  close.addEventListener("click", function () {
+    if (state.phase !== "running") return;
+    state.phase = "closed";
+    state.silent = 0;
+    render();
+  });
+  installing.addEventListener("click", function () {
+    state.installing = !state.installing;
+    render();
+  });
+  wait5.addEventListener("click", function () { tick(5); render(); });
+  wait10.addEventListener("click", function () { tick(10); render(); });
+  clear.addEventListener("click", function () {
+    if (state.phase !== "closed" || state.silent < 5) return;
+    state.phase = "cleared";
+    render();
+  });
+  document.querySelector("[data-demo-reset]").addEventListener("click", function () {
+    state = { phase: "idle", silent: 0, installing: false };
+    render();
+  });
+  render();
+})();
+</script>
+</body>
+</html>

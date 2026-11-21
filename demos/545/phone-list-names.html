@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: names keep their room on a phone</title>
+<link rel="stylesheet" href="../../assets/demo.css">
+<style>
+.panel { width: 100%; max-width: 560px; margin: 16px auto 0; overflow-x: auto; }
+.row button { min-height: 48px; }
+.frame { max-width: 100%; border: 1px dashed var(--out); border-radius: 16px; padding: 8px; background: var(--sl1); margin: 0 auto; }
+.item { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 0; border-top: 1px solid var(--outv); }
+.item:first-child { border-top: none; }
+.name { flex: 1 1 150px; min-width: 150px; overflow-wrap: anywhere; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.actions button { min-height: 48px; }
+.measure { font-family: var(--mono); font-size: 13px; }
+</style>
+</head>
+<body>
+<main class="demo" data-demo="phone-list-names">
+  <h1>Names on a phone list</h1>
+  <p class="muted">A demonstration with three made-up automations in a phone-width frame. Choose a width to see where the buttons land.</p>
+
+  <div class="row" role="group" aria-label="Screen width">
+    <button type="button" class="chip" id="w390" aria-pressed="true">390</button>
+    <button type="button" class="chip" id="w320" aria-pressed="false">320</button>
+  </div>
+
+  <section class="panel card">
+    <div class="frame" id="frame">
+      <div class="item">
+        <span class="name">Porch lights at sunset and again after the last person leaves</span>
+        <div class="actions"><button type="button" class="tonal">Use</button><button type="button">Details</button></div>
+      </div>
+      <div class="item">
+        <span class="name">Morning kitchen routine</span>
+        <div class="actions"><button type="button" class="tonal">Use</button><button type="button">Details</button></div>
+      </div>
+      <div class="item">
+        <span class="name">Weekend heating</span>
+        <div class="actions"><button type="button" class="tonal">Use</button><button type="button">Details</button></div>
+      </div>
+    </div>
+    <p class="muted measure" id="measure" aria-live="polite"></p>
+    <p class="note" id="note" aria-live="polite"></p>
+  </section>
+  <p class="demo-pretend">This is a demonstration with pretend data. Nothing is saved.</p>
+  <div class="row"><button type="button" class="tonal" data-demo-reset>Start again</button></div>
+</main>
+<script>
+(function () {
+  var frame = document.getElementById("frame");
+  var w390 = document.getElementById("w390");
+  var w320 = document.getElementById("w320");
+  var measure = document.getElementById("measure");
+  var note = document.getElementById("note");
+  var width = 390;
+
+  function render() {
+    frame.style.width = width + "px";
+    w390.setAttribute("aria-pressed", String(width === 390));
+    w320.setAttribute("aria-pressed", String(width === 320));
+
+    var item = frame.querySelector(".item");
+    var name = item.querySelector(".name");
+    var actions = item.querySelector(".actions");
+    var onOwnLine = actions.getBoundingClientRect().top > name.getBoundingClientRect().top + 4;
+    var nameWidth = Math.round(name.getBoundingClientRect().width);
+
+    measure.textContent = "Name width: " + nameWidth + " px (at least 150). Buttons: " +
+      (onOwnLine ? "on their own line under the name." : "beside the name.");
+
+    if (onOwnLine) {
+      note.textContent = "At " + width + " px the name keeps its room, and the buttons drop to their own line. Both stay one press away.";
+    } else {
+      note.textContent = "At " + width + " px there is room for the name and both buttons on one line.";
+    }
+  }
+
+  w390.addEventListener("click", function () { width = 390; render(); });
+  w320.addEventListener("click", function () { width = 320; render(); });
+  document.querySelector("[data-demo-reset]").addEventListener("click", function () {
+    width = 390;
+    render();
+  });
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "build": 545,
+  "headline": "Names keep their room on phone lists, and the Updates page starts loading again",
+  "summary": "Build 545 repairs what the browser check of build 544 still found. On a phone, the lists for Scripts, Automations, Dashboards, Backups, Labels, Helpers, Blueprints, Tags and Users had lost most of each name's width to the new action and details columns. Each name now keeps at least 150 pixels, and the row buttons move to their own line, so both stay one press away. On the Updates page, a reloaded page after a run that updated the Supervisor and Core together could sit on a spinner. Its loads now start as soon as the parts they need appear, with a time limit and retries, and after 30 seconds a plain line with a Reload button says what is still missing. Smaller repairs cover Escape on a detail row, long labels in details, the colour sheet, two-digit hours in 24-hour time, and the states tool. Build 545 itself was not seen in a browser when its notes were written. The browser check of build 545 then said no because of two faults on the Updates page, which build 546 repairs.",
+  "summary_yue": "545 版修正咗 544 版瀏覽器檢查仲搵到嘅毛病。手機上嘅腳本、自動化、儀表板、備份、標籤、輔助工具、藍圖、標籤同用戶清單，個名之前俾新加嘅動作欄同詳細資料欄壓到好窄；而家每個名最少有 150 像素，掣就自己落一行，兩個掣喺手機都係一撳就到。更新頁方面，Supervisor 同 Core 一齊更新之後重新載入，之前可能會一直轉圈；而家資料齊咗就開始載入，有時限同重試，三十秒仲未齊就會有一句說明同重新載入掣。返去舊版之後唔會再顯示「行緊」。細修正包括 Escape 收埋詳細資料行、長標籤擺上面，同二十四小時制顯示兩位數小時。545 版寫說明嗰陣仲未喺瀏覽器睇過；之後嘅瀏覽器檢查話唔得，因為更新頁有兩個毛病，由 546 版修正。",
+  "highlights": [
+    {
+      "id": "names-on-phone-lists",
+      "title": "Names keep their room on phone lists, and the Updates page loads again",
+      "areas": ["interface"],
+      "what": "Build 544 passed its browser check and runs on the owner's instance. The check still found faults, and this build repairs them. On a phone, the lists for Scripts, Automations, Dashboards, Backups, Labels, Helpers, Blueprints, Tags and Users had lost most of each name's width to the new action and details columns. The shared column helpers now keep 150 pixels for the name and move the row buttons to their own line. Both buttons stay one press away. On the Updates page, a reloaded page after a run that updated the Supervisor and Core together could sit on a spinner. Its loads now start whenever their parts appear, with a time limit and retries. After 30 seconds, a plain line with a Reload button says what is still missing. A run that went back to an older build no longer shows as running. Smaller repairs: Escape closes a detail row and returns focus to its toggle, a long label sits above its value, and 24-hour times show two-digit hours. This build was not seen in a browser when its notes were written.",
+      "what_yue": "544 版過咗瀏覽器檢查，而家喺屋主部機度行緊。545 版修返個檢查仲搵到嘅毛病。手機上嘅腳本、自動化、儀表板、備份、標籤、輔助工具、藍圖、標籤同用戶清單，個名俾新嘅動作欄同詳細資料欄壓到好窄。而家共用嘅欄位會預設換行：個名最少有 150 像素，掣自己落一行，手機上兩個掣都係一撳就到。更新頁方面，Supervisor 同 Core 一齊更新之後重新載入，頁面可能會一直轉圈。而家資料幾時到就幾時開始載入，有時限同重試；三十秒仲未齊，就會有一句說明同重新載入掣。返去舊版之後，唔會再顯示「行緊」。細修正包括：詳細資料行撳 Escape 會收埋並返回焦點；長標籤擺喺數值上面；二十四小時制顯示兩位數小時。呢版寫說明嗰陣，仲未喺瀏覽器睇過。",
+      "why": "A name squeezed down to a few letters on a phone, or an Updates page stuck on a spinner after an important update, makes the phone view unreliable at the moment the owner most needs it.",
+      "try": [
+        "On a phone-width window, open Scripts or Blueprints. Each name keeps its room, and the buttons sit on their own line.",
+        "Open a detail row, then press Escape. The row closes and focus returns to its toggle.",
+        "Under 24-hour time, look at any time in a list. The hour shows two digits, such as 07:05."
+      ],
+      "sha": ["775a96382"],
+      "demo": "demos/545/phone-list-names.html"
+    }
+  ],
+  "other": []
+}
